@@ -28,9 +28,34 @@ A premium personalized Santa video service ($59+) for parents/grandparents to gi
 - Deployment: Railway (manual CLI push)
 
 ## Current Stage
-See plan file for detailed stages. Resume with "Resume from Stage X.Y"
+Stage 9 (Pre-made Scenes) ready to generate. Resume with "Resume from Stage 9"
+
+## AI Services Setup
+- **Gemini**: Vertex AI REST API (gemini-2.0-flash-001) ✅
+- **Imagen**: Vertex AI REST API (imagen-3.0-generate-001) ✅
+- **Veo**: Vertex AI REST API (veo-2.0-generate-001) ✅
+- **Service Account**: vertex-express@primal-turbine-478412-k9.iam.gserviceaccount.com
 
 ## Progress Log
 - 2024-11-29: Project started
-- 2024-11-29: Stage 1.1 completed - Wishlist components deleted
-- 2024-11-29: Stage 1.2 in progress - Branding update
+- 2024-11-29: Stage 1 completed - Cleanup & Foundation
+- 2024-11-29: Stage 2 completed - Premium landing page
+- 2024-11-29: Stage 3 completed - Order wizard (6 steps)
+- 2024-11-29: Stage 5 completed - Gemini script generation
+- 2024-11-29: Stage 6 completed - Imagen keyframe generation
+- 2024-11-29: Stage 7 completed - Stripe payment integration
+- 2024-11-29: Stage 8 completed - Veo video generation
+- 2024-11-29: Stage 9 in progress - Pre-made scenes (prompts ready)
+
+## Key Files
+- `src/lib/gemini.ts` - Gemini script generation
+- `src/lib/imagen.ts` - Imagen keyframe generation
+- `src/lib/veo.ts` - Veo video generation
+- `src/lib/premade-scenes.ts` - Pre-made scene prompts
+- `src/app/api/admin/generate-premade/route.ts` - Admin tool
+
+## Git Commits (recent)
+- 9138436 Add admin API for generating pre-made scenes
+- 58f08e8 Add spectacular pre-made scene prompts for Veo 3.1
+- 7ab6b3a Stage 8: Add video generation with Veo 2
+- 2049b15 Stage 6: Add keyframe generation with Imagen 3
