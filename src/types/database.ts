@@ -1,3 +1,15 @@
+// Order status type
+export type OrderStatus = 'draft' | 'script_approved' | 'keyframes_approved' | 'paid' | 'generating' | 'complete' | 'failed'
+
+// Script scene structure
+export interface ScriptScene {
+  scene_number: number
+  dialogue: string
+  emotion_note: string
+  is_personalized: boolean
+}
+
+// Profile type (from Supabase Auth)
 export interface Profile {
   id: string
   email: string
@@ -6,31 +18,84 @@ export interface Profile {
   created_at: string
 }
 
-export interface Wishlist {
+// Order type
+export interface Order {
   id: string
   user_id: string
-  title: string
-  description: string | null
-  share_code: string
-  is_public: boolean
+  status: OrderStatus
+
+  // Child info
+  child_name: string
+  child_photo_url: string | null
+  child_age: number | null
+
+  // Personalization
+  good_behavior: string | null
+  thing_to_improve: string | null
+  thing_to_learn: string | null
+  custom_message: string | null
+
+  // Generated content
+  generated_script: ScriptScene[] | null
+  keyframe_urls: string[] | null
+  final_video_url: string | null
+
+  // Payment
+  stripe_payment_intent_id: string | null
+  stripe_session_id: string | null
+  amount_paid: number | null
+
+  // Timestamps
   created_at: string
   updated_at: string
+  completed_at: string | null
 }
 
-export interface WishlistItem {
+// Order insert type (for creating new orders)
+export interface OrderInsert {
+  user_id: string
+  child_name: string
+  child_photo_url?: string | null
+  child_age?: number | null
+  good_behavior?: string | null
+  thing_to_improve?: string | null
+  thing_to_learn?: string | null
+  custom_message?: string | null
+}
+
+// Order update type
+export interface OrderUpdate {
+  status?: OrderStatus
+  child_name?: string
+  child_photo_url?: string | null
+  child_age?: number | null
+  good_behavior?: string | null
+  thing_to_improve?: string | null
+  thing_to_learn?: string | null
+  custom_message?: string | null
+  generated_script?: ScriptScene[] | null
+  keyframe_urls?: string[] | null
+  final_video_url?: string | null
+  stripe_payment_intent_id?: string | null
+  stripe_session_id?: string | null
+  amount_paid?: number | null
+  completed_at?: string | null
+}
+
+// Premade scene type
+export interface PremadeScene {
   id: string
-  wishlist_id: string
+  scene_number: number
   name: string
   description: string | null
-  url: string | null
-  price: number | null
-  priority: 'low' | 'medium' | 'high'
-  image_url: string | null
-  is_claimed: boolean
-  claimed_by: string | null
+  video_url: string | null
+  keyframe_url: string | null
+  duration_seconds: number
+  prompt_used: string | null
   created_at: string
 }
 
+// Database type for Supabase
 export interface Database {
   public: {
     Tables: {
@@ -39,15 +104,15 @@ export interface Database {
         Insert: Omit<Profile, 'created_at'>
         Update: Partial<Omit<Profile, 'id' | 'created_at'>>
       }
-      wishlists: {
-        Row: Wishlist
-        Insert: Omit<Wishlist, 'id' | 'created_at' | 'updated_at' | 'share_code'>
-        Update: Partial<Omit<Wishlist, 'id' | 'user_id' | 'created_at' | 'share_code'>>
+      orders: {
+        Row: Order
+        Insert: OrderInsert
+        Update: OrderUpdate
       }
-      wishlist_items: {
-        Row: WishlistItem
-        Insert: Omit<WishlistItem, 'id' | 'created_at' | 'is_claimed' | 'claimed_by'>
-        Update: Partial<Omit<WishlistItem, 'id' | 'wishlist_id' | 'created_at'>>
+      premade_scenes: {
+        Row: PremadeScene
+        Insert: Omit<PremadeScene, 'id' | 'created_at'>
+        Update: Partial<Omit<PremadeScene, 'id' | 'created_at'>>
       }
     }
   }

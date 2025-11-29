@@ -37,7 +37,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
             <span className="text-3xl">🎅</span>
-            <span className="text-xl font-bold glow-gold">Santa&apos;s List</span>
+            <span className="text-xl font-bold glow-gold">The Santa Experience</span>
           </Link>
 
           <nav className="flex items-center gap-4">
@@ -47,7 +47,7 @@ export default function Header() {
                   href="/dashboard"
                   className="text-white/80 hover:text-white transition-colors"
                 >
-                  My Lists
+                  My Videos
                 </Link>
                 <button
                   onClick={handleSignOut}

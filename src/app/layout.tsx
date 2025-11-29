@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Santa's Nice List - Christmas Wishlist App",
-  description: 'Create and share your Christmas wishlist with family and friends. Let Santa know what you want!',
-  keywords: ['christmas', 'wishlist', 'santa', 'gifts', 'holiday'],
+  title: "The Santa Experience - Personalized Santa Video Messages",
+  description: 'Give your child a magical, personalized video message from Santa himself. A premium Christmas gift they will never forget.',
+  keywords: ['santa video', 'personalized santa', 'christmas gift', 'santa message', 'kids christmas'],
 }
 
 export default function RootLayout({
