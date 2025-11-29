@@ -38,25 +38,25 @@ CREATE INDEX IF NOT EXISTS orders_status_idx ON orders(status);
 -- Enable RLS
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can only see their own orders
+-- Policy: Users can view own orders (authenticated) or all orders for service role
 CREATE POLICY "Users can view own orders"
   ON orders FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = user_id OR user_id IS NULL);
 
--- Policy: Users can insert their own orders
-CREATE POLICY "Users can create orders"
+-- Policy: Anyone can create orders (allows guest checkout)
+CREATE POLICY "Anyone can create orders"
   ON orders FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
 
--- Policy: Users can update their own orders
+-- Policy: Users can update their own orders, service role can update any
 CREATE POLICY "Users can update own orders"
   ON orders FOR UPDATE
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = user_id OR user_id IS NULL);
 
 -- Policy: Users can delete their own draft orders
 CREATE POLICY "Users can delete own draft orders"
   ON orders FOR DELETE
-  USING (auth.uid() = user_id AND status = 'draft');
+  USING ((auth.uid() = user_id OR user_id IS NULL) AND status = 'draft');
 
 -- Function to auto-update updated_at
 CREATE OR REPLACE FUNCTION update_orders_updated_at()

@@ -8,6 +8,8 @@ import type { WizardData } from '@/components/CreateWizard/WizardContext'
 export default function SummaryPage() {
   const router = useRouter()
   const [data, setData] = useState<WizardData | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const stored = sessionStorage.getItem('pendingOrder')
@@ -17,6 +19,58 @@ export default function SummaryPage() {
       router.push('/create')
     }
   }, [router])
+
+  const handleProceedToPayment = async () => {
+    if (!data) return
+
+    setIsProcessing(true)
+    setError(null)
+
+    try {
+      // Step 1: Create the order
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          childName: data.childName,
+          childAge: data.childAge,
+          childPhotoUrl: data.childPhotoPreview, // In production, upload to Supabase Storage first
+          goodBehavior: data.goodBehavior,
+          thingToImprove: data.thingToImprove,
+          thingToLearn: data.thingToLearn,
+          customMessage: data.customMessage,
+        }),
+      })
+
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json()
+        throw new Error(errorData.error || 'Failed to create order')
+      }
+
+      const { order } = await orderResponse.json()
+
+      // Step 2: Create Stripe checkout session
+      const checkoutResponse = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: order.id }),
+      })
+
+      if (!checkoutResponse.ok) {
+        const errorData = await checkoutResponse.json()
+        throw new Error(errorData.error || 'Failed to create checkout session')
+      }
+
+      const { url } = await checkoutResponse.json()
+
+      // Step 3: Redirect to Stripe Checkout
+      window.location.href = url
+    } catch (err) {
+      console.error('Payment error:', err)
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+      setIsProcessing(false)
+    }
+  }
 
   if (!data) {
     return (
@@ -33,7 +87,7 @@ export default function SummaryPage() {
           <div className="text-6xl mb-4">✨</div>
           <h1 className="text-3xl font-bold glow-gold">Ready to Create Magic!</h1>
           <p className="text-white/70 mt-2">
-            Review your details before we generate your personalized script
+            Review your details before proceeding to payment
           </p>
         </div>
 
@@ -91,32 +145,45 @@ export default function SummaryPage() {
           </div>
         </div>
 
-        {/* What's Next */}
+        {/* Pricing */}
         <div className="card-christmas mt-6">
-          <h3 className="text-lg font-bold text-christmas-gold mb-4">What Happens Next?</h3>
-          <ol className="space-y-3 text-white/80">
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-christmas-red flex items-center justify-center text-sm font-bold">1</span>
-              <span>We&apos;ll generate a personalized script for Santa to say</span>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-christmas-gold">Your Order</h3>
+            <div className="text-right">
+              <span className="text-3xl font-bold text-christmas-gold">$59</span>
+              <span className="text-white/50 text-sm block">one-time</span>
+            </div>
+          </div>
+          <ul className="space-y-2 text-white/70 text-sm">
+            <li className="flex items-center gap-2">
+              <span className="text-christmas-green">✓</span>
+              Personalized ~90 second video
             </li>
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-christmas-red flex items-center justify-center text-sm font-bold">2</span>
-              <span>You&apos;ll see keyframe images showing each scene</span>
+            <li className="flex items-center gap-2">
+              <span className="text-christmas-green">✓</span>
+              Santa speaks directly to {data.childName}
             </li>
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-christmas-red flex items-center justify-center text-sm font-bold">3</span>
-              <span>Approve the script and visuals</span>
+            <li className="flex items-center gap-2">
+              <span className="text-christmas-green">✓</span>
+              High-quality AI-generated video
             </li>
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-christmas-red flex items-center justify-center text-sm font-bold">4</span>
-              <span>Pay $59 to start video creation</span>
+            <li className="flex items-center gap-2">
+              <span className="text-christmas-green">✓</span>
+              Downloadable forever
             </li>
-            <li className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-christmas-green flex items-center justify-center text-sm font-bold">5</span>
-              <span>Receive your magical video within 24-48 hours!</span>
+            <li className="flex items-center gap-2">
+              <span className="text-christmas-green">✓</span>
+              Delivered within 24-48 hours
             </li>
-          </ol>
+          </ul>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mt-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-center">
+            <p className="text-red-200">{error}</p>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
@@ -127,18 +194,27 @@ export default function SummaryPage() {
             ← Edit Details
           </Link>
           <button
-            className="btn-christmas px-8 py-3 flex items-center justify-center gap-2"
-            onClick={() => {
-              // In Stage 5, this will call the Gemini API to generate script
-              alert('Script generation will be added in Stage 5!')
-            }}
+            onClick={handleProceedToPayment}
+            disabled={isProcessing}
+            className={`btn-christmas px-8 py-3 flex items-center justify-center gap-2 ${
+              isProcessing ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
-            Generate Script <span className="text-xl">✨</span>
+            {isProcessing ? (
+              <>
+                <span className="animate-spin">⏳</span>
+                Processing...
+              </>
+            ) : (
+              <>
+                Proceed to Payment <span className="text-xl">💳</span>
+              </>
+            )}
           </button>
         </div>
 
         <p className="text-center mt-4 text-white/50 text-sm">
-          You won&apos;t be charged until you approve the script and visuals
+          Secure payment powered by Stripe 🔒
         </p>
       </div>
     </div>
