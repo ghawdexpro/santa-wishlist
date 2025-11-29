@@ -12,12 +12,13 @@ export default function Step6CustomMessage() {
   const handleSubmit = async () => {
     setIsSubmitting(true)
 
-    // For now, just redirect to a preview/summary page
-    // In Stage 4, we'll create the order via API
     try {
-      // Store data in sessionStorage for the preview page
+      // Store data in sessionStorage for the script generation page
       sessionStorage.setItem('pendingOrder', JSON.stringify(data))
-      router.push('/create/summary')
+      // Clear any previously generated script
+      sessionStorage.removeItem('generatedScript')
+      sessionStorage.removeItem('scriptApproved')
+      router.push('/create/script')
     } catch (error) {
       console.error('Error submitting:', error)
       setIsSubmitting(false)
