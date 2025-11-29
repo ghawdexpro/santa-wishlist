@@ -21,10 +21,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if API key is configured
-    if (!process.env.GOOGLE_AI_API_KEY || process.env.GOOGLE_AI_API_KEY === 'your_google_ai_api_key_here') {
+    // Check if Google Cloud is configured
+    if (!process.env.GOOGLE_CLOUD_PROJECT && !process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
       return NextResponse.json(
-        { error: 'Google AI API key not configured' },
+        { error: 'Google Cloud not configured' },
         { status: 503 }
       )
     }
