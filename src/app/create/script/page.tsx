@@ -5,14 +5,23 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { WizardData } from '@/components/CreateWizard/WizardContext'
 import type { GeneratedScript, ScriptScene } from '@/lib/gemini'
+import KeyframeStoryboard from '@/components/KeyframeStoryboard'
+
+interface Keyframe {
+  sceneNumber: number
+  imageDataUrl: string
+}
 
 export default function ScriptPreviewPage() {
   const router = useRouter()
   const [data, setData] = useState<WizardData | null>(null)
   const [script, setScript] = useState<GeneratedScript | null>(null)
+  const [keyframes, setKeyframes] = useState<Keyframe[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isGeneratingKeyframes, setIsGeneratingKeyframes] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [expandedScene, setExpandedScene] = useState<number | null>(null)
+  const [scriptApproved, setScriptApproved] = useState(false)
 
   useEffect(() => {
     const stored = sessionStorage.getItem('pendingOrder')
@@ -24,6 +33,18 @@ export default function ScriptPreviewPage() {
       const storedScript = sessionStorage.getItem('generatedScript')
       if (storedScript) {
         setScript(JSON.parse(storedScript))
+      }
+
+      // Check if script was already approved
+      const approved = sessionStorage.getItem('scriptApproved')
+      if (approved === 'true') {
+        setScriptApproved(true)
+      }
+
+      // Check if we already have keyframes
+      const storedKeyframes = sessionStorage.getItem('generatedKeyframes')
+      if (storedKeyframes) {
+        setKeyframes(JSON.parse(storedKeyframes))
       }
     } else {
       router.push('/create')
@@ -69,8 +90,48 @@ export default function ScriptPreviewPage() {
   }
 
   const handleApproveScript = () => {
-    // Store approval and proceed to summary/payment
+    // Store approval and proceed to keyframe generation
     sessionStorage.setItem('scriptApproved', 'true')
+    setScriptApproved(true)
+  }
+
+  const handleGenerateKeyframes = async () => {
+    if (!script || !data) return
+
+    setIsGeneratingKeyframes(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/generate-keyframes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenes: script.scenes,
+          childName: data.childName,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to generate keyframes')
+      }
+
+      const { keyframes: generatedKeyframes } = await response.json()
+      setKeyframes(generatedKeyframes)
+
+      // Store for later use
+      sessionStorage.setItem('generatedKeyframes', JSON.stringify(generatedKeyframes))
+    } catch (err) {
+      console.error('Keyframe generation error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to generate keyframes')
+    } finally {
+      setIsGeneratingKeyframes(false)
+    }
+  }
+
+  const handleApproveKeyframes = () => {
+    // Store keyframe approval and proceed to payment
+    sessionStorage.setItem('keyframesApproved', 'true')
     router.push('/create/summary')
   }
 
@@ -182,27 +243,119 @@ export default function ScriptPreviewPage() {
               ))}
             </div>
 
-            {/* Actions */}
-            <div className="card-christmas">
-              <h3 className="text-lg font-bold text-christmas-gold mb-4">Happy with the script?</h3>
-              <p className="text-white/70 text-sm mb-6">
-                You can regenerate for a different version, or approve to continue.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={handleRegenerateScript}
-                  className="px-6 py-3 border border-white/20 rounded-lg text-white/70 hover:text-white hover:border-white/40 transition-colors"
-                >
-                  🔄 Regenerate Script
-                </button>
-                <button
-                  onClick={handleApproveScript}
-                  className="btn-christmas px-8 py-3 flex-1"
-                >
-                  Approve & Continue ✓
-                </button>
+            {/* Script Actions - Only show if script not yet approved */}
+            {!scriptApproved && (
+              <div className="card-christmas">
+                <h3 className="text-lg font-bold text-christmas-gold mb-4">Happy with the script?</h3>
+                <p className="text-white/70 text-sm mb-6">
+                  You can regenerate for a different version, or approve to continue to keyframe generation.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    onClick={handleRegenerateScript}
+                    className="px-6 py-3 border border-white/20 rounded-lg text-white/70 hover:text-white hover:border-white/40 transition-colors"
+                  >
+                    🔄 Regenerate Script
+                  </button>
+                  <button
+                    onClick={handleApproveScript}
+                    className="btn-christmas px-8 py-3 flex-1"
+                  >
+                    Approve Script & Generate Keyframes 🎬
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Keyframe Section - Show after script is approved */}
+            {scriptApproved && (
+              <div className="space-y-6">
+                {/* Script approved badge */}
+                <div className="card-christmas border-green-500/30 bg-green-900/20">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">✓</span>
+                    <div>
+                      <h3 className="font-bold text-green-400">Script Approved</h3>
+                      <p className="text-white/60 text-sm">Now let&apos;s generate the visual keyframes for each scene</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Keyframe Storyboard */}
+                {keyframes.length > 0 && (
+                  <div className="card-christmas">
+                    <KeyframeStoryboard
+                      scenes={script.scenes.map(s => ({
+                        sceneNumber: s.sceneNumber,
+                        title: s.title,
+                        duration: s.duration,
+                        santaDialogue: s.santaDialogue,
+                        isPremade: s.isPremade,
+                      }))}
+                      keyframes={keyframes}
+                      isGenerating={isGeneratingKeyframes}
+                    />
+                  </div>
+                )}
+
+                {/* Generate Keyframes Button */}
+                {keyframes.length === 0 && !isGeneratingKeyframes && (
+                  <div className="card-christmas text-center py-8">
+                    <div className="text-6xl mb-4">🎨</div>
+                    <h3 className="text-xl font-bold mb-2">Generate Visual Keyframes</h3>
+                    <p className="text-white/70 mb-6 max-w-md mx-auto">
+                      We&apos;ll create AI-generated preview images for each scene. This helps you visualize the final video.
+                    </p>
+                    <button
+                      onClick={handleGenerateKeyframes}
+                      className="btn-christmas px-8 py-4 text-lg"
+                    >
+                      Generate Keyframes 🎬
+                    </button>
+                  </div>
+                )}
+
+                {/* Generating Keyframes Animation */}
+                {isGeneratingKeyframes && keyframes.length === 0 && (
+                  <div className="card-christmas text-center py-12">
+                    <div className="text-6xl mb-6 animate-pulse">🎨</div>
+                    <h2 className="text-2xl font-bold mb-4">Creating Visual Magic...</h2>
+                    <p className="text-white/70 mb-4">
+                      Generating {script.scenes.length} keyframes. This may take 2-3 minutes.
+                    </p>
+                    <div className="flex justify-center gap-2">
+                      <div className="w-3 h-3 bg-christmas-red rounded-full animate-pulse" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-3 h-3 bg-christmas-green rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-3 h-3 bg-christmas-gold rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Approve Keyframes and Continue */}
+                {keyframes.length > 0 && !isGeneratingKeyframes && (
+                  <div className="card-christmas">
+                    <h3 className="text-lg font-bold text-christmas-gold mb-4">Ready to create your video?</h3>
+                    <p className="text-white/70 text-sm mb-6">
+                      These keyframes show the visual style for your video. Approve to continue to payment.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <button
+                        onClick={handleGenerateKeyframes}
+                        className="px-6 py-3 border border-white/20 rounded-lg text-white/70 hover:text-white hover:border-white/40 transition-colors"
+                      >
+                        🔄 Regenerate Keyframes
+                      </button>
+                      <button
+                        onClick={handleApproveKeyframes}
+                        className="btn-christmas px-8 py-3 flex-1"
+                      >
+                        Approve & Continue to Payment 💳
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
 
