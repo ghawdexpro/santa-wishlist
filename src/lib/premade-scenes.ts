@@ -1,30 +1,32 @@
 /**
- * Pre-made scene definitions for The Santa Experience
- * These scenes are generated once and reused for all videos
+ * Scene definitions for The Santa Experience - "The Brightest Star"
  *
- * Scenes: 1, 2, 3, 9, 10, 13 (6 pre-made scenes)
+ * 8-scene structure (~95 seconds total):
+ * - PRE-MADE (1, 2, 3, 7): Generate once, reuse forever
+ * - PERSONALIZED (4, 5, 6, 8): Generate per order with child's data
  */
 
-export interface PremadeSceneConfig {
+export interface SceneConfig {
   sceneNumber: number
   name: string
   description: string
   durationSeconds: number
+  type: 'premade' | 'personalized'
   videoPrompt: string
   keyframePrompt: string
   audioDescription: string
 }
 
-// Cinematic quality settings for Veo 3.1
-const CINEMATIC_STYLE = `Cinematic quality, 4K resolution, professional film lighting,
-shallow depth of field, warm color grading, gentle camera movement,
-photorealistic rendering, no artifacts, smooth motion.`
+// Cinematic quality settings for Veo
+const CINEMATIC_STYLE = `Cinematic quality, 4K resolution, professional Hollywood film lighting,
+shallow depth of field, warm color grading, smooth camera movement,
+photorealistic rendering, no artifacts, seamless motion, Pixar-quality magic.`
 
 const SANTA_CHARACTER = `Santa Claus: distinguished elderly man in his 60s,
 full natural white beard perfectly groomed, rosy cheeks glowing with warmth,
-kind twinkling blue eyes with crow's feet, genuine warm smile,
+kind twinkling blue eyes with crow's feet from smiling, genuine warm smile,
 classic red velvet suit with pristine white fur trim, polished black leather belt with ornate gold buckle,
-soft gentle demeanor like a beloved grandfather.`
+soft gentle demeanor like a beloved grandfather, magical presence.`
 
 const WORKSHOP_SETTING = `Santa's private study in the North Pole workshop:
 Warm honey-colored wood paneling, magnificent stone fireplace with crackling orange flames,
@@ -33,170 +35,396 @@ shelves lined with antique toys and snow globes, frosted windows showing gentle 
 warm golden ambient lighting from oil lamps and candles, magical dust particles floating in air,
 Christmas garlands with golden bells, the cozy intimate feeling of a treasured family room.`
 
-export const PREMADE_SCENES: PremadeSceneConfig[] = [
+// ============================================================================
+// PRE-MADE SCENES (4 total) - Generate once, reuse for all orders
+// ============================================================================
+
+export const PREMADE_SCENES: SceneConfig[] = [
   {
     sceneNumber: 1,
-    name: 'Workshop Welcome',
-    description: 'Santa sitting contentedly by the fire in his cozy workshop',
-    durationSeconds: 8,
+    name: 'Sky Dive',
+    description: 'Epic fly-through clouds into North Pole like roller coaster',
+    durationSeconds: 12,
+    type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
-Opening shot of a magical Christmas scene.
-${WORKSHOP_SETTING}
+EPIC OPENING - Thrilling aerial journey to the North Pole.
 
-${SANTA_CHARACTER}
+Camera POV flying through a magical winter night sky at high speed.
+Starting above the clouds, stars twinkling brilliantly all around.
+DIVE DOWN through layers of fluffy clouds, like a roller coaster drop.
+Pass through spectacular AURORA BOREALIS - ribbons of green and purple light dancing.
+Magical sparkles and stardust trail behind the camera as it moves.
+Speed increases - WHOOSH through more clouds with motion blur.
+Snowflakes whip past the camera.
+Finally break through the last cloud layer to reveal:
+The magnificent NORTH POLE VILLAGE below - hundreds of warm glowing windows,
+snow-covered rooftops, candy cane lampposts, giant Christmas tree in the center,
+all nestled in a snowy valley surrounded by snow-capped mountains.
+Camera continues diving toward the largest building - Santa's Workshop.
 
-Santa sits in his leather chair by the crackling fireplace, looking peaceful and content.
-He gazes warmly toward the camera with a gentle knowing smile.
-Firelight flickers across his face, creating dancing shadows.
-Snow falls gently outside the frosted window behind him.
-Magical golden particles drift through the air.
-The scene feels intimate, warm, and inviting - like visiting a beloved grandfather.
-
-Camera: Slow gentle push-in from medium wide to medium shot.
-Mood: Cozy, magical, welcoming, peaceful anticipation.`,
-    keyframePrompt: `${SANTA_CHARACTER} seated in burgundy leather wingback chair, ${WORKSHOP_SETTING}, firelight on face, gentle smile, looking at camera, warm golden lighting, photorealistic, cinematic`,
-    audioDescription: 'Crackling fireplace, soft wind outside, gentle magical chimes',
+Camera: First-person POV, dynamic movement, roller-coaster energy, diving motion.
+VFX: Particle trails, lens flares, speed blur, aurora effects, magical sparkles.
+Mood: EXCITING, thrilling, "WOOOAH!", sense of magic and wonder.`,
+    keyframePrompt: `POV flying through magical night sky, aurora borealis green purple, diving through clouds, North Pole village glowing below, snow-capped mountains, magical sparkles, motion blur, cinematic, photorealistic`,
+    audioDescription: 'Whooshing wind, magical chimes building, orchestral crescendo, sleigh bells distant',
   },
   {
     sceneNumber: 2,
-    name: 'The Nice List',
-    description: 'Santa reaches for the magical glowing Nice List book',
-    durationSeconds: 7,
+    name: 'Workshop Wonder',
+    description: 'Inside magical workshop with flying toys and acrobatic elves',
+    durationSeconds: 12,
+    type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
-${WORKSHOP_SETTING}
+MAGICAL WORKSHOP - Pure wonder and spectacle.
 
-${SANTA_CHARACTER}
+Interior of Santa's magnificent toy workshop - a massive space full of magic.
+Toys FLYING through the air - teddy bears, toy trains, dolls, robots.
+Toys ASSEMBLING THEMSELVES mid-flight - pieces spinning together with sparkles.
+Conveyor belts carrying beautifully wrapped presents with glowing ribbons.
+Cheerful ELVES in green and red outfits:
+- Some doing ACROBATIC FLIPS between workstations
+- Others riding on flying toys
+- Some painting toys with magical brushes that leave rainbow trails
+Giant candy canes as pillars, gingerbread trim on railings.
+Snow globes the size of beach balls floating and spinning.
+Christmas lights EVERYWHERE - twinkling in rainbow patterns.
+Golden sparkles and magical dust filling the air.
+Warm lighting from countless candles and magical orbs.
 
-Santa leans forward with anticipation, his eyes twinkling with excitement.
-He reaches toward an ancient leather-bound book on his desk - THE NICE LIST.
-The book is extraordinary: thick worn leather with golden embossed lettering,
-ornate golden clasps, emanating a soft magical golden glow.
-As his hand approaches, the glow intensifies warmly.
-His face lights up with joy and purpose.
-
-Santa speaks warmly: "Let me check on someone very special tonight..."
-
-Camera: Close-up on Santa's face transitioning to his hands reaching for the book.
-Mood: Anticipation, magic awakening, the moment before wonder.`,
-    keyframePrompt: `${SANTA_CHARACTER} reaching toward ancient magical leather book with golden glow, ornate golden clasps, THE NICE LIST embossed, ${WORKSHOP_SETTING}, excited anticipation, warm lighting, photorealistic, cinematic`,
-    audioDescription: 'Magical shimmer sound, soft orchestral swell, Santa speaking warmly',
+Camera: Sweeping crane shot through the workshop, following a flying toy.
+VFX: Floating objects, magic sparkles, glowing trails, busy magical motion.
+Mood: "SO COOL!", wonder, childhood dream come true, pure magic.`,
+    keyframePrompt: `Inside magical Santa workshop, toys flying through air assembling themselves, elves doing acrobatic flips, conveyor belts with presents, giant candy canes, Christmas lights everywhere, golden sparkles, warm magical lighting, photorealistic, cinematic`,
+    audioDescription: 'Cheerful workshop sounds, magical chimes, elf laughter, toy sounds, joyful music',
   },
   {
     sceneNumber: 3,
-    name: 'Opening the Book',
-    description: 'Close-up of hands opening the magical book with golden light',
-    durationSeconds: 7,
-    videoPrompt: `${CINEMATIC_STYLE}
-
-Extreme close-up shot focusing on Santa's hands and the magical book.
-
-Santa's hands: aged but strong, wearing a simple gold wedding band,
-gentle and careful as they handle precious things.
-
-The Nice List book opens slowly, reverently.
-Golden light pours from between the pages like captured sunshine.
-Magical golden particles swirl up from the illuminated pages.
-Ancient parchment pages with beautiful calligraphy visible.
-Names written in elegant golden ink shimmer and glow.
-The light illuminates Santa's face from below, casting wonder.
-
-Soft gentle humming from Santa as he searches.
-
-Camera: Extreme close-up on hands and book, slight tilt up to catch light on face.
-Mood: Pure magic, sacred moment, wonder and reverence.`,
-    keyframePrompt: `Close-up of elderly hands opening ancient magical book, golden light pouring from pages, magical particles swirling, illuminated face from below, ${WORKSHOP_SETTING} background blurred, photorealistic, cinematic lighting`,
-    audioDescription: 'Magical whoosh, golden shimmer sounds, gentle humming, orchestral wonder',
-  },
-  {
-    sceneNumber: 9,
-    name: 'The Window',
-    description: 'Santa walks to window showing the magical North Pole',
-    durationSeconds: 8,
-    videoPrompt: `${CINEMATIC_STYLE}
-
-${SANTA_CHARACTER}
-
-Santa rises gracefully from his chair with purpose.
-He walks slowly toward a large frost-covered window.
-His silhouette against the window is majestic.
-Outside: the magical North Pole in all its glory -
-Gentle snowfall, northern lights dancing green and purple in the sky,
-distant warm lights of the elf village, snow-covered pine trees.
-
-Santa places his hand on the cold glass, looking out with wonder.
-His breath fogs slightly on the window.
-
-Santa speaks with anticipation: "Christmas Eve is coming soon..."
-
-Camera: Following shot as Santa walks, settling into a beautiful silhouette composition.
-Mood: Anticipation of magic to come, the promise of Christmas.`,
-    keyframePrompt: `${SANTA_CHARACTER} standing at frost-covered window, silhouette against magical North Pole night sky, northern lights green purple, snowy village lights in distance, hand on glass, ${WORKSHOP_SETTING}, cinematic, photorealistic`,
-    audioDescription: 'Footsteps on wood, wind howling softly, magical orchestral anticipation',
-  },
-  {
-    sceneNumber: 10,
-    name: 'Reindeer Ready',
-    description: 'Through window: reindeer, sleigh, and elves preparing',
-    durationSeconds: 7,
-    videoPrompt: `${CINEMATIC_STYLE}
-
-Shot through the frost-framed window, looking out at the magical scene.
-
-The North Pole courtyard in enchanting detail:
-The magnificent red and gold sleigh, polished to perfection, loaded with colorful presents.
-Eight majestic reindeer harnessed and ready, breath visible in cold air,
-Rudolph at the front, nose glowing warm red.
-Cheerful elves in green and red outfits making final preparations,
-checking lists, adjusting ribbons on presents.
-Snow falling gently, northern lights reflecting off everything.
-Warm lantern light from the workshop casting golden pools on snow.
-
-Santa speaks with joy: "And I have a very special delivery to make..."
-
-Camera: Point of view through window, slight movement as if leaning closer.
-Mood: Excitement, magic is real, Christmas is coming.`,
-    keyframePrompt: `View through frost-framed window, magnificent red gold sleigh with presents, eight reindeer with Rudolph's glowing nose, cheerful elves preparing, snowy North Pole courtyard, northern lights, warm lantern glow, magical Christmas scene, photorealistic, cinematic`,
-    audioDescription: 'Reindeer bells jingling, elves chattering, magical sleigh bells, excitement',
-  },
-  {
-    sceneNumber: 13,
-    name: 'Ho Ho Ho Goodbye',
-    description: 'Santa winks and laughs with magical ending',
-    durationSeconds: 7,
+    name: 'Book Magic',
+    description: 'Santa uses telekinesis to summon the Magic Book with golden light explosion',
+    durationSeconds: 10,
+    type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
 ${WORKSHOP_SETTING}
 
 ${SANTA_CHARACTER}
 
-The grand finale - pure joy and magic.
-Santa looks directly at camera with his warmest smile.
-His eyes twinkle mischievously, then he gives a knowing wink.
-He throws his head back slightly with genuine laughter.
-"Ho ho ho!" - deep, warm, from the belly, full of love.
+SANTA'S MAGICAL POWERS revealed.
 
-As he laughs, magical golden sparkles swirl around him.
-The sparkles increase, becoming a beautiful golden cascade.
-Fade through the sparkles to reveal:
+Santa sits in his cozy study by the crackling fireplace.
+He looks toward camera with a knowing twinkle in his eye.
+Santa raises his hand with a MAGICAL GESTURE - fingers spread, gentle wave.
+Across the room, an ancient leather-bound book begins to GLOW golden.
+The book - THE NICE LIST - FLIES through the air toward Santa!
+Trails of golden sparkles follow the floating book.
+The book lands gently in Santa's hands.
+He opens it and GOLDEN LIGHT EXPLODES from the pages!
+Magical particles swirl up from the illuminated pages.
+Santa's face is bathed in warm golden light from below.
+Pages begin to flip by themselves, searching...
+Santa's expression shows anticipation and excitement.
 
-Elegant end card: "The Santa Experience" in golden script
-on deep red velvet background with subtle snowflakes.
+Camera: Medium shot of Santa, dramatic lighting from book's glow.
+VFX: Telekinesis effect, floating book, golden light burst, magical particles, page flip.
+Mood: "He has POWERS!", real movie magic, wizardly Santa, awe-inspiring.`,
+    keyframePrompt: `${SANTA_CHARACTER} in cozy study, magical glowing book flying through air toward him, golden light and sparkles trailing, telekinesis pose with raised hand, fireplace in background, dramatic magical lighting, photorealistic, cinematic`,
+    audioDescription: 'Magical whoosh, golden shimmer sounds, book flutter, dramatic orchestral swell',
+  },
+  {
+    sceneNumber: 7,
+    name: 'Sleigh Ready',
+    description: 'Santa walks to door revealing magnificent sleigh with reindeer',
+    durationSeconds: 10,
+    type: 'premade',
+    videoPrompt: `${CINEMATIC_STYLE}
 
-Camera: Close-up on Santa, pulling back as magic swirls, dissolve to end card.
-Mood: Pure joy, magic, the warmth of Christmas love, memorable goodbye.`,
-    keyframePrompt: `${SANTA_CHARACTER} laughing joyfully, warm twinkle in eye, mid-wink, golden magical sparkles swirling around, ${WORKSHOP_SETTING}, pure joy, warm lighting, photorealistic, cinematic`,
-    audioDescription: 'Deep warm Ho Ho Ho laugh, magical sparkle crescendo, triumphant orchestral flourish',
+${SANTA_CHARACTER}
+
+THE GRAND DEPARTURE setup.
+
+Santa rises from his chair with purpose and excitement.
+He walks toward a large wooden door with ornate Christmas carvings.
+Santa places his hand on the golden door handle.
+Door SWINGS OPEN dramatically, revealing:
+
+The magnificent SNOWY COURTYARD in all its glory:
+- The legendary RED AND GOLD SLEIGH, polished to perfection
+- Piled HIGH with beautifully wrapped presents, ribbons glowing softly
+- EIGHT MAJESTIC REINDEER harnessed and ready, breath visible in cold air
+- RUDOLPH at the front, nose BLAZING bright red, casting red glow on snow
+- Cheerful ELVES in winter gear making final preparations
+- Snow falling gently, catching the warm light from the workshop
+- Northern lights dancing in the sky above
+- Stars twinkling brilliantly
+
+Santa steps through the doorway, silhouetted against the magical scene.
+Reindeer paw the snow eagerly, ready to fly.
+
+Camera: Following Santa, then wide reveal of the spectacular scene.
+VFX: Glowing Rudolph nose, breath vapor, magical atmosphere, northern lights.
+Mood: Anticipation, the promise of Christmas, epic setup for finale.`,
+    keyframePrompt: `${SANTA_CHARACTER} standing in open doorway, revealing magnificent red gold sleigh loaded with presents, eight reindeer with Rudolph's glowing red nose, snowy courtyard, elves preparing, northern lights above, magical Christmas scene, photorealistic, cinematic`,
+    audioDescription: 'Door creaking open, reindeer snorting, bells jingling, wind, magical anticipation',
   },
 ]
 
-// Helper to get pre-made scene by number
-export function getPremadeScene(sceneNumber: number): PremadeSceneConfig | undefined {
+// ============================================================================
+// PERSONALIZED SCENE TEMPLATES (4 total) - Generate per order
+// ============================================================================
+
+export interface PersonalizedSceneTemplate {
+  sceneNumber: number
+  name: string
+  description: string
+  durationSeconds: number
+  type: 'personalized'
+  // These have placeholders: [NAME], [GOOD_BEHAVIOR], [THING_TO_IMPROVE], [CUSTOM_MESSAGE]
+  videoPromptTemplate: string
+  keyframePromptTemplate: string
+  audioDescription: string
+}
+
+export const PERSONALIZED_SCENE_TEMPLATES: PersonalizedSceneTemplate[] = [
+  {
+    sceneNumber: 4,
+    name: 'Photo Comes Alive',
+    description: "Child's photo appears on Magic Book page and comes alive with animation",
+    durationSeconds: 12,
+    type: 'personalized',
+    videoPromptTemplate: `${CINEMATIC_STYLE}
+
+${WORKSHOP_SETTING}
+
+${SANTA_CHARACTER}
+
+THE MAGICAL MOMENT - Child's photo comes alive!
+
+Santa looks down at the glowing Magic Book in his hands.
+The page glows intensely with golden light.
+On the page, a PHOTOGRAPH appears - surrounded by an ornate golden magical frame.
+The photograph shows [CHILD_DESCRIPTION].
+Santa's face lights up with recognition and pure JOY.
+"Ah! There you are!" Santa says warmly.
+
+THE PHOTO BEGINS TO COME ALIVE:
+- Subtle movement within the frame
+- The image gains depth and dimension
+- Magical golden sparkles swirl around the photo
+- The frame pulses with warm light
+- Santa watches with wonder and delight
+
+Santa speaks to the photo: "I've been watching you, and I'm so proud..."
+
+Camera: Close-up on book with photo, then Santa's joyful reaction.
+VFX: Photo animation, magical frame glow, golden particles, depth effect.
+Mood: "THAT'S ME!!!", magical recognition, personal connection, wonder.`,
+    keyframePromptTemplate: `${SANTA_CHARACTER} looking at magical glowing book, photograph on page with ornate golden frame, golden sparkles swirling, expression of joy and recognition, ${WORKSHOP_SETTING}, warm lighting, photorealistic, cinematic`,
+    audioDescription: 'Magical shimmer, warm orchestral swell, Santa speaking gently, sparkle sounds',
+  },
+  {
+    sceneNumber: 5,
+    name: 'Name Reveal',
+    description: "Child's name rises from book as giant 3D golden letters",
+    durationSeconds: 10,
+    type: 'personalized',
+    videoPromptTemplate: `${CINEMATIC_STYLE}
+
+${WORKSHOP_SETTING}
+
+${SANTA_CHARACTER}
+
+THE NAME REVEAL - Spectacular personalization moment!
+
+Santa holds the Magic Book, the photo still glowing on the page.
+From the book, letters begin to RISE UP:
+[NAME] forms in GIANT 3D GOLDEN LETTERS!
+The letters are luminous, casting golden light across the room.
+They FLOAT and SPIN in the air around Santa.
+Golden sparkles trail behind each letter.
+The letters arrange themselves, hovering majestically.
+Santa looks up at the floating name with pure delight.
+
+"[NAME]!" Santa exclaims with joy. "What a wonderful child!"
+
+The letters pulse with warm light, magical particles swirling.
+Santa's face glows in the golden light of the floating name.
+
+Camera: Dynamic shot - letters rising, spinning around Santa.
+VFX: 3D text animation, golden glow, particle trails, magical floating.
+Mood: "MY NAME!", personalized magic, spectacular, memorable.`,
+    keyframePromptTemplate: `Giant 3D golden glowing letters spelling [NAME] floating in air, ${SANTA_CHARACTER} looking up with joy, golden sparkles and particles, ${WORKSHOP_SETTING}, magical lighting, photorealistic, cinematic`,
+    audioDescription: 'Magical rising sound, triumphant orchestral notes, sparkle crescendo, Santa exclaiming',
+  },
+  {
+    sceneNumber: 6,
+    name: "Santa's Message",
+    description: 'Santa speaks directly to camera with personalized message about behaviors',
+    durationSeconds: 25,
+    type: 'personalized',
+    videoPromptTemplate: `${CINEMATIC_STYLE}
+
+${WORKSHOP_SETTING}
+
+${SANTA_CHARACTER}
+
+SANTA'S PERSONAL MESSAGE - Emotional core of the video.
+
+Santa looks directly at camera with warm, grandfatherly love.
+Firelight flickers warmly on his face.
+He speaks with genuine emotion and warmth:
+
+"[NAME], I want you to know something very important..."
+
+As Santa mentions GOOD BEHAVIORS:
+- "[GOOD_BEHAVIOR]" - SPARKLE BURST of golden light!
+- Santa nods approvingly, eyes twinkling
+
+As Santa gives gentle encouragement:
+- "[THING_TO_IMPROVE]" - Santa gives understanding nod
+- Warm smile, no judgment, just love
+
+As Santa mentions something exciting:
+- "[THING_TO_LEARN]" - Santa's eyes light up with excitement
+- Enthusiastic gesture, sparkles dance
+
+[CUSTOM_MESSAGE if provided]
+
+Throughout: magical sparkles punctuate emotional moments.
+Santa's expressions shift naturally - pride, encouragement, joy.
+The fireplace crackles warmly in the background.
+Occasional magical dust particles float through frame.
+
+Camera: Medium close-up on Santa, intimate and personal.
+VFX: Sparkle bursts on key moments, warm glow, floating particles.
+Mood: Eyes glued, "He KNOWS me!", emotional, validating, loving.`,
+    keyframePromptTemplate: `${SANTA_CHARACTER} speaking directly to camera with warm expression, firelight on face, golden sparkles around, ${WORKSHOP_SETTING}, intimate warm lighting, grandfather energy, photorealistic, cinematic`,
+    audioDescription: 'Warm Santa voice, crackling fire, gentle orchestral underscore, sparkle accents',
+  },
+  {
+    sceneNumber: 8,
+    name: 'Epic Launch',
+    description: 'Sleigh rockets into sky with rainbow trail and personalized goodbye',
+    durationSeconds: 10,
+    type: 'personalized',
+    videoPromptTemplate: `${CINEMATIC_STYLE}
+
+THE EPIC FINALE - Rocket launch and farewell!
+
+Exterior: The magnificent sleigh in the snowy courtyard.
+${SANTA_CHARACTER} takes his seat in the sleigh.
+Reindeer paw eagerly, Rudolph's nose blazing bright.
+Elves wave and cheer from below.
+
+Santa calls out: "Now Dasher, now Dancer...!"
+The reindeer LEAP into action!
+The sleigh ROCKETS UPWARD with incredible speed!
+A magnificent RAINBOW TRAIL streams behind the sleigh!
+Golden stardust swirls in their wake!
+
+The sleigh arcs across the starlit sky.
+Santa looks back, waves his hand:
+"See you soon, [NAME]! Ho ho ho!"
+
+His warm laughter echoes across the sky.
+The sleigh becomes a streak of light among the stars.
+The rainbow trail forms a heart shape before fading.
+
+TRANSITION: Magical sparkles swirl and transform into:
+Elegant end card - "The Santa Experience" in golden script
+on deep red velvet background with gentle snowflakes.
+
+Camera: Ground level looking up, following the launch, epic wide shot.
+VFX: Rainbow trail, speed blur, stardust, magical transition, logo reveal.
+Mood: "GO GO GO!", exhilarating, perfect ending, memorable farewell.`,
+    keyframePromptTemplate: `Magnificent red gold sleigh launching into starlit sky, ${SANTA_CHARACTER} waving, rainbow golden trail behind, reindeer flying, Rudolph's glowing nose, northern lights, magical Christmas scene, epic cinematic shot, photorealistic`,
+    audioDescription: 'Reindeer hooves, whooshing launch, Santa Ho Ho Ho, triumphant orchestra, sleigh bells',
+  },
+]
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Get a pre-made scene by number
+ */
+export function getPremadeScene(sceneNumber: number): SceneConfig | undefined {
   return PREMADE_SCENES.find(s => s.sceneNumber === sceneNumber)
 }
 
-// Check if a scene number is pre-made
+/**
+ * Check if a scene number is pre-made (vs personalized)
+ */
 export function isPremadeScene(sceneNumber: number): boolean {
-  return [1, 2, 3, 9, 10, 13].includes(sceneNumber)
+  return [1, 2, 3, 7].includes(sceneNumber)
+}
+
+/**
+ * Check if a scene number is personalized
+ */
+export function isPersonalizedScene(sceneNumber: number): boolean {
+  return [4, 5, 6, 8].includes(sceneNumber)
+}
+
+/**
+ * Get personalized scene template by number
+ */
+export function getPersonalizedTemplate(sceneNumber: number): PersonalizedSceneTemplate | undefined {
+  return PERSONALIZED_SCENE_TEMPLATES.find(s => s.sceneNumber === sceneNumber)
+}
+
+/**
+ * Generate personalized scene prompt by filling in placeholders
+ */
+export function generatePersonalizedPrompt(
+  sceneNumber: number,
+  data: {
+    name: string
+    childDescription?: string
+    goodBehavior?: string
+    thingToImprove?: string
+    thingToLearn?: string
+    customMessage?: string
+  }
+): { videoPrompt: string; keyframePrompt: string } | null {
+  const template = getPersonalizedTemplate(sceneNumber)
+  if (!template) return null
+
+  let videoPrompt = template.videoPromptTemplate
+  let keyframePrompt = template.keyframePromptTemplate
+
+  // Replace placeholders
+  const replacements: Record<string, string> = {
+    '[NAME]': data.name,
+    '[CHILD_DESCRIPTION]': data.childDescription || 'a happy child',
+    '[GOOD_BEHAVIOR]': data.goodBehavior || 'being kind and helpful',
+    '[THING_TO_IMPROVE]': data.thingToImprove || 'keep trying your best',
+    '[THING_TO_LEARN]': data.thingToLearn || 'something amazing',
+    '[CUSTOM_MESSAGE]': data.customMessage || '',
+  }
+
+  for (const [placeholder, value] of Object.entries(replacements)) {
+    videoPrompt = videoPrompt.replace(new RegExp(placeholder.replace(/[[\]]/g, '\\$&'), 'g'), value)
+    keyframePrompt = keyframePrompt.replace(new RegExp(placeholder.replace(/[[\]]/g, '\\$&'), 'g'), value)
+  }
+
+  return { videoPrompt, keyframePrompt }
+}
+
+/**
+ * Get all scene numbers in order for final video stitching
+ */
+export function getSceneOrder(): number[] {
+  return [1, 2, 3, 4, 5, 6, 7, 8]
+}
+
+/**
+ * Get total video duration in seconds
+ */
+export function getTotalDuration(): number {
+  const premadeDuration = PREMADE_SCENES.reduce((sum, s) => sum + s.durationSeconds, 0)
+  const personalizedDuration = PERSONALIZED_SCENE_TEMPLATES.reduce((sum, s) => sum + s.durationSeconds, 0)
+  return premadeDuration + personalizedDuration // ~95 seconds
 }

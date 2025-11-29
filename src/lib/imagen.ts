@@ -202,3 +202,149 @@ export async function generateAllKeyframes(
 
   return results
 }
+
+// ============================================================================
+// PHOTO COMPOSITING FOR "PHOTO COMES ALIVE" SCENE
+// ============================================================================
+
+const PHOTO_COMPOSITE_SANTA = `Santa Claus: distinguished elderly man in his 60s,
+full natural white beard perfectly groomed, rosy cheeks glowing with warmth,
+kind twinkling blue eyes, genuine warm smile of recognition and joy,
+classic red velvet suit with pristine white fur trim, polished black leather belt with ornate gold buckle.`
+
+const PHOTO_COMPOSITE_SETTING = `Santa's cozy study in the North Pole workshop:
+Warm honey-colored wood paneling, magnificent stone fireplace with crackling orange flames,
+antique leather wingback chair, ornate wooden desk, shelves with toys and snow globes,
+warm golden ambient lighting from oil lamps and candles, magical dust particles in air.`
+
+/**
+ * Generate a keyframe for the "Photo Comes Alive" scene (Scene 4)
+ * This creates a keyframe showing Santa looking at a glowing book with a photo frame
+ *
+ * Note: The actual child's photo will be composited in a later step or
+ * animated using Veo's image-to-video capabilities
+ */
+export async function generatePhotoCompositeKeyframe(
+  childDescription?: string
+): Promise<{ imageBase64: string; mimeType: string }> {
+  const description = childDescription || 'a happy smiling child'
+
+  const prompt = `Cinematic quality, 4K resolution, professional Hollywood film lighting, photorealistic.
+
+${PHOTO_COMPOSITE_SETTING}
+
+${PHOTO_COMPOSITE_SANTA}
+
+Santa is seated, holding an ancient magical leather-bound book (The Nice List).
+The book is open and glowing with warm golden light.
+On the illuminated page is an ORNATE GOLDEN FRAME with magical sparkles around it.
+Inside the frame is a softly glowing rectangular space - like a magical photograph holder.
+Golden sparkles and magical particles swirl around the book and frame.
+Santa is looking down at the page with an expression of pure joy and recognition.
+His face is illuminated from below by the golden glow of the book.
+
+The magical frame on the page should be prominent and clearly visible.
+The frame has intricate golden filigree designs, glowing edges, and magical runes.
+Inside the frame area: a soft golden glow suggesting where a photo would appear.
+
+Camera: Close-up to medium shot, showing Santa and the book clearly.
+Lighting: Warm golden glow from book, firelight from side, magical atmosphere.
+Mood: Magical recognition, wonder, joy, personal connection.`
+
+  return await generateKeyframe(prompt)
+}
+
+/**
+ * Generate a keyframe for the "Name Reveal" scene (Scene 5)
+ * Shows Santa with giant 3D golden letters floating around him
+ */
+export async function generateNameRevealKeyframe(
+  childName: string
+): Promise<{ imageBase64: string; mimeType: string }> {
+  const prompt = `Cinematic quality, 4K resolution, professional Hollywood film lighting, photorealistic.
+
+${PHOTO_COMPOSITE_SETTING}
+
+${PHOTO_COMPOSITE_SANTA}
+
+SPECTACULAR MOMENT: Giant 3D golden letters spelling "${childName}" floating in the air!
+
+Santa stands in his cozy study, looking up with pure delight and joy.
+Above and around him, the letters of the name "${childName}" float majestically:
+- Each letter is 3D, luminous, made of pure golden light
+- Letters are large (about the size of Santa's head)
+- They hover and glow, casting golden light across the room
+- Golden sparkles and magical particles trail from each letter
+- The letters are arranged beautifully in the air
+
+Santa's face is bathed in the warm golden light from the floating letters.
+His expression shows genuine joy and excitement - "What a wonderful child!"
+Magical golden dust particles fill the air.
+
+Camera: Wide shot showing Santa and the floating letters together.
+Lighting: Dramatic golden glow from letters, warm firelight, magical atmosphere.
+Mood: Spectacular, personalized magic, memorable, joyful.`
+
+  return await generateKeyframe(prompt)
+}
+
+/**
+ * Generate a keyframe for "Santa's Message" scene (Scene 6)
+ * Shows Santa speaking directly to camera with warm expression
+ */
+export async function generateSantaMessageKeyframe(): Promise<{ imageBase64: string; mimeType: string }> {
+  const prompt = `Cinematic quality, 4K resolution, professional Hollywood film lighting, photorealistic.
+
+${PHOTO_COMPOSITE_SETTING}
+
+${PHOTO_COMPOSITE_SANTA}
+
+Santa is speaking directly to camera with warm, grandfatherly love.
+He is seated in his leather wingback chair by the crackling fireplace.
+Firelight flickers warmly on his face from the side.
+His expression is kind, proud, and full of genuine emotion.
+One hand is gently raised as if making an important point.
+Golden sparkles float softly in the air around him.
+
+His eyes are focused directly on camera - speaking to YOU.
+Expression: loving grandfather sharing important words with a beloved grandchild.
+Magical dust particles catch the warm firelight.
+The atmosphere is intimate, personal, and emotional.
+
+Camera: Medium close-up, intimate and personal framing.
+Lighting: Warm firelight from side, soft ambient glow, golden particles.
+Mood: Emotional core, "He knows me", validating, loving, proud.`
+
+  return await generateKeyframe(prompt)
+}
+
+/**
+ * Generate a keyframe for "Epic Launch" scene (Scene 8)
+ * Shows sleigh launching into starlit sky with rainbow trail
+ */
+export async function generateEpicLaunchKeyframe(): Promise<{ imageBase64: string; mimeType: string }> {
+  const prompt = `Cinematic quality, 4K resolution, professional Hollywood film lighting, photorealistic.
+
+EPIC FINALE: Santa's sleigh launching into the Christmas night sky!
+
+The magnificent RED AND GOLD SLEIGH is mid-flight, rocketing upward.
+Santa Claus in his red suit is in the sleigh, waving back toward camera.
+Eight majestic reindeer pulling the sleigh through the starlit sky.
+RUDOLPH at the front, nose blazing bright red!
+
+Behind the sleigh streams a MAGNIFICENT RAINBOW TRAIL of light!
+Golden stardust and magical sparkles swirl in their wake.
+The trail creates beautiful arcs of color against the dark sky.
+
+Below: the snow-covered North Pole village with warm glowing windows.
+Above: brilliant stars and northern lights (aurora borealis) dancing.
+Snow falling gently, catching the magical light.
+
+Camera: Epic wide shot from below, looking up at the launching sleigh.
+Lighting: Magical glow from sleigh, Rudolph's red nose, starlight, aurora.
+Mood: EXHILARATING, triumphant, perfect ending, "Go go go!"
+
+The sleigh should be clearly visible against the night sky with the rainbow trail streaming behind it.`
+
+  return await generateKeyframe(prompt)
+}
