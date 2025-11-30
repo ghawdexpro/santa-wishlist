@@ -32,11 +32,63 @@ import {
 export interface ChildData {
   name: string
   age: number
-  photoBase64: string
-  photoMimeType: 'image/jpeg' | 'image/png' | 'image/webp'
+  photoUrl?: string  // URL to download photo from
+  photoBase64?: string  // Or pre-encoded base64
+  photoMimeType?: 'image/jpeg' | 'image/png' | 'image/webp'
   goodBehavior?: string
   thingToImprove?: string
   thingToLearn?: string
+}
+
+/**
+ * Download photo from URL and convert to base64
+ */
+async function downloadPhoto(photoUrl: string): Promise<{
+  base64: string
+  mimeType: 'image/jpeg' | 'image/png' | 'image/webp'
+}> {
+  console.log(`[Hollywood] Downloading photo from: ${photoUrl}`)
+
+  const response = await fetch(photoUrl)
+  if (!response.ok) {
+    throw new Error(`Failed to download photo: ${response.status}`)
+  }
+
+  const buffer = await response.arrayBuffer()
+  const base64 = Buffer.from(buffer).toString('base64')
+
+  // Detect MIME type
+  const contentType = response.headers.get('content-type') || 'image/jpeg'
+  let mimeType: 'image/jpeg' | 'image/png' | 'image/webp' = 'image/jpeg'
+  if (contentType.includes('png')) mimeType = 'image/png'
+  else if (contentType.includes('webp')) mimeType = 'image/webp'
+
+  console.log(`[Hollywood] Photo downloaded: ${mimeType}, ${base64.length} chars`)
+  return { base64, mimeType }
+}
+
+/**
+ * Ensure child data has photo in base64 format
+ */
+async function ensurePhotoBase64(childData: ChildData): Promise<{
+  base64: string
+  mimeType: 'image/jpeg' | 'image/png' | 'image/webp'
+} | null> {
+  // Already have base64
+  if (childData.photoBase64 && childData.photoMimeType) {
+    return {
+      base64: childData.photoBase64,
+      mimeType: childData.photoMimeType,
+    }
+  }
+
+  // Download from URL
+  if (childData.photoUrl) {
+    return downloadPhoto(childData.photoUrl)
+  }
+
+  // No photo available
+  return null
 }
 
 export interface KeyframeResult {
@@ -134,7 +186,8 @@ async function generateKeyframeWithPhoto(
 
 /**
  * Generate BOTH start and end keyframes for a scene
- * For scenes with photo reference (4, 5, 6), both keyframes include the photo
+ * For scenes with photo reference (4, 6), both keyframes include the photo
+ * Automatically downloads photo from URL if needed
  */
 export async function generateDualKeyframes(
   sceneNumber: SceneNumber,
@@ -151,24 +204,37 @@ export async function generateDualKeyframes(
   let endKeyframe: { base64: string; mimeType: string }
 
   if (usesPhoto && childData) {
-    // Generate both keyframes WITH photo reference
-    // Run in parallel for speed
-    const [start, end] = await Promise.all([
-      generateKeyframeWithPhoto(
-        sceneNumber,
-        prompts.startKeyframe,
-        childData.photoBase64,
-        childData.photoMimeType
-      ),
-      generateKeyframeWithPhoto(
-        sceneNumber,
-        prompts.endKeyframe,
-        childData.photoBase64,
-        childData.photoMimeType
-      ),
-    ])
-    startKeyframe = start
-    endKeyframe = end
+    // Get photo in base64 format (download if needed)
+    const photo = await ensurePhotoBase64(childData)
+
+    if (!photo) {
+      console.warn(`[Hollywood] No photo available for scene ${sceneNumber}, falling back to no-photo generation`)
+      const [start, end] = await Promise.all([
+        generateStartKeyframeSimple(sceneNumber, prompts.startKeyframe),
+        generateEndKeyframeSimple(sceneNumber, prompts.endKeyframe),
+      ])
+      startKeyframe = start
+      endKeyframe = end
+    } else {
+      // Generate both keyframes WITH photo reference
+      // Run in parallel for speed
+      const [start, end] = await Promise.all([
+        generateKeyframeWithPhoto(
+          sceneNumber,
+          prompts.startKeyframe,
+          photo.base64,
+          photo.mimeType
+        ),
+        generateKeyframeWithPhoto(
+          sceneNumber,
+          prompts.endKeyframe,
+          photo.base64,
+          photo.mimeType
+        ),
+      ])
+      startKeyframe = start
+      endKeyframe = end
+    }
   } else {
     // Generate both keyframes WITHOUT photo reference
     const [start, end] = await Promise.all([
@@ -270,6 +336,7 @@ export async function generateScene(
 /**
  * Generate Scene 4: Photo Comes Alive
  * Child's photo appears in Santa's magical book
+ * Returns full result with keyframes
  */
 export async function generateScene4PhotoComesAlive(
   childData: ChildData
@@ -279,7 +346,8 @@ export async function generateScene4PhotoComesAlive(
 
 /**
  * Generate Scene 5: Name Reveal
- * Child's name in golden letters, photo visible in background
+ * Child's name in golden letters (no photo)
+ * Returns full result with keyframes
  */
 export async function generateScene5NameReveal(
   childData: ChildData
@@ -290,6 +358,7 @@ export async function generateScene5NameReveal(
 /**
  * Generate Scene 6: Santa's Message
  * Santa holds child's photo while speaking
+ * Returns full result with keyframes
  */
 export async function generateScene6SantasMessage(
   childData: ChildData
@@ -299,13 +368,95 @@ export async function generateScene6SantasMessage(
 
 /**
  * Generate Scene 8: Epic Launch
- * Child's name appears in stars (no photo reference needed for this one)
+ * Child's name appears in stars (no photo reference)
+ * Returns full result with keyframes
  */
 export async function generateScene8EpicLaunch(
   childData: ChildData
 ): Promise<SceneGenerationResult> {
-  // Scene 8 doesn't use photo reference - just the name in stars
   return generateScene(8, childData)
+}
+
+// =============================================================================
+// SIMPLIFIED API (returns operation name only - compatible with old system)
+// =============================================================================
+
+export interface SimpleChildData {
+  childName: string
+  childAge: number
+  photoUrl?: string
+  goodBehavior?: string
+  thingToImprove?: string
+  thingToLearn?: string
+  personalizedScript?: string
+}
+
+/**
+ * Scene 4: Photo Comes Alive - returns operation name only
+ * Compatible with old orchestration API
+ */
+export async function generateScene4ForChildHollywood(data: {
+  name: string
+  photoUrl: string
+}): Promise<string> {
+  const result = await generateScene(4, {
+    name: data.name,
+    age: 7, // Default
+    photoUrl: data.photoUrl,
+  })
+  return result.operationName
+}
+
+/**
+ * Scene 5: Name Reveal - returns operation name only
+ * Compatible with old orchestration API
+ */
+export async function generateScene5NameRevealHollywood(
+  data: SimpleChildData
+): Promise<string> {
+  const result = await generateScene(5, {
+    name: data.childName,
+    age: data.childAge,
+    goodBehavior: data.goodBehavior,
+    thingToImprove: data.thingToImprove,
+    thingToLearn: data.thingToLearn,
+  })
+  return result.operationName
+}
+
+/**
+ * Scene 6: Santa's Message - returns operation name only
+ * Compatible with old orchestration API
+ */
+export async function generateScene6SantasMessageHollywood(
+  data: SimpleChildData
+): Promise<string> {
+  const result = await generateScene(6, {
+    name: data.childName,
+    age: data.childAge,
+    photoUrl: data.photoUrl, // Scene 6 uses photo!
+    goodBehavior: data.goodBehavior,
+    thingToImprove: data.thingToImprove,
+    thingToLearn: data.thingToLearn,
+  })
+  return result.operationName
+}
+
+/**
+ * Scene 8: Epic Launch - returns operation name only
+ * Compatible with old orchestration API
+ */
+export async function generateScene8EpicLaunchHollywood(
+  data: SimpleChildData
+): Promise<string> {
+  const result = await generateScene(8, {
+    name: data.childName,
+    age: data.childAge,
+    goodBehavior: data.goodBehavior,
+    thingToImprove: data.thingToImprove,
+    thingToLearn: data.thingToLearn,
+  })
+  return result.operationName
 }
 
 /**

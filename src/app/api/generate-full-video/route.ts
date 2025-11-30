@@ -3,16 +3,20 @@
  * Triggered by Stripe webhook after successful payment
  * Handles 8-scene multi-child video generation:
  * Scenes 1,2,3,7: Pre-made (cached)
- * Scenes 4,5,6,8: Personalized per child (NanoBanana + Veo + HeyGen)
+ * Scenes 4,5,6,8: Personalized per child - HOLLYWOOD QUALITY
+ *   - Dual keyframes (start + end) for controlled Veo animation
+ *   - Scene 4 & 6: Child photo reference (50% of frame)
+ *   - Scene 5: Golden letters only (70% of frame)
+ *   - Scene 8: Name in stars
  */
 
 import { generateMultiChildScript } from '@/lib/gemini'
-import { generateScene4ForChild } from '@/lib/photo-alive-generation'
 import {
-  generateScene5NameReveal,
-  generateScene6SantasMessage,
-  generateScene8EpicLaunch,
-} from '@/lib/scene-generators'
+  generateScene4ForChildHollywood,
+  generateScene5NameRevealHollywood,
+  generateScene6SantasMessageHollywood,
+  generateScene8EpicLaunchHollywood,
+} from '@/lib/hollywood-scene-generator'
 import { getAllPremadeScenes } from '@/lib/premade-cache'
 import { generateStitchOrder, stitchVideoSegments } from '@/lib/video-stitcher'
 import { waitForVideoGeneration } from '@/lib/veo'
@@ -136,14 +140,14 @@ export async function POST(request: NextRequest) {
       const photoUrl = child.photo_url ?? ''
 
       try {
-        // Scene 4: Photo Comes Alive (async Veo generation with photo reference keyframe)
-        const scene4Op = await generateScene4ForChild({
+        // Scene 4: Photo Comes Alive - HOLLYWOOD dual-keyframe with photo reference
+        const scene4Op = await generateScene4ForChildHollywood({
           name: child.name,
           photoUrl,
         })
 
-        // Scene 5: Name Reveal (async Veo generation)
-        const scene5Op = await generateScene5NameReveal({
+        // Scene 5: Name Reveal - HOLLYWOOD dual-keyframe (golden letters, no photo)
+        const scene5Op = await generateScene5NameRevealHollywood({
           childName: child.name,
           childAge,
           goodBehavior,
@@ -151,10 +155,11 @@ export async function POST(request: NextRequest) {
           thingToLearn,
         })
 
-        // Scene 6: Santa's Message (now Veo - returns operation name)
-        const scene6Op = await generateScene6SantasMessage({
+        // Scene 6: Santa's Message - HOLLYWOOD dual-keyframe WITH photo reference
+        const scene6Op = await generateScene6SantasMessageHollywood({
           childName: child.name,
           childAge,
+          photoUrl, // Hollywood Scene 6 uses photo!
           goodBehavior,
           thingToImprove,
           thingToLearn,
@@ -163,8 +168,8 @@ export async function POST(request: NextRequest) {
             ?.santaDialogue,
         })
 
-        // Scene 8: Epic Launch (async Veo generation)
-        const scene8Op = await generateScene8EpicLaunch({
+        // Scene 8: Epic Launch - HOLLYWOOD dual-keyframe (name in stars)
+        const scene8Op = await generateScene8EpicLaunchHollywood({
           childName: child.name,
           childAge,
           goodBehavior,
