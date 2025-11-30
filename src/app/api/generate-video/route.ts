@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { startVideoGeneration } from '@/lib/veo'
-import { generateKeyframe, makePhotoMagical } from '@/lib/nanobanana'
+import { generateKeyframeSimple as generateKeyframe, makePhotoMagical } from '@/lib/nanobanana'
 import {
   isPremadeScene,
   isPersonalizedScene,

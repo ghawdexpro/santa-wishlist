@@ -80,12 +80,12 @@ export async function POST(request: NextRequest) {
       script = await generateMultiChildScript({
         children: children.map(c => ({
           name: c.name,
-          age: c.age,
-          goodBehavior: c.good_behavior,
-          thingToImprove: c.thing_to_improve,
-          thingToLearn: c.thing_to_learn,
+          age: c.age ?? 7, // Default age if not provided
+          goodBehavior: c.good_behavior ?? 'being kind and helpful',
+          thingToImprove: c.thing_to_improve ?? 'listening more carefully',
+          thingToLearn: c.thing_to_learn ?? 'new things',
         })),
-        customMessage: order.custom_message,
+        customMessage: order.custom_message ?? undefined,
       })
 
       await supabase.from('orders').update({ generated_script: script }).eq('id', orderId)
@@ -128,29 +128,36 @@ export async function POST(request: NextRequest) {
     const childGenerationPromises = children.map(async child => {
       console.log(`[Orchestration] Starting scene generation for ${child.name}...`)
 
+      // Default values for nullable fields
+      const childAge = child.age ?? 7
+      const goodBehavior = child.good_behavior ?? 'being kind and helpful'
+      const thingToImprove = child.thing_to_improve ?? 'listening more carefully'
+      const thingToLearn = child.thing_to_learn ?? 'new things'
+      const photoUrl = child.photo_url ?? ''
+
       try {
         // Scene 4: Photo Comes Alive (async Veo generation with photo reference keyframe)
         const scene4Op = await generateScene4ForChild({
           name: child.name,
-          photoUrl: child.photo_url,
+          photoUrl,
         })
 
         // Scene 5: Name Reveal (async Veo generation)
         const scene5Op = await generateScene5NameReveal({
           childName: child.name,
-          childAge: child.age,
-          goodBehavior: child.good_behavior,
-          thingToImprove: child.thing_to_improve,
-          thingToLearn: child.thing_to_learn,
+          childAge,
+          goodBehavior,
+          thingToImprove,
+          thingToLearn,
         })
 
         // Scene 6: Santa's Message (HeyGen - returns URL directly)
         const scene6Url = await generateScene6SantasMessage({
           childName: child.name,
-          childAge: child.age,
-          goodBehavior: child.good_behavior,
-          thingToImprove: child.thing_to_improve,
-          thingToLearn: child.thing_to_learn,
+          childAge,
+          goodBehavior,
+          thingToImprove,
+          thingToLearn,
           personalizedScript: script.personalized?.[child.name]
             ?.find(s => s.sceneNumber === 6)
             ?.santaDialogue,
@@ -159,10 +166,10 @@ export async function POST(request: NextRequest) {
         // Scene 8: Epic Launch (async Veo generation)
         const scene8Op = await generateScene8EpicLaunch({
           childName: child.name,
-          childAge: child.age,
-          goodBehavior: child.good_behavior,
-          thingToImprove: child.thing_to_improve,
-          thingToLearn: child.thing_to_learn,
+          childAge,
+          goodBehavior,
+          thingToImprove,
+          thingToLearn,
         })
 
         // Store results
@@ -196,7 +203,7 @@ export async function POST(request: NextRequest) {
           try {
             const result = await waitForVideoGeneration(ops.scene4Op)
             const videos = childSceneVideos.get(childId)!
-            videos.scene4 = result.videoUrl
+            videos.scene4 = result.videoUrl ?? ''
             console.log(`[Orchestration] Scene 4 (Photo Comes Alive) complete for child ${childId}`)
           } catch (error) {
             console.error(`[Orchestration] Scene 4 polling failed for child ${childId}:`, error)
@@ -209,7 +216,7 @@ export async function POST(request: NextRequest) {
           try {
             const result = await waitForVideoGeneration(ops.scene5Op)
             const videos = childSceneVideos.get(childId)!
-            videos.scene5 = result.videoUrl
+            videos.scene5 = result.videoUrl ?? ''
             console.log(`[Orchestration] Scene 5 (Name Reveal) complete for child ${childId}`)
           } catch (error) {
             console.error(`[Orchestration] Scene 5 polling failed for child ${childId}:`, error)
@@ -222,7 +229,7 @@ export async function POST(request: NextRequest) {
           try {
             const result = await waitForVideoGeneration(ops.scene8Op)
             const videos = childSceneVideos.get(childId)!
-            videos.scene8 = result.videoUrl
+            videos.scene8 = result.videoUrl ?? ''
             console.log(`[Orchestration] Scene 8 (Epic Launch) complete for child ${childId}`)
           } catch (error) {
             console.error(`[Orchestration] Scene 8 polling failed for child ${childId}:`, error)

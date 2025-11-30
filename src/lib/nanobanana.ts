@@ -34,7 +34,7 @@ async function getAuthClient() {
 
 async function getAccessToken() {
   const auth = await getAuthClient()
-  const client = auth.getClient()
+  const client = await auth.getClient()
   const { token } = await client.getAccessToken()
   if (!token) throw new Error('Failed to get access token')
   return token
@@ -150,8 +150,9 @@ async function generateKeyframeTextOnly(
   request: KeyframeRequest,
   accessToken: string
 ): Promise<KeyframeResult> {
+  const location = LOCATION
   const response = await fetch(
-    `https://${request.location || 'us-central1'}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${request.location || 'us-central1'}/endpoints/generic_model:rawPredict`,
+    `https://${location}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${location}/endpoints/generic_model:rawPredict`,
     {
       method: 'POST',
       headers: {
@@ -159,7 +160,7 @@ async function generateKeyframeTextOnly(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: `projects/${PROJECT_ID}/locations/${request.location || 'us-central1'}/models/${MODEL}`,
+        model: `projects/${PROJECT_ID}/locations/${location}/models/${MODEL}`,
         instances: [
           {
             prompt: request.prompt,
@@ -207,4 +208,76 @@ export async function generateAllKeyframes(requests: KeyframeRequest[]): Promise
   console.log(`[NanoBanana] Successfully generated ${results.length} keyframes`)
 
   return results
+}
+
+/**
+ * Simple keyframe generation with just prompt and aspect ratio
+ * Used by admin routes and generate-video route
+ */
+export async function generateKeyframeSimple(
+  prompt: string,
+  aspectRatio: string = '16:9'
+): Promise<{ base64: string; mimeType: string } | null> {
+  try {
+    const request: KeyframeRequest = {
+      prompt,
+      sceneNumber: 0, // Generic scene
+    }
+    const result = await generateKeyframe(request)
+    return {
+      base64: result.imageBase64,
+      mimeType: result.mimeType,
+    }
+  } catch (error) {
+    console.error('[NanoBanana] Simple keyframe generation failed:', error)
+    return null
+  }
+}
+
+/**
+ * Make a child's photo magical using NanoBanana reference image feature
+ * Used for Scene 4: Photo Comes Alive
+ */
+export async function makePhotoMagical(
+  photoBase64: string,
+  photoMimeType: string,
+  childName: string
+): Promise<{ images: Array<{ base64: string; mimeType: string }> }> {
+  console.log(`[NanoBanana] Making photo magical for ${childName}`)
+
+  const accessToken = await getAccessToken()
+
+  const magicalPrompt = `Transform this child's photo into a magical Christmas scene.
+The child (${childName}) should appear surrounded by:
+- Warm, glowing Christmas lights
+- Magical golden sparkles floating in the air
+- Soft snow falling gently
+- Santa's workshop elements in the background
+- A cozy, festive atmosphere
+Keep the child's face recognizable but add magical Christmas wonder.
+Style: Cinematic, warm lighting, premium quality, photorealistic with magical elements.`
+
+  const request: KeyframeRequest = {
+    prompt: magicalPrompt,
+    sceneNumber: 4,
+    referenceImage: {
+      base64: photoBase64,
+      mimeType: photoMimeType as 'image/jpeg' | 'image/png' | 'image/webp',
+    },
+  }
+
+  try {
+    const result = await generateKeyframe(request)
+    return {
+      images: [
+        {
+          base64: result.imageBase64,
+          mimeType: result.mimeType,
+        },
+      ],
+    }
+  } catch (error) {
+    console.error(`[NanoBanana] Failed to make photo magical:`, error)
+    throw error
+  }
 }

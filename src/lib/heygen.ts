@@ -144,3 +144,22 @@ export async function waitForHeyGenCompletion(
 
   throw new Error(`HeyGen generation timeout (waited ${maxWaitMs}ms)`)
 }
+
+/**
+ * Generate HeyGen video and wait for completion
+ * Convenience function that combines generation + polling
+ */
+export async function generateHeyGenVideo(options: {
+  script: string
+  durationSeconds?: number
+  characterId?: string
+}): Promise<string> {
+  const { videoId } = await generateTalkingHead({
+    script: options.script,
+    avatarId: options.characterId,
+  })
+
+  // Wait for video to complete and return URL
+  const videoUrl = await waitForHeyGenCompletion(videoId)
+  return videoUrl
+}

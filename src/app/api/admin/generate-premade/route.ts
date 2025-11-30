@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PREMADE_SCENES } from '@/lib/premade-scenes'
 import { startVideoGeneration } from '@/lib/veo'
-import { generateKeyframe } from '@/lib/nanobanana'
+import { generateKeyframeSimple as generateKeyframe } from '@/lib/nanobanana'
 import { createClient } from '@supabase/supabase-js'
 
 export const maxDuration = 300 // 5 minutes

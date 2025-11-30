@@ -1,12 +1,16 @@
 // Order status type
 export type OrderStatus = 'draft' | 'script_approved' | 'keyframes_approved' | 'paid' | 'generating' | 'complete' | 'failed'
 
-// Script scene structure
+// Script scene structure (matches gemini.ts output)
 export interface ScriptScene {
-  scene_number: number
-  dialogue: string
-  emotion_note: string
-  is_personalized: boolean
+  sceneNumber: number
+  title: string
+  duration: string
+  setting: string
+  santaDialogue: string
+  visualDescription: string
+  emotionalTone: string
+  isPremade: boolean
 }
 
 // Profile type (from Supabase Auth)
@@ -47,6 +51,16 @@ export interface ChildInsert {
   custom_message?: string | null
 }
 
+// Generated script structure (from Gemini)
+export interface GeneratedScript {
+  childName?: string
+  childrenNames?: string[]
+  totalDuration: string
+  scenes: ScriptScene[]
+  personalized?: Record<string, ScriptScene[]>
+  generatedAt: string
+}
+
 // Order type (updated for multi-child support)
 export interface Order {
   id: string
@@ -57,7 +71,7 @@ export interface Order {
   child_count: 1 | 2 | 3
 
   // Generated content (shared across all children)
-  generated_script: ScriptScene[] | null
+  generated_script: GeneratedScript | null
   keyframe_urls: string[] | null
   final_video_url: string | null
 
@@ -108,7 +122,7 @@ export interface OrderInsert {
 export interface OrderUpdate {
   status?: OrderStatus
   child_count?: 1 | 2 | 3
-  generated_script?: ScriptScene[] | null
+  generated_script?: GeneratedScript | null
   keyframe_urls?: string[] | null
   final_video_url?: string | null
   generation_progress?: Order['generation_progress']
