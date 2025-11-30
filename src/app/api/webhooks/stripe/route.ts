@@ -67,6 +67,24 @@ export async function POST(request: NextRequest) {
       }
 
       console.log(`Order ${orderId} marked as paid`)
+
+      // Trigger video generation
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://santapl-production.up.railway.app'
+        const response = await fetch(`${baseUrl}/api/generate-full-video`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId }),
+        })
+
+        if (!response.ok) {
+          console.error(`Failed to trigger video generation: ${response.statusText}`)
+        } else {
+          console.log(`Video generation triggered for order ${orderId}`)
+        }
+      } catch (err) {
+        console.error('Error triggering video generation:', err)
+      }
       break
     }
 
