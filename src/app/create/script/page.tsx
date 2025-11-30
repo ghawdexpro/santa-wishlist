@@ -20,7 +20,7 @@ export default function ScriptPreviewPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [isGeneratingKeyframes, setIsGeneratingKeyframes] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [expandedScene, setExpandedScene] = useState<number | null>(null)
+  const [expandedScenes, setExpandedScenes] = useState<Set<number>>(new Set())
   const [scriptApproved, setScriptApproved] = useState(false)
 
   useEffect(() => {
@@ -50,6 +50,14 @@ export default function ScriptPreviewPage() {
       router.push('/create')
     }
   }, [router])
+
+  useEffect(() => {
+    if (script) {
+      // Expand all scenes by default
+      const allSceneNumbers = script.scenes.map(s => s.sceneNumber)
+      setExpandedScenes(new Set(allSceneNumbers))
+    }
+  }, [script])
 
   const handleGenerateScript = async () => {
     if (!data) return
@@ -235,10 +243,16 @@ export default function ScriptPreviewPage() {
                 <SceneCard
                   key={scene.sceneNumber}
                   scene={scene}
-                  isExpanded={expandedScene === scene.sceneNumber}
-                  onToggle={() => setExpandedScene(
-                    expandedScene === scene.sceneNumber ? null : scene.sceneNumber
-                  )}
+                  isExpanded={expandedScenes.has(scene.sceneNumber)}
+                  onToggle={() => {
+                    const newSet = new Set(expandedScenes)
+                    if (newSet.has(scene.sceneNumber)) {
+                      newSet.delete(scene.sceneNumber)
+                    } else {
+                      newSet.add(scene.sceneNumber)
+                    }
+                    setExpandedScenes(newSet)
+                  }}
                 />
               ))}
             </div>
