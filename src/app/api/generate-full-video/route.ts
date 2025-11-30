@@ -1,19 +1,34 @@
 /**
  * Master orchestration endpoint for full video generation
  * Triggered by Stripe webhook after successful payment
- * Handles: script → keyframes → Veo video → HeyGen → FFmpeg stitch → delivery
+ * Handles 8-scene multi-child video generation:
+ * Scenes 1,2,3,7: Pre-made (cached)
+ * Scenes 4,5,6,8: Personalized per child (NanoBanana + Veo + HeyGen)
  */
 
-import { generateSantaScript } from '@/lib/gemini'
-import { generateAllKeyframes } from '@/lib/nanobanana'
-import { startVideoGeneration, waitForVideoGeneration } from '@/lib/veo'
-import { generateTalkingHead, waitForHeyGenCompletion } from '@/lib/heygen'
-import { stitchFinalVideo } from '@/lib/ffmpeg'
+import { generateMultiChildScript } from '@/lib/gemini'
+import { generateScene4ForChild } from '@/lib/photo-alive-generation'
+import {
+  generateScene5NameReveal,
+  generateScene6SantasMessage,
+  generateScene8EpicLaunch,
+} from '@/lib/scene-generators'
+import { getAllPremadeScenes } from '@/lib/premade-cache'
+import { generateStitchOrder, stitchVideoSegments } from '@/lib/video-stitcher'
+import { waitForVideoGeneration } from '@/lib/veo'
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs/promises'
+import type { OrderWithChildren } from '@/types/database'
 
-export const maxDuration = 600 // 10 minutes
+export const maxDuration = 900 // 15 minutes for multi-child processing
+
+interface GenerationProgress {
+  stage: 'loading' | 'script' | 'premade' | 'personalized' | 'polling' | 'stitching' | 'uploading'
+  scenesComplete: number[]
+  scenesInProgress: { [sceneNum: number]: { childId: string; operationName: string }[] }
+  scenesFailed: { [sceneNum: number]: string[] }
+}
 
 export async function POST(request: NextRequest) {
   const { orderId } = await request.json() as { orderId: string }
@@ -21,102 +36,225 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    console.log(`[Orchestration] Starting full video generation for order: ${orderId}`)
+    console.log(`[Orchestration] Starting 8-scene multi-child video generation for order: ${orderId}`)
 
-    // 1. Fetch order data
-    const { data: order, error: fetchError } = await supabase
+    // 1. Fetch order with children
+    const { data: orderData, error: fetchError } = await supabase
       .from('orders')
-      .select('*')
+      .select('*, children(*)')
       .eq('id', orderId)
       .single()
 
-    if (fetchError || !order) {
+    if (fetchError || !orderData) {
       throw new Error(`Order not found: ${orderId}`)
     }
 
-    console.log(`[Orchestration] Order data loaded for ${order.child_name}`)
+    const order = orderData as OrderWithChildren
+    const children = (order.children || []).sort((a, b) => a.sequence_number - b.sequence_number)
+
+    console.log(
+      `[Orchestration] Order loaded with ${children.length} child(ren): ${children.map(c => c.name).join(', ')}`
+    )
 
     // Update status to generating
-    await supabase.from('orders').update({ status: 'generating' }).eq('id', orderId)
+    const initialProgress: GenerationProgress = {
+      stage: 'loading',
+      scenesComplete: [],
+      scenesInProgress: {},
+      scenesFailed: {},
+    }
 
-    // 2. Generate script (if not already generated)
-    console.log(`[Orchestration] Generating script with Gemini...`)
+    await supabase
+      .from('orders')
+      .update({
+        status: 'generating',
+        generation_progress: initialProgress,
+      })
+      .eq('id', orderId)
+
+    // 2. Generate multi-child script
+    console.log(`[Orchestration] Generating script for ${children.length} child(ren)...`)
     let script = order.generated_script
 
     if (!script) {
-      script = await generateSantaScript({
-        childName: order.child_name,
-        childAge: order.child_age,
-        goodBehavior: order.good_behavior,
-        thingToImprove: order.thing_to_improve,
-        thingToLearn: order.thing_to_learn,
+      script = await generateMultiChildScript({
+        children: children.map(c => ({
+          name: c.name,
+          age: c.age,
+          goodBehavior: c.good_behavior,
+          thingToImprove: c.thing_to_improve,
+          thingToLearn: c.thing_to_learn,
+        })),
         customMessage: order.custom_message,
       })
 
       await supabase.from('orders').update({ generated_script: script }).eq('id', orderId)
 
-      console.log(`[Orchestration] Script generated with ${script.scenes.length} scenes`)
+      console.log(`[Orchestration] Script generated for ${children.length} child(ren)`)
     }
 
-    // 3. Generate HeyGen intro (Scene 1: 30s talking head)
-    console.log(`[Orchestration] Generating HeyGen intro...`)
-    const introScript = script.scenes[0]?.santaDialogue || `Ho ho ho, ${order.child_name}!`
-    const { videoId: introVideoId } = await generateTalkingHead({
-      script: introScript,
+    let progress = initialProgress
+    progress.stage = 'premade'
+
+    // 3. Load all pre-made scenes (1, 2, 3, 7)
+    console.log(`[Orchestration] Loading pre-made scenes...`)
+    const premadeScenes = await getAllPremadeScenes()
+    console.log(
+      `[Orchestration] Pre-made scenes loaded: ${Array.from(premadeScenes.keys()).join(', ')}`
+    )
+
+    progress.stage = 'personalized'
+    progress.scenesComplete = [1, 2, 3, 7] // Mark pre-made as complete
+
+    // 4. Generate all personalized scenes for each child (parallel by child)
+    console.log(`[Orchestration] Generating personalized scenes for ${children.length} child(ren)...`)
+
+    const childSceneVideos = new Map<
+      string,
+      {
+        scene4: string
+        scene5: string
+        scene6: string
+        scene8: string
+      }
+    >()
+
+    const veoOperations = new Map<
+      string,
+      { scene4Op: string; scene5Op: string; scene8Op: string } // Store operation names for polling
+    >()
+
+    // Generate Scene 4 (photo) + Scene 5 (name) + Scene 6 (message) + Scene 8 (launch) for each child
+    const childGenerationPromises = children.map(async child => {
+      console.log(`[Orchestration] Starting scene generation for ${child.name}...`)
+
+      try {
+        // Scene 4: Photo Comes Alive (async Veo generation with photo reference keyframe)
+        const scene4Op = await generateScene4ForChild({
+          name: child.name,
+          photoUrl: child.photo_url,
+        })
+
+        // Scene 5: Name Reveal (async Veo generation)
+        const scene5Op = await generateScene5NameReveal({
+          childName: child.name,
+          childAge: child.age,
+          goodBehavior: child.good_behavior,
+          thingToImprove: child.thing_to_improve,
+          thingToLearn: child.thing_to_learn,
+        })
+
+        // Scene 6: Santa's Message (HeyGen - returns URL directly)
+        const scene6Url = await generateScene6SantasMessage({
+          childName: child.name,
+          childAge: child.age,
+          goodBehavior: child.good_behavior,
+          thingToImprove: child.thing_to_improve,
+          thingToLearn: child.thing_to_learn,
+          personalizedScript: script.personalized?.[child.name]
+            ?.find(s => s.sceneNumber === 6)
+            ?.santaDialogue,
+        })
+
+        // Scene 8: Epic Launch (async Veo generation)
+        const scene8Op = await generateScene8EpicLaunch({
+          childName: child.name,
+          childAge: child.age,
+          goodBehavior: child.good_behavior,
+          thingToImprove: child.thing_to_improve,
+          thingToLearn: child.thing_to_learn,
+        })
+
+        // Store results
+        childSceneVideos.set(child.id, {
+          scene4: scene4Op,
+          scene5: scene5Op,
+          scene6: scene6Url,
+          scene8: scene8Op,
+        })
+
+        veoOperations.set(child.id, { scene4Op, scene5Op, scene8Op })
+
+        console.log(`[Orchestration] Scene generation started for ${child.name}`)
+      } catch (error) {
+        console.error(`[Orchestration] Failed to generate scenes for ${child.name}:`, error)
+        progress.scenesFailed[4] = progress.scenesFailed[4] || []
+        progress.scenesFailed[4].push(child.id)
+        throw error
+      }
     })
-    const introUrl = await waitForHeyGenCompletion(introVideoId)
-    console.log(`[Orchestration] HeyGen intro complete`)
 
-    // 4. Generate Veo magic scene (Scene 2: 30s video with keyframe)
-    console.log(`[Orchestration] Generating Veo magic scene...`)
-    const veoScene = script.scenes[1]
-    const veoPrompt = veoScene?.visualDescription || `Magical book opens with ${order.child_name}'s name in gold letters`
+    await Promise.all(childGenerationPromises)
 
-    // Generate keyframe for image-to-video
-    const keyframes = await generateAllKeyframes([{ prompt: veoPrompt, sceneNumber: 2 }])
-    const keyframeBase64 = keyframes[0]?.imageBase64
+    // 5. Poll for Veo video completions (Scenes 4, 5, and 8)
+    console.log(`[Orchestration] Polling for Veo completions (Scenes 4, 5 & 8)...`)
+    progress.stage = 'polling'
 
-    const veoOperationName = await startVideoGeneration({
-      prompt: veoPrompt,
-      imageBase64: keyframeBase64,
-      imageMimeType: 'image/png',
-      durationSeconds: 8,
-    })
+    const veoCompletionPromises = Array.from(veoOperations.entries()).flatMap(
+      ([childId, ops]) => [
+        (async () => {
+          try {
+            const result = await waitForVideoGeneration(ops.scene4Op)
+            const videos = childSceneVideos.get(childId)!
+            videos.scene4 = result.videoUrl
+            console.log(`[Orchestration] Scene 4 (Photo Comes Alive) complete for child ${childId}`)
+          } catch (error) {
+            console.error(`[Orchestration] Scene 4 polling failed for child ${childId}:`, error)
+            progress.scenesFailed[4] = progress.scenesFailed[4] || []
+            progress.scenesFailed[4].push(childId)
+            throw error
+          }
+        })(),
+        (async () => {
+          try {
+            const result = await waitForVideoGeneration(ops.scene5Op)
+            const videos = childSceneVideos.get(childId)!
+            videos.scene5 = result.videoUrl
+            console.log(`[Orchestration] Scene 5 (Name Reveal) complete for child ${childId}`)
+          } catch (error) {
+            console.error(`[Orchestration] Scene 5 polling failed for child ${childId}:`, error)
+            progress.scenesFailed[5] = progress.scenesFailed[5] || []
+            progress.scenesFailed[5].push(childId)
+            throw error
+          }
+        })(),
+        (async () => {
+          try {
+            const result = await waitForVideoGeneration(ops.scene8Op)
+            const videos = childSceneVideos.get(childId)!
+            videos.scene8 = result.videoUrl
+            console.log(`[Orchestration] Scene 8 (Epic Launch) complete for child ${childId}`)
+          } catch (error) {
+            console.error(`[Orchestration] Scene 8 polling failed for child ${childId}:`, error)
+            progress.scenesFailed[8] = progress.scenesFailed[8] || []
+            progress.scenesFailed[8].push(childId)
+            throw error
+          }
+        })(),
+      ]
+    )
 
-    const veoResult = await waitForVideoGeneration(veoOperationName)
-    const veoUrl = veoResult.videoUrl
+    await Promise.all(veoCompletionPromises)
 
-    if (!veoUrl) {
-      throw new Error('Veo video generation failed')
-    }
+    console.log(`[Orchestration] All Veo completions finished`)
+    progress.scenesComplete = [1, 2, 3, 4, 5, 6, 7, 8]
 
-    console.log(`[Orchestration] Veo scene complete`)
+    // 6. Generate stitch order and stitch video
+    console.log(`[Orchestration] Generating stitch order...`)
+    progress.stage = 'stitching'
 
-    // 5. Generate HeyGen outro (Scene 3: 30s talking head)
-    console.log(`[Orchestration] Generating HeyGen outro...`)
-    const outroScript =
-      script.scenes[2]?.santaDialogue || `${order.child_name}, see you on Christmas Eve!`
-    const { videoId: outroVideoId } = await generateTalkingHead({
-      script: outroScript,
-    })
-    const outroUrl = await waitForHeyGenCompletion(outroVideoId)
-    console.log(`[Orchestration] HeyGen outro complete`)
-
-    // 6. Stitch final video with FFmpeg
-    console.log(`[Orchestration] Stitching final video with FFmpeg...`)
-    const segments = [
-      { url: introUrl, type: 'heygen' as const, order: 1 },
-      { url: veoUrl, type: 'veo' as const, order: 2 },
-      { url: outroUrl, type: 'heygen' as const, order: 3 },
-    ]
+    const stitchOrder = generateStitchOrder(premadeScenes, childSceneVideos, children)
+    console.log(`[Orchestration] Stitch order generated: ${stitchOrder.length} segments`)
 
     const tempOutputPath = `/tmp/final-${orderId}.mp4`
-    await stitchFinalVideo(segments, tempOutputPath)
+    await stitchVideoSegments(stitchOrder, tempOutputPath)
 
     console.log(`[Orchestration] Final video stitched: ${tempOutputPath}`)
 
     // 7. Upload to Supabase Storage
     console.log(`[Orchestration] Uploading to Supabase Storage...`)
+    progress.stage = 'uploading'
+
     const fileBuffer = await fs.readFile(tempOutputPath)
     const fileName = `${orderId}/final.mp4`
 
@@ -144,6 +282,7 @@ export async function POST(request: NextRequest) {
         final_video_url: finalVideoUrl,
         status: 'complete',
         completed_at: new Date().toISOString(),
+        generation_progress: progress,
       })
       .eq('id', orderId)
 
@@ -164,6 +303,7 @@ export async function POST(request: NextRequest) {
       success: true,
       videoUrl: finalVideoUrl,
       orderId,
+      childCount: children.length,
     })
   } catch (error) {
     console.error(`[Orchestration] Error for order ${orderId}:`, error)
