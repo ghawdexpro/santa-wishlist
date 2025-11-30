@@ -2,7 +2,7 @@ import { GoogleAuth } from 'google-auth-library'
 
 const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || 'primal-turbine-478412-k9'
 const LOCATION = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1'
-const MODEL = 'imagen-3.0-generate-001'
+const MODEL = 'gemini-3-pro-image'  // Upgraded from Imagen 3.0 to Nano Banana Pro
 
 async function getAccessToken(): Promise<string> {
   if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {

@@ -52,56 +52,56 @@ export async function generateSantaScript(data: {
   thingToLearn: string
   customMessage?: string
 }): Promise<GeneratedScript> {
-  const prompt = `You are a scriptwriter for magical personalized Santa Claus videos for children.
-Create a heartwarming, age-appropriate script for Santa to speak directly to a child.
+  const prompt = `Jesteś scenarzystą magicznych, spersonalizowanych filmów od Świętego Mikołaja dla polskich dzieci.
+Stwórz ciepły, odpowiedni dla wieku scenariusz, w którym Mikołaj przemawia bezpośrednio do dziecka.
 
-CHILD INFORMATION:
-- Name: ${data.childName}
-- Age: ${data.childAge} years old
-- Good behavior to praise: ${data.goodBehavior}
-- Area for gentle improvement: ${data.thingToImprove}
-- Goal to encourage: ${data.thingToLearn}
-${data.customMessage ? `- Special message from parents: ${data.customMessage}` : ''}
+INFORMACJE O DZIECKU:
+- Imię: ${data.childName}
+- Wiek: ${data.childAge} lat
+- Dobre zachowanie do pochwały: ${data.goodBehavior}
+- Obszar do delikatnej poprawy: ${data.thingToImprove}
+- Cel do zachęty: ${data.thingToLearn}
+${data.customMessage ? `- Wiadomość od rodziców: ${data.customMessage}` : ''}
 
-SCRIPT REQUIREMENTS:
-1. Total video length: approximately 90 seconds
-2. Santa should be warm, jolly, and encouraging - never scolding
-3. Use the child's name naturally throughout (3-4 times)
-4. Age-appropriate language for a ${data.childAge}-year-old
-5. Build emotional connection - this is magical for the child
-6. End with excitement about Christmas and a warm goodbye
+WYMAGANIA SCENARIUSZA:
+1. Całkowita długość: około 90 sekund
+2. Mikołaj powinien być ciepły, wesoły i zachęcający - NIGDY nie karci
+3. Użyj imienia dziecka naturalnie (3-4 razy)
+4. Język odpowiedni dla ${data.childAge}-latka
+5. Buduj emocjonalną więź - to ma być magiczne dla dziecka
+6. Zakończ podekscytowaniem Świętami i ciepłym pożegnaniem
 
-SCENE STRUCTURE (follow this exactly):
-- Scene 1: Santa in workshop, greeting (pre-made footage, ~8 sec)
-- Scene 2: Santa opens Nice List book, finds child's name (personalized, ~10 sec)
-- Scene 3: Santa praises the good behavior specifically (personalized, ~12 sec)
-- Scene 4: Santa gently encourages improvement area (personalized, ~10 sec)
-- Scene 5: Santa encourages the goal/learning (personalized, ~10 sec)
-- Scene 6: Santa mentions he's preparing something special (transition, ~8 sec)
-- Scene 7: Quick workshop scene with elves working (pre-made, ~5 sec)
-- Scene 8: Santa promises to visit on Christmas Eve (personalized, ~10 sec)
-- Scene 9: Santa's warm goodbye with child's name (personalized, ~10 sec)
-- Scene 10: Final festive outro with "Ho Ho Ho!" (pre-made, ~7 sec)
+STRUKTURA SCEN (dokładnie w tej kolejności):
+- Scena 1: Mikołaj w domu, powitanie (premade, ~8 sec)
+- Scena 2: Mikołaj otwiera Listę Grzecznych, znajduje imię dziecka (spersonalizowana, ~10 sec)
+- Scena 3: Mikołaj chciał dobre zachowanie konkretnie (spersonalizowana, ~12 sec)
+- Scena 4: Mikołaj delikatnie zachęca do poprawy (spersonalizowana, ~10 sec)
+- Scena 5: Mikołaj zachęca cel/naukę (spersonalizowana, ~10 sec)
+- Scena 6: Mikołaj wspomina o przygotowaniu czegoś specjalnego (przejście, ~8 sec)
+- Scena 7: Szybka scena domu z pomocnikami (premade, ~5 sec)
+- Scena 8: Mikołaj obiecuje odwiedzić na Wigilię (spersonalizowana, ~10 sec)
+- Scena 9: Ciepłe pożegnanie Mikołaja z imieniem dziecka (spersonalizowana, ~10 sec)
+- Scena 10: Ostateczne świąteczne "Ho Ho Ho!" (premade, ~7 sec)
 
-Return ONLY valid JSON in this exact format:
+Zwróć TYLKO valid JSON w tym dokładnie formacie:
 {
   "childName": "${data.childName}",
-  "totalDuration": "~90 seconds",
+  "totalDuration": "~90 sekund",
   "scenes": [
     {
       "sceneNumber": 1,
-      "title": "Workshop Greeting",
+      "title": "Powitanie w Domu",
       "duration": "8 sec",
-      "setting": "Santa's cozy workshop with toys and warm lighting",
-      "santaDialogue": "Ho ho ho! Well, hello there! Welcome to my workshop at the North Pole!",
-      "visualDescription": "Santa seated in big chair, fireplace in background, toys visible",
-      "emotionalTone": "Warm, welcoming, jolly",
+      "setting": "Przytulny dom Świętego Mikołaja z zabawkami i ciepłym oświetleniem",
+      "santaDialogue": "Ho ho ho! Cze ść, ${data.childName}! Witaj w moim domu na Biegunie Północnym!",
+      "visualDescription": "Mikołaj siedzący na wielkim fotelu, kominek w tle, zabawki widoczne",
+      "emotionalTone": "Ciepły, przyjazny, wesoły",
       "isPremade": true
     }
   ]
 }
 
-Generate all 10 scenes with personalized dialogue. Make it magical!`
+Wygeneruj wszystkie 10 scen z spersonalizowanym dialogiem. Niech to będzie magiczne!`
 
   const accessToken = await getAccessToken()
 

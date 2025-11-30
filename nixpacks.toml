@@ -1,0 +1,14 @@
+# Railway Nix Buildpack Configuration
+# Installs FFmpeg and other dependencies for video processing
+
+[phases.setup]
+# Install system packages
+aptPkgs = ["ffmpeg"]
+
+[phases.build]
+# Install npm dependencies and build Next.js
+cmds = ["npm install", "npm run build"]
+
+[start]
+# Start the Next.js app in production mode
+cmd = "npm start"

@@ -2,7 +2,7 @@ import { GoogleAuth } from 'google-auth-library'
 
 const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || 'primal-turbine-478412-k9'
 const LOCATION = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1'
-const MODEL = 'veo-2.0-generate-001' // Using Veo 2 for stability, can upgrade to veo-3.0 when available
+const MODEL = 'veo-3.1-generate-001' // Upgraded to Veo 3.1 with native audio generation
 
 async function getAccessToken(): Promise<string> {
   if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
@@ -71,6 +71,7 @@ export async function startVideoGeneration(request: VideoGenerationRequest): Pro
       sampleCount: request.sampleCount || 1,
       durationSeconds: request.durationSeconds || 8,
       personGeneration: 'allow_adult',
+      generateAudio: true,  // Veo 3.1 native audio generation
       ...(request.negativePrompt && { negativePrompt: request.negativePrompt }),
     },
   }
