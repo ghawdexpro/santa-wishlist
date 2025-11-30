@@ -5,7 +5,7 @@
  */
 
 import { generateSantaScript } from '@/lib/gemini'
-import { generateAllKeyframes } from '@/lib/imagen'
+import { generateAllKeyframes } from '@/lib/nanobanana'
 import { startVideoGeneration, waitForVideoGeneration } from '@/lib/veo'
 import { generateTalkingHead, waitForHeyGenCompletion } from '@/lib/heygen'
 import { stitchFinalVideo } from '@/lib/ffmpeg'
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   const { orderId } = await request.json() as { orderId: string }
 
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     console.log(`[Orchestration] Starting full video generation for order: ${orderId}`)
 
@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
 
     // Update order with error status
     try {
-      const supabase = createClient()
+      const supabase = await createClient()
       await supabase
         .from('orders')
         .update({

@@ -1,270 +1,123 @@
 /**
- * NanoBanana Pro - Image Generation via Vertex AI
- *
- * Models:
- * - gemini-2.5-flash-image (Fast, $0.039/image, max 1024px)
- * - gemini-3-pro-image-preview (Advanced, $0.14-0.24/image, max 4K, needs location=global)
- *
- * Documentation: docs/NANOBANANA-BIBLE.md
+ * Nano Banana Pro (Gemini 3 Pro Image) Integration
+ * Generates high-quality keyframe images for video scenes
  */
 
 import { GoogleAuth } from 'google-auth-library'
+import * as fs from 'fs/promises'
 
-const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || 'primal-turbine-478412-k9'
-const DEFAULT_LOCATION = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1'
+const MODEL = 'gemini-3-pro-image' // Nano Banana Pro
+const LOCATION = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1'
+const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT
 
-// Model IDs
-const MODEL_FLASH = 'gemini-2.5-flash-image'
-const MODEL_PRO = 'gemini-3-pro-image-preview'
+// Initialize auth
+let authClient: GoogleAuth | null = null
 
-// Supported aspect ratios
-export type AspectRatio = '1:1' | '16:9' | '9:16' | '3:2' | '2:3' | '3:4' | '4:3' | '4:5' | '5:4' | '21:9'
+async function getAuthClient() {
+  if (authClient) return authClient
 
-export interface ImageGenerationConfig {
-  prompt: string
-  model?: 'flash' | 'pro'
-  aspectRatio?: AspectRatio
-  inputImages?: Array<{
-    base64: string
-    mimeType: string
-  }>
-}
-
-export interface ImageGenerationResult {
-  text?: string
-  images: Array<{
-    base64: string
-    mimeType: string
-  }>
-}
-
-async function getAccessToken(): Promise<string> {
-  if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
-    const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
-    const auth = new GoogleAuth({
-      credentials,
-      scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-    })
-    const client = await auth.getClient()
-    const token = await client.getAccessToken()
-    return token.token || ''
+  // Use service account from environment
+  const credsJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
+  if (!credsJson) {
+    throw new Error('GOOGLE_APPLICATION_CREDENTIALS_JSON not set')
   }
 
-  const auth = new GoogleAuth({
+  const creds = JSON.parse(credsJson)
+
+  authClient = new GoogleAuth({
+    credentials: creds,
     scopes: ['https://www.googleapis.com/auth/cloud-platform'],
   })
-  const client = await auth.getClient()
-  const token = await client.getAccessToken()
-  return token.token || ''
+
+  return authClient
+}
+
+async function getAccessToken() {
+  const auth = await getAuthClient()
+  const client = auth.getClient()
+  const { token } = await client.getAccessToken()
+  if (!token) throw new Error('Failed to get access token')
+  return token
+}
+
+export interface KeyframeRequest {
+  prompt: string
+  sceneNumber: number
+  width?: number
+  height?: number
+}
+
+export interface KeyframeResult {
+  sceneNumber: number
+  imageBase64: string
+  mimeType: string
 }
 
 /**
- * Generate images using NanoBanana (Gemini Image models)
+ * Generate a single keyframe image using Nano Banana Pro
  */
-export async function generateImage(config: ImageGenerationConfig): Promise<ImageGenerationResult> {
+export async function generateKeyframe(request: KeyframeRequest): Promise<KeyframeResult> {
+  console.log(
+    `[Imagen] Generating keyframe for scene ${request.sceneNumber}: "${request.prompt.substring(0, 50)}..."`
+  )
+
   const accessToken = await getAccessToken()
 
-  // Model selection
-  const model = config.model === 'pro' ? MODEL_PRO : MODEL_FLASH
-
-  // Location - Pro REQUIRES global
-  const location = config.model === 'pro' ? 'global' : DEFAULT_LOCATION
-
-  // Build endpoint
-  const baseUrl = location === 'global'
-    ? 'https://aiplatform.googleapis.com/v1'
-    : `https://${location}-aiplatform.googleapis.com/v1`
-
-  const endpoint = `${baseUrl}/projects/${PROJECT_ID}/locations/${location}/publishers/google/models/${model}:generateContent`
-
-  // Build parts array - images first, then text
-  const parts: Array<Record<string, unknown>> = []
-
-  // Add input images first (if any)
-  if (config.inputImages) {
-    for (const img of config.inputImages) {
-      parts.push({
-        inlineData: {
-          mimeType: img.mimeType,
-          data: img.base64,
-        }
-      })
-    }
-  }
-
-  // Add text prompt
-  parts.push({ text: config.prompt })
-
-  const body = {
-    contents: [{
-      role: 'user',
-      parts,
-    }],
-    generationConfig: {
-      responseModalities: ['TEXT', 'IMAGE'],
-      ...(config.aspectRatio && {
-        imageConfig: {
-          aspectRatio: config.aspectRatio,
-        }
+  const response = await fetch(
+    `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/endpoints/generic_model:rawPredict`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: `projects/${PROJECT_ID}/locations/${LOCATION}/models/${MODEL}`,
+        instances: [
+          {
+            prompt: request.prompt,
+          },
+        ],
+        parameters: {
+          width: request.width || 1024,
+          height: request.height || 576,
+          aspect_ratio: '16:9',
+        },
       }),
-    },
-  }
-
-  console.log(`NanoBanana: Generating image with ${model} at ${location}`)
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  })
+    }
+  )
 
   if (!response.ok) {
     const error = await response.text()
-    console.error('NanoBanana API error:', error)
-    throw new Error(`NanoBanana API error: ${response.status} - ${error}`)
+    throw new Error(`Imagen API error: ${response.status} ${error}`)
   }
 
-  const result = await response.json()
+  const result = await response.json() as any
 
-  // Parse response
-  const output: ImageGenerationResult = { images: [] }
-
-  const candidate = result.candidates?.[0]
-  if (candidate?.content?.parts) {
-    for (const part of candidate.content.parts) {
-      if (part.text) {
-        output.text = part.text
-      } else if (part.inlineData) {
-        output.images.push({
-          base64: part.inlineData.data,
-          mimeType: part.inlineData.mimeType || 'image/png',
-        })
-      }
-    }
+  if (!result.predictions || !result.predictions[0]) {
+    throw new Error('No image generated from Imagen API')
   }
 
-  console.log(`NanoBanana: Generated ${output.images.length} image(s)`)
+  const imageData = result.predictions[0].bytesBase64Encoded || result.predictions[0].image_base64
 
-  return output
-}
+  console.log(`[Imagen] Generated keyframe for scene ${request.sceneNumber}`)
 
-/**
- * Simple text-to-image generation
- */
-export async function textToImage(
-  prompt: string,
-  aspectRatio: AspectRatio = '16:9',
-  model: 'flash' | 'pro' = 'flash'
-): Promise<ImageGenerationResult> {
-  return generateImage({ prompt, aspectRatio, model })
-}
-
-/**
- * Edit an existing image with a text prompt
- */
-export async function editImage(
-  imageBase64: string,
-  imageMimeType: string,
-  editPrompt: string,
-  model: 'flash' | 'pro' = 'flash'
-): Promise<ImageGenerationResult> {
-  return generateImage({
-    prompt: editPrompt,
-    inputImages: [{ base64: imageBase64, mimeType: imageMimeType }],
-    model,
-  })
-}
-
-/**
- * Composite multiple images with a text prompt
- * Note: Pro model supports up to 14 images, Flash supports up to 3
- */
-export async function compositeImages(
-  images: Array<{ base64: string; mimeType: string }>,
-  prompt: string,
-  aspectRatio: AspectRatio = '16:9'
-): Promise<ImageGenerationResult> {
-  // Use Pro model for compositing as it handles multiple images better
-  return generateImage({
-    prompt,
-    inputImages: images,
-    model: images.length > 3 ? 'pro' : 'flash',
-    aspectRatio,
-  })
-}
-
-/**
- * Make a child's photo "come alive" - composite with magical effects
- * Used for Scene 4: Photo Comes Alive
- */
-export async function makePhotoMagical(
-  childPhotoBase64: string,
-  childPhotoMimeType: string,
-  childName: string
-): Promise<ImageGenerationResult> {
-  const magicalPrompt = `Transform this child's photo into a magical scene:
-The photo should appear on an ornate golden magical book page.
-The photo is surrounded by a glowing golden magical frame with sparkles.
-The frame pulses with warm light and golden particles swirl around it.
-The image gains depth and dimension, like it's coming alive.
-Cinematic quality, warm lighting, photorealistic magical effects.
-The child in the photo is named ${childName}.`
-
-  return generateImage({
-    prompt: magicalPrompt,
-    inputImages: [{ base64: childPhotoBase64, mimeType: childPhotoMimeType }],
-    model: 'pro', // Pro for better quality on this key personalization
-    aspectRatio: '16:9',
-  })
-}
-
-/**
- * Generate a keyframe image for video generation
- * Can be used as input to Veo for image-to-video
- */
-export async function generateKeyframe(
-  prompt: string,
-  aspectRatio: AspectRatio = '16:9'
-): Promise<{ base64: string; mimeType: string } | null> {
-  const result = await textToImage(prompt, aspectRatio, 'flash')
-
-  if (result.images.length > 0) {
-    return result.images[0]
+  return {
+    sceneNumber: request.sceneNumber,
+    imageBase64: imageData,
+    mimeType: 'image/png',
   }
-
-  return null
 }
 
 /**
- * Generate with retry logic
+ * Generate multiple keyframes in parallel
  */
-export async function generateWithRetry(
-  config: ImageGenerationConfig,
-  maxRetries = 3
-): Promise<ImageGenerationResult> {
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      return await generateImage(config)
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error'
+export async function generateAllKeyframes(requests: KeyframeRequest[]): Promise<KeyframeResult[]> {
+  console.log(`[Imagen] Generating ${requests.length} keyframes...`)
 
-      // Don't retry client errors (4xx)
-      if (message.includes('400') || message.includes('403') || message.includes('401')) {
-        throw error
-      }
+  const results = await Promise.all(requests.map((req) => generateKeyframe(req)))
 
-      // Retry server errors with exponential backoff
-      if (attempt < maxRetries - 1) {
-        const delay = Math.pow(2, attempt) * 1000
-        console.log(`NanoBanana: Retry ${attempt + 1}/${maxRetries} after ${delay}ms`)
-        await new Promise(r => setTimeout(r, delay))
-      } else {
-        throw error
-      }
-    }
-  }
-  throw new Error('NanoBanana: Max retries exceeded')
+  console.log(`[Imagen] Successfully generated ${results.length} keyframes`)
+
+  return results
 }
