@@ -17,8 +17,9 @@ npm run start    # Start production server
 
 **Deployment:**
 ```bash
-git push origin main           # Push to GitHub
-railway up --detach            # Deploy to Railway (manual push required)
+git pull origin main --rebase   # Always pull before pushing (avoid divergent branches)
+git push origin main            # Push to GitHub
+railway up --detach             # Deploy to Railway (MUST be run manually, not automatic)
 ```
 
 **Supabase CLI:**
@@ -179,6 +180,28 @@ NEXT_PUBLIC_APP_URL
 4. Run test scenarios (1, 2, 3 children)
 5. Monitor logs during video generation
 
+## Current Implementation Status
+
+### ✅ Completed Features
+- **Dual-Keyframe Video Generation** - Veo 3.1 supports start + end keyframes for guided generation
+- **Admin Panel** - Full UI for managing pre-made scenes with granular controls
+- **Script Page UX** - All scenes expand by default to show Santa's dialogue immediately
+- **Customer Flow** - Create → Script generation → Payment → Video generation → Download
+- **Database Schema** - `premade_scenes` table with all necessary fields for dual-keyframe pipeline
+
+### ⏳ Pending Tasks
+- Generate pre-made scene keyframes for scenes 1, 2, 3, 7 (cost: ~$0.32 total)
+- Test pre-made scene video generation end-to-end
+- Monitor production stability on Railway
+
+## Frontend Pages & UX
+
+### Script Preview Page (`/create/script`)
+- **Behavior:** All scenes expanded by default when script loads
+- **Reason:** Users see full personalized content (Santa dialogue, visual descriptions, settings)
+- **Interaction:** Users can click "−" to collapse individual scenes, "+" to re-expand
+- **State:** Uses `Set<number>` to track multiple expanded scenes (not single selection)
+
 ## Documentation
 
 - `IMPLEMENTATION-SUMMARY.md` - Complete technical overview of multi-child system
@@ -275,3 +298,31 @@ supabase db push
 - Migration not applying? Check if linked to correct project
 - "Remote database is up to date"? Verify migration file timestamp is newer than previously applied
 - Multiple migrations on same day? Use `_01`, `_02` suffixes: `20241130_01_create_table.sql`, `20241130_02_add_column.sql`
+
+## Troubleshooting
+
+### Git & Deployment
+- **"Updates were rejected" when pushing?** Remote has changes you don't have locally. Use: `git pull origin main --rebase` before pushing
+- **Railway deploy not working?** CLI must be run manually. `railway up --detach` does NOT run automatically
+- **npm command not found in bash?** Node.js may not be in PATH. Use system terminal instead of Claude Code bash environment
+
+### Database & Migrations
+- **New migration column not visible in production?** Check that:
+  1. Migration file timestamp is correctly formatted (YYYYMMDD_description.sql)
+  2. You ran `supabase link --project-ref epxeimwsheyttevwtjku` if it's first time
+  3. Migration was actually committed and pushed to GitHub
+  4. Railway deployment completed successfully
+- **Production database out of sync with local?** Verify via Supabase dashboard that column exists in `premade_scenes` table
+
+### Vertex AI & Image Generation
+- **NanoBanana failing silently?** Check that location is `us-central1` (default) for gemini-2.5-flash-image model
+- **Veo video generation stuck?** Check `/api/generate-video/status` endpoint for actual operation status
+- **Service account auth failing?** Verify `GOOGLE_APPLICATION_CREDENTIALS_JSON` is valid and not truncated in environment
+
+## Development Workflow
+
+1. **Before making changes:** Always pull latest: `git pull origin main --rebase`
+2. **When adding features:** Test locally with `npm run dev` first
+3. **When deploying:** Always push to GitHub before Railway: `git push origin main && railway up --detach`
+4. **For database changes:** Create separate migration files with timestamps, never modify applied migrations
+5. **Testing the full flow:** Use `/create` wizard to test: script generation → payment → video generation
