@@ -32,7 +32,11 @@ export default function ScriptPreviewPage() {
       // Check if we already have a generated script
       const storedScript = sessionStorage.getItem('generatedScript')
       if (storedScript) {
-        setScript(JSON.parse(storedScript))
+        const parsedScript = JSON.parse(storedScript)
+        setScript(parsedScript)
+        // Expand all scenes immediately when loading from storage
+        const allSceneNumbers = parsedScript.scenes.map((s: ScriptScene) => s.sceneNumber)
+        setExpandedScenes(new Set(allSceneNumbers))
       }
 
       // Check if script was already approved
