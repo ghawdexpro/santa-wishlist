@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS premade_scenes (
   duration_seconds INTEGER DEFAULT 10,
   prompt_used TEXT,
   keyframe_url TEXT,
-  keyframe_end_url TEXT,
   video_url TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -15,6 +14,3 @@ CREATE TABLE IF NOT EXISTS premade_scenes (
 
 -- Index for quick lookups
 CREATE INDEX IF NOT EXISTS idx_premade_scenes_number ON premade_scenes(scene_number);
-
--- Add comment for documentation
-COMMENT ON COLUMN premade_scenes.keyframe_end_url IS 'URL of the end keyframe image for guided video generation';
