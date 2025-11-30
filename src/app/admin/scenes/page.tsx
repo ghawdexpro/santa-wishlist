@@ -8,7 +8,6 @@ interface SceneStatus {
   name: string
   description: string
   duration_seconds: number
-  keyframe_url?: string
   video_url?: string
   prompt_used?: string
   created_at?: string
@@ -18,7 +17,6 @@ interface SceneStatus {
 interface GenerationResult {
   sceneNumber: number
   name: string
-  keyframeGenerated?: boolean
   videoOperationStarted?: boolean
   operationName?: string
   error?: string
@@ -42,7 +40,6 @@ export default function AdminScenesPage() {
       durationSeconds: s.durationSeconds,
       type: 'personalized' as const,
       videoPrompt: s.videoPromptTemplate,
-      keyframePrompt: s.keyframePromptTemplate,
       audioDescription: s.audioDescription,
     })),
   ].sort((a, b) => a.sceneNumber - b.sceneNumber)
@@ -69,41 +66,6 @@ export default function AdminScenesPage() {
     fetchSceneStatuses()
   }
 
-  const generateKeyframe = async (sceneNumber: number) => {
-    setGenerating(sceneNumber)
-    setMessage(null)
-
-    try {
-      const response = await fetch('/api/admin/generate-premade', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          adminKey,
-          sceneNumbers: [sceneNumber],
-          type: 'keyframes',
-        }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok && data.success) {
-        const result = data.results[0] as GenerationResult
-        if (result.keyframeGenerated) {
-          setMessage({ type: 'success', text: `Scene ${sceneNumber} keyframe generated!` })
-          fetchSceneStatuses()
-        } else if (result.error) {
-          setMessage({ type: 'error', text: `Error: ${result.error}` })
-        }
-      } else {
-        setMessage({ type: 'error', text: data.error || 'Generation failed' })
-      }
-    } catch {
-      setMessage({ type: 'error', text: 'Failed to generate keyframe' })
-    }
-
-    setGenerating(null)
-  }
-
   const generateVideo = async (sceneNumber: number) => {
     setGenerating(sceneNumber)
     setMessage(null)
@@ -115,7 +77,6 @@ export default function AdminScenesPage() {
         body: JSON.stringify({
           adminKey,
           sceneNumbers: [sceneNumber],
-          type: 'videos',
         }),
       })
 
@@ -126,7 +87,7 @@ export default function AdminScenesPage() {
         if (result.videoOperationStarted) {
           setMessage({
             type: 'success',
-            text: `Scene ${sceneNumber} video generation started! Operation: ${result.operationName}`
+            text: `Scene ${sceneNumber} video generation started! Operation: ${result.operationName?.slice(-20)}...`
           })
           fetchSceneStatuses()
         } else if (result.error) {
@@ -186,7 +147,7 @@ export default function AdminScenesPage() {
           <div>
             <h1 className="text-3xl font-bold glow-gold">Scene Generator</h1>
             <p className="text-white/70 mt-1">
-              Generate pre-made scenes for The Santa Experience
+              Generate pre-made VFX scenes with Veo
             </p>
           </div>
           <button
@@ -210,29 +171,29 @@ export default function AdminScenesPage() {
         <div className="grid gap-6">
           {allScenes.map((scene) => {
             const status = getSceneStatus(scene.sceneNumber)
-            const hasKeyframe = !!status?.keyframe_url
             const hasVideo = !!status?.video_url
             const isGenerating = generating === scene.sceneNumber
             const isPremade = scene.type === 'premade'
 
+            // Check if video generation was started
+            let operationStarted = false
+            if (status?.prompt_used) {
+              try {
+                const parsed = JSON.parse(status.prompt_used)
+                operationStarted = !!parsed.operationName
+              } catch {}
+            }
+
             return (
               <div key={scene.sceneNumber} className="card-christmas">
                 <div className="flex flex-col lg:flex-row gap-6">
-                  {/* Preview */}
+                  {/* Preview placeholder */}
                   <div className="lg:w-64 flex-shrink-0">
-                    {hasKeyframe && status?.keyframe_url ? (
-                      <img
-                        src={status.keyframe_url}
-                        alt={`Scene ${scene.sceneNumber} keyframe`}
-                        className="w-full aspect-video object-cover rounded-lg border border-christmas-gold/30"
-                      />
-                    ) : (
-                      <div className="w-full aspect-video bg-white/5 rounded-lg border border-white/20 flex items-center justify-center">
-                        <span className="text-white/40 text-4xl">
-                          {scene.sceneNumber}
-                        </span>
-                      </div>
-                    )}
+                    <div className="w-full aspect-video bg-white/5 rounded-lg border border-white/20 flex items-center justify-center">
+                      <span className="text-white/40 text-4xl">
+                        {scene.sceneNumber}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Info */}
@@ -254,11 +215,8 @@ export default function AdminScenesPage() {
 
                     <div className="flex flex-wrap gap-4 text-sm text-white/60 mb-4">
                       <span>Duration: {scene.durationSeconds}s</span>
-                      <span className={hasKeyframe ? 'text-green-400' : 'text-white/40'}>
-                        Keyframe: {hasKeyframe ? '✓' : '✗'}
-                      </span>
-                      <span className={hasVideo ? 'text-green-400' : 'text-white/40'}>
-                        Video: {hasVideo ? '✓' : '✗'}
+                      <span className={hasVideo ? 'text-green-400' : operationStarted ? 'text-yellow-400' : 'text-white/40'}>
+                        Video: {hasVideo ? '✓ Ready' : operationStarted ? '⏳ Processing' : '✗ Not started'}
                       </span>
                     </div>
 
@@ -266,16 +224,9 @@ export default function AdminScenesPage() {
                     {isPremade && (
                       <div className="flex flex-wrap gap-3">
                         <button
-                          onClick={() => generateKeyframe(scene.sceneNumber)}
+                          onClick={() => generateVideo(scene.sceneNumber)}
                           disabled={isGenerating}
                           className="btn-christmas text-sm py-2 px-4"
-                        >
-                          {isGenerating ? 'Generating...' : hasKeyframe ? 'Regenerate Keyframe' : 'Generate Keyframe'}
-                        </button>
-                        <button
-                          onClick={() => generateVideo(scene.sceneNumber)}
-                          disabled={isGenerating || !hasKeyframe}
-                          className="btn-christmas btn-green text-sm py-2 px-4 disabled:opacity-50"
                         >
                           {isGenerating ? 'Starting...' : hasVideo ? 'Regenerate Video' : 'Generate Video'}
                         </button>
@@ -293,21 +244,12 @@ export default function AdminScenesPage() {
                 {/* Prompt Preview (collapsible) */}
                 <details className="mt-4">
                   <summary className="cursor-pointer text-white/60 hover:text-white/80 text-sm">
-                    View Prompts
+                    View Video Prompt
                   </summary>
-                  <div className="mt-3 space-y-3 text-sm">
-                    <div>
-                      <p className="text-christmas-gold font-semibold mb-1">Keyframe Prompt:</p>
-                      <pre className="bg-black/30 p-3 rounded text-white/70 whitespace-pre-wrap text-xs">
-                        {scene.keyframePrompt || (scene as any).keyframePromptTemplate}
-                      </pre>
-                    </div>
-                    <div>
-                      <p className="text-christmas-gold font-semibold mb-1">Video Prompt:</p>
-                      <pre className="bg-black/30 p-3 rounded text-white/70 whitespace-pre-wrap text-xs max-h-48 overflow-y-auto">
-                        {scene.videoPrompt || (scene as any).videoPromptTemplate}
-                      </pre>
-                    </div>
+                  <div className="mt-3">
+                    <pre className="bg-black/30 p-3 rounded text-white/70 whitespace-pre-wrap text-xs max-h-48 overflow-y-auto">
+                      {scene.videoPrompt || (scene as any).videoPromptTemplate}
+                    </pre>
                   </div>
                 </details>
               </div>
@@ -318,18 +260,12 @@ export default function AdminScenesPage() {
         {/* Summary Stats */}
         <div className="card-christmas mt-8">
           <h3 className="text-lg font-bold mb-4">Generation Progress</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="text-3xl font-bold glow-gold">
-                {sceneStatuses.filter(s => s.keyframe_url).length}
-              </div>
-              <div className="text-white/60 text-sm">Keyframes</div>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
             <div>
               <div className="text-3xl font-bold glow-gold">
                 {sceneStatuses.filter(s => s.video_url).length}
               </div>
-              <div className="text-white/60 text-sm">Videos</div>
+              <div className="text-white/60 text-sm">Videos Ready</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-green-400">

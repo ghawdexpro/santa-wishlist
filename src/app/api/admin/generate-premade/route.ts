@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PREMADE_SCENES } from '@/lib/premade-scenes'
-import { generateKeyframe } from '@/lib/imagen'
-import { startVideoGeneration, pollVideoGeneration } from '@/lib/veo'
+import { startVideoGeneration } from '@/lib/veo'
 import { createClient } from '@supabase/supabase-js'
 
 export const maxDuration = 300 // 5 minutes
@@ -18,17 +17,16 @@ const ADMIN_KEY = process.env.ADMIN_SECRET_KEY || 'santa-admin-2024'
 /**
  * POST /api/admin/generate-premade
  *
- * Generate pre-made scenes for reuse.
+ * Generate pre-made scene videos using Veo.
  *
  * Body:
  * - adminKey: string (required)
  * - sceneNumbers: number[] (optional, defaults to all)
- * - type: 'keyframes' | 'videos' | 'both' (default: 'keyframes')
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { adminKey, sceneNumbers, type = 'keyframes' } = body
+    const { adminKey, sceneNumbers } = body
 
     // Verify admin key
     if (adminKey !== ADMIN_KEY) {
@@ -47,7 +45,6 @@ export async function POST(request: NextRequest) {
     const results: Array<{
       sceneNumber: number
       name: string
-      keyframeGenerated?: boolean
       videoOperationStarted?: boolean
       operationName?: string
       error?: string
@@ -62,59 +59,36 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        // Generate keyframe
-        if (type === 'keyframes' || type === 'both') {
-          console.log(`Generating keyframe for scene ${scene.sceneNumber}...`)
+        console.log(`Starting video generation for scene ${scene.sceneNumber}...`)
 
-          const { imageBase64, mimeType } = await generateKeyframe(scene.keyframePrompt)
+        const operationName = await startVideoGeneration({
+          prompt: scene.videoPrompt,
+          durationSeconds: scene.durationSeconds,
+          aspectRatio: '16:9',
+        })
 
-          // Store in database
-          const { error: dbError } = await supabaseAdmin
-            .from('premade_scenes')
-            .upsert({
-              scene_number: scene.sceneNumber,
-              name: scene.name,
-              description: scene.description,
-              duration_seconds: scene.durationSeconds,
-              prompt_used: scene.keyframePrompt,
-              // Store base64 keyframe (in production, upload to Supabase Storage)
-              keyframe_url: `data:${mimeType};base64,${imageBase64}`,
-            }, {
-              onConflict: 'scene_number',
-            })
+        result.videoOperationStarted = true
+        result.operationName = operationName
 
-          if (dbError) {
-            console.error(`DB error for scene ${scene.sceneNumber}:`, dbError)
-          }
-
-          result.keyframeGenerated = true
-        }
-
-        // Start video generation
-        if (type === 'videos' || type === 'both') {
-          console.log(`Starting video generation for scene ${scene.sceneNumber}...`)
-
-          const operationName = await startVideoGeneration({
-            prompt: scene.videoPrompt,
-            durationSeconds: scene.durationSeconds,
-            aspectRatio: '16:9',
+        // Store in database
+        const { error: dbError } = await supabaseAdmin
+          .from('premade_scenes')
+          .upsert({
+            scene_number: scene.sceneNumber,
+            name: scene.name,
+            description: scene.description,
+            duration_seconds: scene.durationSeconds,
+            prompt_used: JSON.stringify({
+              videoPrompt: scene.videoPrompt,
+              operationName,
+              startedAt: new Date().toISOString(),
+            }),
+          }, {
+            onConflict: 'scene_number',
           })
 
-          result.videoOperationStarted = true
-          result.operationName = operationName
-
-          // Update database with operation name
-          await supabaseAdmin
-            .from('premade_scenes')
-            .update({
-              // Store operation name for later polling
-              prompt_used: JSON.stringify({
-                videoPrompt: scene.videoPrompt,
-                operationName,
-                startedAt: new Date().toISOString(),
-              }),
-            })
-            .eq('scene_number', scene.sceneNumber)
+        if (dbError) {
+          console.error(`DB error for scene ${scene.sceneNumber}:`, dbError)
         }
 
         // Delay between scenes to avoid rate limits
@@ -130,7 +104,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      type,
       scenesProcessed: results.length,
       results,
     })

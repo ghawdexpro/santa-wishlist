@@ -13,7 +13,6 @@ export interface SceneConfig {
   durationSeconds: number
   type: 'premade' | 'personalized'
   videoPrompt: string
-  keyframePrompt: string
   audioDescription: string
 }
 
@@ -66,7 +65,6 @@ Camera continues diving toward the largest building - Santa's Workshop.
 Camera: First-person POV, dynamic movement, roller-coaster energy, diving motion.
 VFX: Particle trails, lens flares, speed blur, aurora effects, magical sparkles.
 Mood: EXCITING, thrilling, "WOOOAH!", sense of magic and wonder.`,
-    keyframePrompt: `POV flying through magical night sky, aurora borealis green purple, diving through clouds, North Pole village glowing below, snow-capped mountains, magical sparkles, motion blur, cinematic, photorealistic`,
     audioDescription: 'Whooshing wind, magical chimes building, orchestral crescendo, sleigh bells distant',
   },
   {
@@ -96,7 +94,6 @@ Warm lighting from countless candles and magical orbs.
 Camera: Sweeping crane shot through the workshop, following a flying toy.
 VFX: Floating objects, magic sparkles, glowing trails, busy magical motion.
 Mood: "SO COOL!", wonder, childhood dream come true, pure magic.`,
-    keyframePrompt: `Inside magical Santa workshop, toys flying through air assembling themselves, elves doing acrobatic flips, conveyor belts with presents, giant candy canes, Christmas lights everywhere, golden sparkles, warm magical lighting, photorealistic, cinematic`,
     audioDescription: 'Cheerful workshop sounds, magical chimes, elf laughter, toy sounds, joyful music',
   },
   {
@@ -129,7 +126,6 @@ Santa's expression shows anticipation and excitement.
 Camera: Medium shot of Santa, dramatic lighting from book's glow.
 VFX: Telekinesis effect, floating book, golden light burst, magical particles, page flip.
 Mood: "He has POWERS!", real movie magic, wizardly Santa, awe-inspiring.`,
-    keyframePrompt: `${SANTA_CHARACTER} in cozy study, magical glowing book flying through air toward him, golden light and sparkles trailing, telekinesis pose with raised hand, fireplace in background, dramatic magical lighting, photorealistic, cinematic`,
     audioDescription: 'Magical whoosh, golden shimmer sounds, book flutter, dramatic orchestral swell',
   },
   {
@@ -165,7 +161,6 @@ Reindeer paw the snow eagerly, ready to fly.
 Camera: Following Santa, then wide reveal of the spectacular scene.
 VFX: Glowing Rudolph nose, breath vapor, magical atmosphere, northern lights.
 Mood: Anticipation, the promise of Christmas, epic setup for finale.`,
-    keyframePrompt: `${SANTA_CHARACTER} standing in open doorway, revealing magnificent red gold sleigh loaded with presents, eight reindeer with Rudolph's glowing red nose, snowy courtyard, elves preparing, northern lights above, magical Christmas scene, photorealistic, cinematic`,
     audioDescription: 'Door creaking open, reindeer snorting, bells jingling, wind, magical anticipation',
   },
 ]
@@ -182,7 +177,6 @@ export interface PersonalizedSceneTemplate {
   type: 'personalized'
   // These have placeholders: [NAME], [GOOD_BEHAVIOR], [THING_TO_IMPROVE], [CUSTOM_MESSAGE]
   videoPromptTemplate: string
-  keyframePromptTemplate: string
   audioDescription: string
 }
 
@@ -220,7 +214,6 @@ Santa speaks to the photo: "I've been watching you, and I'm so proud..."
 Camera: Close-up on book with photo, then Santa's joyful reaction.
 VFX: Photo animation, magical frame glow, golden particles, depth effect.
 Mood: "THAT'S ME!!!", magical recognition, personal connection, wonder.`,
-    keyframePromptTemplate: `${SANTA_CHARACTER} looking at magical glowing book, photograph on page with ornate golden frame, golden sparkles swirling, expression of joy and recognition, ${WORKSHOP_SETTING}, warm lighting, photorealistic, cinematic`,
     audioDescription: 'Magical shimmer, warm orchestral swell, Santa speaking gently, sparkle sounds',
   },
   {
@@ -254,7 +247,6 @@ Santa's face glows in the golden light of the floating name.
 Camera: Dynamic shot - letters rising, spinning around Santa.
 VFX: 3D text animation, golden glow, particle trails, magical floating.
 Mood: "MY NAME!", personalized magic, spectacular, memorable.`,
-    keyframePromptTemplate: `Giant 3D golden glowing letters spelling [NAME] floating in air, ${SANTA_CHARACTER} looking up with joy, golden sparkles and particles, ${WORKSHOP_SETTING}, magical lighting, photorealistic, cinematic`,
     audioDescription: 'Magical rising sound, triumphant orchestral notes, sparkle crescendo, Santa exclaiming',
   },
   {
@@ -299,7 +291,6 @@ Occasional magical dust particles float through frame.
 Camera: Medium close-up on Santa, intimate and personal.
 VFX: Sparkle bursts on key moments, warm glow, floating particles.
 Mood: Eyes glued, "He KNOWS me!", emotional, validating, loving.`,
-    keyframePromptTemplate: `${SANTA_CHARACTER} speaking directly to camera with warm expression, firelight on face, golden sparkles around, ${WORKSHOP_SETTING}, intimate warm lighting, grandfather energy, photorealistic, cinematic`,
     audioDescription: 'Warm Santa voice, crackling fire, gentle orchestral underscore, sparkle accents',
   },
   {
@@ -338,7 +329,6 @@ on deep red velvet background with gentle snowflakes.
 Camera: Ground level looking up, following the launch, epic wide shot.
 VFX: Rainbow trail, speed blur, stardust, magical transition, logo reveal.
 Mood: "GO GO GO!", exhilarating, perfect ending, memorable farewell.`,
-    keyframePromptTemplate: `Magnificent red gold sleigh launching into starlit sky, ${SANTA_CHARACTER} waving, rainbow golden trail behind, reindeer flying, Rudolph's glowing nose, northern lights, magical Christmas scene, epic cinematic shot, photorealistic`,
     audioDescription: 'Reindeer hooves, whooshing launch, Santa Ho Ho Ho, triumphant orchestra, sleigh bells',
   },
 ]
@@ -388,12 +378,11 @@ export function generatePersonalizedPrompt(
     thingToLearn?: string
     customMessage?: string
   }
-): { videoPrompt: string; keyframePrompt: string } | null {
+): { videoPrompt: string } | null {
   const template = getPersonalizedTemplate(sceneNumber)
   if (!template) return null
 
   let videoPrompt = template.videoPromptTemplate
-  let keyframePrompt = template.keyframePromptTemplate
 
   // Replace placeholders
   const replacements: Record<string, string> = {
@@ -407,10 +396,9 @@ export function generatePersonalizedPrompt(
 
   for (const [placeholder, value] of Object.entries(replacements)) {
     videoPrompt = videoPrompt.replace(new RegExp(placeholder.replace(/[[\]]/g, '\\$&'), 'g'), value)
-    keyframePrompt = keyframePrompt.replace(new RegExp(placeholder.replace(/[[\]]/g, '\\$&'), 'g'), value)
   }
 
-  return { videoPrompt, keyframePrompt }
+  return { videoPrompt }
 }
 
 /**
