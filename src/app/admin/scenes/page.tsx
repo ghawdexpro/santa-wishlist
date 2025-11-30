@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { PREMADE_SCENES, PERSONALIZED_SCENE_TEMPLATES } from '@/lib/premade-scenes'
 
 interface SceneStatus {
@@ -9,6 +9,8 @@ interface SceneStatus {
   description: string
   duration_seconds: number
   video_url?: string
+  keyframe_url?: string
+  keyframe_end_url?: string
   prompt_used?: string
   created_at?: string
   updated_at?: string
@@ -17,17 +19,22 @@ interface SceneStatus {
 interface GenerationResult {
   sceneNumber: number
   name: string
+  startKeyframeGenerated?: boolean
+  endKeyframeGenerated?: boolean
   videoOperationStarted?: boolean
   operationName?: string
   error?: string
 }
+
+type ActionType = 'keyframe_start' | 'keyframe_end' | 'video' | 'all'
 
 export default function AdminScenesPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [adminKey, setAdminKey] = useState('')
   const [sceneStatuses, setSceneStatuses] = useState<SceneStatus[]>([])
   const [loading, setLoading] = useState(false)
-  const [generating, setGenerating] = useState<number | null>(null)
+  const [generatingScene, setGeneratingScene] = useState<number | null>(null)
+  const [generatingAction, setGeneratingAction] = useState<ActionType | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // Combine all scenes for display
@@ -66,8 +73,9 @@ export default function AdminScenesPage() {
     fetchSceneStatuses()
   }
 
-  const generateVideo = async (sceneNumber: number) => {
-    setGenerating(sceneNumber)
+  const generateContent = async (sceneNumber: number, action: ActionType) => {
+    setGeneratingScene(sceneNumber)
+    setGeneratingAction(action)
     setMessage(null)
 
     try {
@@ -77,6 +85,8 @@ export default function AdminScenesPage() {
         body: JSON.stringify({
           adminKey,
           sceneNumbers: [sceneNumber],
+          action,
+          useKeyframes: action === 'all', // Only use keyframes when generating all
         }),
       })
 
@@ -84,23 +94,27 @@ export default function AdminScenesPage() {
 
       if (response.ok && data.success) {
         const result = data.results[0] as GenerationResult
-        if (result.videoOperationStarted) {
-          setMessage({
-            type: 'success',
-            text: `Scene ${sceneNumber} video generation started! Operation: ${result.operationName?.slice(-20)}...`
-          })
-          fetchSceneStatuses()
-        } else if (result.error) {
-          setMessage({ type: 'error', text: `Error: ${result.error}` })
-        }
+        const messages: string[] = []
+
+        if (result.startKeyframeGenerated) messages.push('Start keyframe generated')
+        if (result.endKeyframeGenerated) messages.push('End keyframe generated')
+        if (result.videoOperationStarted) messages.push(`Video started: ${result.operationName?.slice(-20)}...`)
+        if (result.error) messages.push(`Error: ${result.error}`)
+
+        setMessage({
+          type: result.error ? 'error' : 'success',
+          text: messages.join(' | ') || 'Operation completed'
+        })
+        fetchSceneStatuses()
       } else {
         setMessage({ type: 'error', text: data.error || 'Generation failed' })
       }
     } catch {
-      setMessage({ type: 'error', text: 'Failed to start video generation' })
+      setMessage({ type: 'error', text: 'Failed to start generation' })
     }
 
-    setGenerating(null)
+    setGeneratingScene(null)
+    setGeneratingAction(null)
   }
 
   const getSceneStatus = (sceneNumber: number): SceneStatus | undefined => {
@@ -147,7 +161,7 @@ export default function AdminScenesPage() {
           <div>
             <h1 className="text-3xl font-bold glow-gold">Scene Generator</h1>
             <p className="text-white/70 mt-1">
-              Generate pre-made VFX scenes with Veo
+              Generate keyframes (NanoBanana) + videos (Veo)
             </p>
           </div>
           <button
@@ -172,15 +186,20 @@ export default function AdminScenesPage() {
           {allScenes.map((scene) => {
             const status = getSceneStatus(scene.sceneNumber)
             const hasVideo = !!status?.video_url
-            const isGenerating = generating === scene.sceneNumber
+            const hasStartKeyframe = !!status?.keyframe_url
+            const hasEndKeyframe = !!status?.keyframe_end_url
+            const isGenerating = generatingScene === scene.sceneNumber
             const isPremade = scene.type === 'premade'
 
             // Check if video generation was started
             let operationStarted = false
+            let usedKeyframes = { start: false, end: false }
             if (status?.prompt_used) {
               try {
                 const parsed = JSON.parse(status.prompt_used)
                 operationStarted = !!parsed.operationName
+                usedKeyframes.start = !!parsed.usedStartKeyframe
+                usedKeyframes.end = !!parsed.usedEndKeyframe
               } catch {}
             }
 
@@ -213,22 +232,50 @@ export default function AdminScenesPage() {
 
                     <p className="text-white/70 mb-3">{scene.description}</p>
 
-                    <div className="flex flex-wrap gap-4 text-sm text-white/60 mb-4">
-                      <span>Duration: {scene.durationSeconds}s</span>
+                    {/* Status indicators */}
+                    <div className="flex flex-wrap gap-4 text-sm mb-4">
+                      <span className="text-white/60">Duration: {scene.durationSeconds}s</span>
+                      <span className={hasStartKeyframe ? 'text-blue-400' : 'text-white/40'}>
+                        Start KF: {hasStartKeyframe ? '✓' : '✗'}
+                      </span>
+                      <span className={hasEndKeyframe ? 'text-purple-400' : 'text-white/40'}>
+                        End KF: {hasEndKeyframe ? '✓' : '✗'}
+                      </span>
                       <span className={hasVideo ? 'text-green-400' : operationStarted ? 'text-yellow-400' : 'text-white/40'}>
-                        Video: {hasVideo ? '✓ Ready' : operationStarted ? '⏳ Processing' : '✗ Not started'}
+                        Video: {hasVideo ? '✓ Ready' : operationStarted ? '⏳ Processing' : '✗'}
                       </span>
                     </div>
 
                     {/* Actions - Only for pre-made scenes */}
                     {isPremade && (
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-2">
                         <button
-                          onClick={() => generateVideo(scene.sceneNumber)}
+                          onClick={() => generateContent(scene.sceneNumber, 'keyframe_start')}
+                          disabled={isGenerating}
+                          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm py-2 px-3 rounded transition-colors"
+                        >
+                          {isGenerating && generatingAction === 'keyframe_start' ? '...' : 'Gen Start KF'}
+                        </button>
+                        <button
+                          onClick={() => generateContent(scene.sceneNumber, 'keyframe_end')}
+                          disabled={isGenerating}
+                          className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-sm py-2 px-3 rounded transition-colors"
+                        >
+                          {isGenerating && generatingAction === 'keyframe_end' ? '...' : 'Gen End KF'}
+                        </button>
+                        <button
+                          onClick={() => generateContent(scene.sceneNumber, 'video')}
+                          disabled={isGenerating}
+                          className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm py-2 px-3 rounded transition-colors"
+                        >
+                          {isGenerating && generatingAction === 'video' ? '...' : 'Gen Video Only'}
+                        </button>
+                        <button
+                          onClick={() => generateContent(scene.sceneNumber, 'all')}
                           disabled={isGenerating}
                           className="btn-christmas text-sm py-2 px-4"
                         >
-                          {isGenerating ? 'Starting...' : hasVideo ? 'Regenerate Video' : 'Generate Video'}
+                          {isGenerating && generatingAction === 'all' ? 'Generating...' : 'Gen All'}
                         </button>
                       </div>
                     )}
@@ -260,7 +307,19 @@ export default function AdminScenesPage() {
         {/* Summary Stats */}
         <div className="card-christmas mt-8">
           <h3 className="text-lg font-bold mb-4">Generation Progress</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-3xl font-bold text-blue-400">
+                {sceneStatuses.filter(s => s.keyframe_url).length}
+              </div>
+              <div className="text-white/60 text-sm">Start Keyframes</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-purple-400">
+                {sceneStatuses.filter(s => s.keyframe_end_url).length}
+              </div>
+              <div className="text-white/60 text-sm">End Keyframes</div>
+            </div>
             <div>
               <div className="text-3xl font-bold glow-gold">
                 {sceneStatuses.filter(s => s.video_url).length}
@@ -271,15 +330,14 @@ export default function AdminScenesPage() {
               <div className="text-3xl font-bold text-green-400">
                 {PREMADE_SCENES.length}
               </div>
-              <div className="text-white/60 text-sm">Pre-made Scenes</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-yellow-400">
-                {PERSONALIZED_SCENE_TEMPLATES.length}
-              </div>
-              <div className="text-white/60 text-sm">Personalized Scenes</div>
+              <div className="text-white/60 text-sm">Pre-made Total</div>
             </div>
           </div>
+        </div>
+
+        {/* Cost Info */}
+        <div className="card-christmas mt-4 text-sm text-white/60">
+          <p><strong>Costs:</strong> NanoBanana keyframe ~$0.04/image | Veo video ~varies by duration</p>
         </div>
       </div>
     </div>

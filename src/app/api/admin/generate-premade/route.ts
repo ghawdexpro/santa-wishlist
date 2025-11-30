@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PREMADE_SCENES } from '@/lib/premade-scenes'
 import { startVideoGeneration } from '@/lib/veo'
+import { generateKeyframe } from '@/lib/nanobanana'
 import { createClient } from '@supabase/supabase-js'
 
 export const maxDuration = 300 // 5 minutes
@@ -14,19 +15,36 @@ const supabaseAdmin = createClient(
 // Simple admin key check (in production, use proper auth)
 const ADMIN_KEY = process.env.ADMIN_SECRET_KEY || 'santa-admin-2024'
 
+interface GenerateResult {
+  sceneNumber: number
+  name: string
+  startKeyframeGenerated?: boolean
+  endKeyframeGenerated?: boolean
+  videoOperationStarted?: boolean
+  operationName?: string
+  error?: string
+}
+
 /**
  * POST /api/admin/generate-premade
  *
- * Generate pre-made scene videos using Veo.
+ * Generate pre-made scene content using NanoBanana (keyframes) and Veo (video).
  *
  * Body:
  * - adminKey: string (required)
  * - sceneNumbers: number[] (optional, defaults to all)
+ * - action: 'keyframe_start' | 'keyframe_end' | 'video' | 'all' (default: 'all')
+ * - useKeyframes: boolean (default: true) - whether to pass keyframes to Veo
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { adminKey, sceneNumbers } = body
+    const {
+      adminKey,
+      sceneNumbers,
+      action = 'all',
+      useKeyframes = true
+    } = body
 
     // Verify admin key
     if (adminKey !== ADMIN_KEY) {
@@ -42,50 +60,115 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No valid scenes specified' }, { status: 400 })
     }
 
-    const results: Array<{
-      sceneNumber: number
-      name: string
-      videoOperationStarted?: boolean
-      operationName?: string
-      error?: string
-    }> = []
+    const results: GenerateResult[] = []
 
     for (const scene of scenesToGenerate) {
-      console.log(`Processing scene ${scene.sceneNumber}: ${scene.name}`)
+      console.log(`Processing scene ${scene.sceneNumber}: ${scene.name} (action: ${action})`)
 
-      const result: typeof results[0] = {
+      const result: GenerateResult = {
         sceneNumber: scene.sceneNumber,
         name: scene.name,
       }
 
       try {
-        console.log(`Starting video generation for scene ${scene.sceneNumber}...`)
+        // Get existing scene data from database
+        const { data: existingScene } = await supabaseAdmin
+          .from('premade_scenes')
+          .select('*')
+          .eq('scene_number', scene.sceneNumber)
+          .single()
 
-        const operationName = await startVideoGeneration({
-          prompt: scene.videoPrompt,
-          durationSeconds: scene.durationSeconds,
-          aspectRatio: '16:9',
-        })
+        let startKeyframeBase64: string | undefined
+        let startKeyframeMimeType: string | undefined
+        let endKeyframeBase64: string | undefined
+        let endKeyframeMimeType: string | undefined
+        let keyframeUrl: string | undefined = existingScene?.keyframe_url
+        let keyframeEndUrl: string | undefined = existingScene?.keyframe_end_url
 
-        result.videoOperationStarted = true
-        result.operationName = operationName
+        // Generate START keyframe
+        if (action === 'keyframe_start' || action === 'all') {
+          console.log(`Generating START keyframe for scene ${scene.sceneNumber}...`)
+          const startKeyframe = await generateKeyframe(scene.videoPrompt, '16:9')
+          if (startKeyframe) {
+            startKeyframeBase64 = startKeyframe.base64
+            startKeyframeMimeType = startKeyframe.mimeType
+            result.startKeyframeGenerated = true
+
+            // Store as data URL for now (in production, upload to Supabase Storage)
+            keyframeUrl = `data:${startKeyframe.mimeType};base64,${startKeyframe.base64.slice(0, 100)}...`
+            console.log(`START keyframe generated for scene ${scene.sceneNumber}`)
+          }
+        }
+
+        // Generate END keyframe
+        if (action === 'keyframe_end' || action === 'all') {
+          console.log(`Generating END keyframe for scene ${scene.sceneNumber}...`)
+          const endPrompt = `Final moment of: ${scene.description}. ${scene.videoPrompt.slice(0, 500)}`
+          const endKeyframe = await generateKeyframe(endPrompt, '16:9')
+          if (endKeyframe) {
+            endKeyframeBase64 = endKeyframe.base64
+            endKeyframeMimeType = endKeyframe.mimeType
+            result.endKeyframeGenerated = true
+
+            keyframeEndUrl = `data:${endKeyframe.mimeType};base64,${endKeyframe.base64.slice(0, 100)}...`
+            console.log(`END keyframe generated for scene ${scene.sceneNumber}`)
+          }
+        }
+
+        // Generate VIDEO
+        if (action === 'video' || action === 'all') {
+          console.log(`Starting video generation for scene ${scene.sceneNumber}...`)
+
+          // Use keyframes if available and requested
+          const videoRequest: Parameters<typeof startVideoGeneration>[0] = {
+            prompt: scene.videoPrompt,
+            durationSeconds: scene.durationSeconds,
+            aspectRatio: '16:9',
+          }
+
+          if (useKeyframes) {
+            if (startKeyframeBase64 && startKeyframeMimeType) {
+              videoRequest.imageBase64 = startKeyframeBase64
+              videoRequest.imageMimeType = startKeyframeMimeType
+            }
+            if (endKeyframeBase64 && endKeyframeMimeType) {
+              videoRequest.endImageBase64 = endKeyframeBase64
+              videoRequest.endImageMimeType = endKeyframeMimeType
+            }
+          }
+
+          const operationName = await startVideoGeneration(videoRequest)
+          result.videoOperationStarted = true
+          result.operationName = operationName
+        }
 
         // Store in database
+        const updateData: Record<string, unknown> = {
+          scene_number: scene.sceneNumber,
+          name: scene.name,
+          description: scene.description,
+          duration_seconds: scene.durationSeconds,
+        }
+
+        if (keyframeUrl) {
+          updateData.keyframe_url = keyframeUrl
+        }
+        if (keyframeEndUrl) {
+          updateData.keyframe_end_url = keyframeEndUrl
+        }
+        if (result.operationName) {
+          updateData.prompt_used = JSON.stringify({
+            videoPrompt: scene.videoPrompt,
+            operationName: result.operationName,
+            startedAt: new Date().toISOString(),
+            usedStartKeyframe: !!startKeyframeBase64,
+            usedEndKeyframe: !!endKeyframeBase64,
+          })
+        }
+
         const { error: dbError } = await supabaseAdmin
           .from('premade_scenes')
-          .upsert({
-            scene_number: scene.sceneNumber,
-            name: scene.name,
-            description: scene.description,
-            duration_seconds: scene.durationSeconds,
-            prompt_used: JSON.stringify({
-              videoPrompt: scene.videoPrompt,
-              operationName,
-              startedAt: new Date().toISOString(),
-            }),
-          }, {
-            onConflict: 'scene_number',
-          })
+          .upsert(updateData, { onConflict: 'scene_number' })
 
         if (dbError) {
           console.error(`DB error for scene ${scene.sceneNumber}:`, dbError)
@@ -104,6 +187,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      action,
       scenesProcessed: results.length,
       results,
     })

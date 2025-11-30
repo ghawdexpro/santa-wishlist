@@ -26,8 +26,10 @@ async function getAccessToken(): Promise<string> {
 
 export interface VideoGenerationRequest {
   prompt: string
-  imageBase64?: string  // Optional: generate from keyframe image
+  imageBase64?: string  // Optional: start keyframe image
   imageMimeType?: string
+  endImageBase64?: string  // Optional: end keyframe image
+  endImageMimeType?: string
   durationSeconds?: number  // 5-8 for Veo 2
   aspectRatio?: '16:9' | '9:16'
   sampleCount?: number
@@ -56,11 +58,19 @@ export async function startVideoGeneration(request: VideoGenerationRequest): Pro
     prompt: request.prompt,
   }
 
-  // If we have a keyframe image, use image-to-video
+  // If we have a start keyframe image, use image-to-video
   if (request.imageBase64 && request.imageMimeType) {
     instance.image = {
       bytesBase64Encoded: request.imageBase64,
       mimeType: request.imageMimeType,
+    }
+  }
+
+  // If we have an end keyframe image, add it for guided generation
+  if (request.endImageBase64 && request.endImageMimeType) {
+    instance.endImage = {
+      bytesBase64Encoded: request.endImageBase64,
+      mimeType: request.endImageMimeType,
     }
   }
 
@@ -204,8 +214,10 @@ export async function waitForVideoGeneration(
 export async function generateSceneVideo(
   sceneNumber: number,
   prompt: string,
-  keyframeBase64?: string,
-  keyframeMimeType?: string
+  startKeyframeBase64?: string,
+  startKeyframeMimeType?: string,
+  endKeyframeBase64?: string,
+  endKeyframeMimeType?: string
 ): Promise<{ operationName: string }> {
   // Build a detailed prompt for video generation
   const videoPrompt = `Cinematic video scene: ${prompt}
@@ -215,8 +227,10 @@ Quality: High detail, no artifacts, natural motion.`
 
   const operationName = await startVideoGeneration({
     prompt: videoPrompt,
-    imageBase64: keyframeBase64,
-    imageMimeType: keyframeMimeType,
+    imageBase64: startKeyframeBase64,
+    imageMimeType: startKeyframeMimeType,
+    endImageBase64: endKeyframeBase64,
+    endImageMimeType: endKeyframeMimeType,
     durationSeconds: 8,
     aspectRatio: '16:9',
     negativePrompt: 'cartoon, anime, low quality, blurry, distorted, glitch, text overlay',
@@ -246,8 +260,10 @@ export async function startAllSceneVideos(
   scenes: Array<{
     sceneNumber: number
     prompt: string
-    keyframeBase64?: string
-    keyframeMimeType?: string
+    startKeyframeBase64?: string
+    startKeyframeMimeType?: string
+    endKeyframeBase64?: string
+    endKeyframeMimeType?: string
   }>
 ): Promise<SceneVideoOperation[]> {
   const operations: SceneVideoOperation[] = []
@@ -258,8 +274,10 @@ export async function startAllSceneVideos(
       const { operationName } = await generateSceneVideo(
         scene.sceneNumber,
         scene.prompt,
-        scene.keyframeBase64,
-        scene.keyframeMimeType
+        scene.startKeyframeBase64,
+        scene.startKeyframeMimeType,
+        scene.endKeyframeBase64,
+        scene.endKeyframeMimeType
       )
 
       operations.push({
