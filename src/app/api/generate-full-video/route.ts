@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
 
     const veoOperations = new Map<
       string,
-      { scene4Op: string; scene5Op: string; scene8Op: string } // Store operation names for polling
+      { scene4Op: string; scene5Op: string; scene6Op: string; scene8Op: string } // All scenes now use Veo
     >()
 
     // Generate Scene 4 (photo) + Scene 5 (name) + Scene 6 (message) + Scene 8 (launch) for each child
@@ -151,8 +151,8 @@ export async function POST(request: NextRequest) {
           thingToLearn,
         })
 
-        // Scene 6: Santa's Message (HeyGen - returns URL directly)
-        const scene6Url = await generateScene6SantasMessage({
+        // Scene 6: Santa's Message (now Veo - returns operation name)
+        const scene6Op = await generateScene6SantasMessage({
           childName: child.name,
           childAge,
           goodBehavior,
@@ -172,15 +172,15 @@ export async function POST(request: NextRequest) {
           thingToLearn,
         })
 
-        // Store results
+        // Store results (all are now Veo operation names)
         childSceneVideos.set(child.id, {
           scene4: scene4Op,
           scene5: scene5Op,
-          scene6: scene6Url,
+          scene6: scene6Op,
           scene8: scene8Op,
         })
 
-        veoOperations.set(child.id, { scene4Op, scene5Op, scene8Op })
+        veoOperations.set(child.id, { scene4Op, scene5Op, scene6Op, scene8Op })
 
         console.log(`[Orchestration] Scene generation started for ${child.name}`)
       } catch (error) {
@@ -193,8 +193,8 @@ export async function POST(request: NextRequest) {
 
     await Promise.all(childGenerationPromises)
 
-    // 5. Poll for Veo video completions (Scenes 4, 5, and 8)
-    console.log(`[Orchestration] Polling for Veo completions (Scenes 4, 5 & 8)...`)
+    // 5. Poll for Veo video completions (Scenes 4, 5, 6, and 8 - all Veo now)
+    console.log(`[Orchestration] Polling for Veo completions (Scenes 4, 5, 6 & 8)...`)
     progress.stage = 'polling'
 
     const veoCompletionPromises = Array.from(veoOperations.entries()).flatMap(
@@ -222,6 +222,19 @@ export async function POST(request: NextRequest) {
             console.error(`[Orchestration] Scene 5 polling failed for child ${childId}:`, error)
             progress.scenesFailed[5] = progress.scenesFailed[5] || []
             progress.scenesFailed[5].push(childId)
+            throw error
+          }
+        })(),
+        (async () => {
+          try {
+            const result = await waitForVideoGeneration(ops.scene6Op)
+            const videos = childSceneVideos.get(childId)!
+            videos.scene6 = result.videoUrl ?? ''
+            console.log(`[Orchestration] Scene 6 (Santa's Message) complete for child ${childId}`)
+          } catch (error) {
+            console.error(`[Orchestration] Scene 6 polling failed for child ${childId}:`, error)
+            progress.scenesFailed[6] = progress.scenesFailed[6] || []
+            progress.scenesFailed[6].push(childId)
             throw error
           }
         })(),

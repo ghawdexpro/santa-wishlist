@@ -1,11 +1,11 @@
 /**
  * Scene Generators for Scenes 5, 6, and 8
  * Personalized scene generation for each child
+ * All scenes use NanoBanana (keyframes) + Veo (video generation)
  */
 
 import { generateKeyframe, KeyframeRequest } from './nanobanana'
 import { startVideoGeneration, VideoGenerationRequest } from './veo'
-import { generateHeyGenVideo } from './heygen'
 
 export interface SceneGenerationRequest {
   childName: string
@@ -100,61 +100,98 @@ Premium cinematic quality, 10 seconds duration.`
 
 /**
  * SCENE 6: Santa's Personal Message
- * Use HeyGen talking head with personalized script
+ * Generate keyframe with Santa and personalized message, then animate with Veo
+ * (Temporarily using Veo instead of HeyGen)
  */
 export async function generateScene6SantasMessage(childData: SceneGenerationRequest): Promise<string> {
   console.log(`[Scene6] Generating Santa's Message for ${childData.childName}`)
 
   try {
-    // Build personalized script if not provided
-    const script =
-      childData.personalizedScript ||
-      buildScene6Script(
-        childData.childName,
-        childData.childAge,
-        childData.goodBehavior,
-        childData.thingToImprove,
-        childData.thingToLearn
-      )
+    // Step 1: Generate keyframe with NanoBanana
+    const keyframePrompt = `CINEMATIC VFX INSTRUCTION - Scene 6: Santa's Personal Message
 
-    // Use HeyGen to generate talking head video
-    const videoUrl = await generateHeyGenVideo({
-      script,
-      durationSeconds: 25,
-      characterId: 'santa', // Should match configured Santa character
-    })
+HEARTFELT SANTA MOMENT
+Santa Claus in his cozy workshop study, warm and personal setting.
 
-    console.log(`[Scene6] Successfully generated Santa's Message for ${childData.childName}`)
+VISUAL FOCUS:
+Santa sitting in a comfortable armchair by a warm fireplace.
+He is looking directly at the camera with a warm, loving smile.
+Holding a beautiful golden scroll with "${childData.childName}" written in elegant calligraphy.
 
-    return videoUrl
+SANTA'S APPEARANCE:
+- Traditional red suit with white fur trim
+- Kind, twinkling eyes full of warmth
+- Gentle, grandfatherly smile
+- White fluffy beard
+- Rosy cheeks
+- Reading glasses perched on nose
+
+SETTING:
+- Cozy workshop study/reading nook
+- Warm fireplace with golden flames
+- Christmas decorations: garlands, stockings, candles
+- Soft, warm lighting from fire and candles
+- Snow visible through frosted window
+- Nice List book visible nearby
+
+ATMOSPHERE:
+- Intimate, personal moment
+- Warm, loving, caring
+- Like Santa is speaking directly to ${childData.childName}
+- Cozy Christmas Eve feeling
+- Safe, magical, special
+
+EMOTION:
+- Pure love and warmth from Santa
+- "You are special" feeling
+- Personal connection
+- Christmas magic at its most heartfelt
+
+TECHNICAL REQUIREMENTS:
+- Aspect ratio: 16:9
+- Cinematic quality, soft focus background
+- Warm golden color palette
+- Santa should be the clear focus
+- Premium, professional quality
+
+This is the emotional heart of a $59+ personalized Santa video for ${childData.childName}.`
+
+    const keyframeRequest: KeyframeRequest = {
+      prompt: keyframePrompt,
+      sceneNumber: 6,
+    }
+
+    const keyframeResult = await generateKeyframe(keyframeRequest)
+
+    // Step 2: Animate keyframe with Veo
+    const videoPrompt = `Gentle animation: Santa Claus sitting by warm fireplace, holding golden scroll with "${childData.childName}" written on it.
+Santa looks at the camera with warm, loving eyes and a gentle smile.
+Fireplace flames flicker warmly. Soft candlelight glows.
+Santa nods gently, radiating warmth and care.
+Cozy Christmas atmosphere. Snow falls gently outside the window.
+Intimate, heartfelt moment. Premium cinematic quality. 15 seconds duration.`
+
+    const videoRequest: VideoGenerationRequest = {
+      prompt: videoPrompt,
+      imageBase64: keyframeResult.imageBase64,
+      imageMimeType: keyframeResult.mimeType,
+      durationSeconds: 15,
+      aspectRatio: '16:9',
+    }
+
+    const operationName = await startVideoGeneration(videoRequest)
+
+    console.log(`[Scene6] Successfully started video generation for ${childData.childName}`)
+
+    return operationName
   } catch (error) {
     console.error(`[Scene6] Failed to generate Scene 6 for ${childData.childName}:`, error)
     throw error
   }
 }
 
-/**
- * Build default Scene 6 script if not provided by Gemini
- */
-function buildScene6Script(
-  childName: string,
-  childAge: number,
-  goodBehavior: string,
-  thingToImprove: string,
-  thingToLearn: string
-): string {
-  return `Hello ${childName}! I wanted to tell you how proud I am of you.
-I've been watching, and I've noticed how ${goodBehavior}. That's wonderful!
-
-I also wanted to mention, I'd love to see you work on ${thingToImprove}.
-I know you can do it!
-
-And ${childName}, this year I hope you'll learn about ${thingToLearn}.
-It's something very special.
-
-You're on my Nice List, and I have something very special waiting for you under the tree this Christmas.
-Keep being amazing, ${childName}. Merry Christmas!`
-}
+// Note: buildScene6Script removed - no longer needed since HeyGen is disabled
+// Scene 6 now uses visual generation (NanoBanana + Veo) instead of talking head
 
 /**
  * SCENE 8: Epic Launch
@@ -239,20 +276,22 @@ Epic, adventurous, magical finale. 10 seconds duration. Premium cinematic qualit
 /**
  * Generate all personalized scenes for a single child
  * Used in the main orchestration pipeline
+ * All scenes now use NanoBanana + Veo (HeyGen disabled temporarily)
  */
 export async function generateAllPersonalizedScenesForChild(
   childData: SceneGenerationRequest
 ): Promise<{
   scene4: string // Veo operation name
   scene5: string // Veo operation name
-  scene6: string // HeyGen video URL
+  scene6: string // Veo operation name (was HeyGen URL)
   scene8: string // Veo operation name
 }> {
   console.log(`[Orchestration] Generating all personalized scenes for ${childData.childName}`)
 
   try {
     // Generate all scenes in parallel for speed
-    const [scene5Op, scene6Url, scene8Op] = await Promise.all([
+    // All scenes now return Veo operation names
+    const [scene5Op, scene6Op, scene8Op] = await Promise.all([
       generateScene5NameReveal(childData),
       generateScene6SantasMessage(childData),
       generateScene8EpicLaunch(childData),
@@ -266,7 +305,7 @@ export async function generateAllPersonalizedScenesForChild(
     return {
       scene4: '', // Will be set by photo-alive-generation.ts
       scene5: scene5Op,
-      scene6: scene6Url,
+      scene6: scene6Op, // Now Veo operation name, not HeyGen URL
       scene8: scene8Op,
     }
   } catch (error) {
