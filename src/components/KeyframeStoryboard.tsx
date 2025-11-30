@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+// Note: Using regular <img> for data URLs since Next.js Image doesn't support them
 
 interface Keyframe {
   sceneNumber: number
@@ -79,12 +79,11 @@ export default function KeyframeStoryboard({
 
               {/* Keyframe image or placeholder */}
               <div className="aspect-video bg-gray-800 relative">
-                {keyframe ? (
-                  <Image
+                {keyframe && keyframe.imageDataUrl ? (
+                  <img
                     src={keyframe.imageDataUrl}
                     alt={`Scene ${scene.sceneNumber}: ${scene.title}`}
-                    fill
-                    className="object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-500">
@@ -120,12 +119,11 @@ export default function KeyframeStoryboard({
                 {/* Large keyframe preview */}
                 <div className="md:w-1/2">
                   <div className="aspect-video bg-gray-800 rounded-lg overflow-hidden relative">
-                    {keyframe ? (
-                      <Image
+                    {keyframe && keyframe.imageDataUrl ? (
+                      <img
                         src={keyframe.imageDataUrl}
                         alt={`Scene ${scene.sceneNumber}: ${scene.title}`}
-                        fill
-                        className="object-cover"
+                        className="absolute inset-0 w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-500">
