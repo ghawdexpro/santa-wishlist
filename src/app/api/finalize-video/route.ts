@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Finalize] Processing order ${orderId} with ${segments.length} segments...`)
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // 1. Stitch videos
     tempOutputPath = `/tmp/final-${orderId}.mp4`
