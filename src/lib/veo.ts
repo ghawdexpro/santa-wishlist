@@ -354,3 +354,233 @@ export async function checkAllSceneVideos(
 
   return updated
 }
+
+// ============================================================================
+// VIDEO EXTENSION SUPPORT (Veo 3.1)
+// ============================================================================
+
+/**
+ * Video Extension Request
+ * Uses an existing video as a starting point and extends it by 5-8 seconds
+ * Requires the source video to be stored in GCS
+ */
+export interface VideoExtensionRequest {
+  prompt: string
+  sourceVideoGcsUri: string  // gs://bucket/path/to/video.mp4
+  durationSeconds?: number   // 5-8 seconds per extension
+  aspectRatio?: '16:9' | '9:16'
+}
+
+/**
+ * Video Extension Result
+ */
+export interface VideoExtensionResult {
+  operationName: string
+  done: boolean
+  videoUrl?: string
+  videoBase64?: string
+  error?: string
+}
+
+/**
+ * Start video extension - extends an existing video with more content
+ * The video must be stored in GCS to be used as a reference
+ */
+export async function startVideoExtension(request: VideoExtensionRequest): Promise<string> {
+  const accessToken = await getAccessToken()
+
+  const endpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/${MODEL}:predictLongRunning`
+
+  // Build instance with video reference for extension
+  const instance: Record<string, unknown> = {
+    prompt: request.prompt,
+    video: {
+      gcsUri: request.sourceVideoGcsUri,
+      mimeType: 'video/mp4',
+    },
+  }
+
+  const body = {
+    instances: [instance],
+    parameters: {
+      aspectRatio: request.aspectRatio || '16:9',
+      sampleCount: 1,
+      durationSeconds: request.durationSeconds || 8,
+      personGeneration: 'allow_adult',
+      generateAudio: true,
+    },
+  }
+
+  console.log(`[Veo Extension] Starting extension from ${request.sourceVideoGcsUri}`)
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    console.error('Veo extension API error:', error)
+    throw new Error(`Veo extension API error: ${response.status} - ${error}`)
+  }
+
+  const result = await response.json()
+
+  if (!result.name) {
+    throw new Error('No operation name returned from Veo extension API')
+  }
+
+  console.log(`[Veo Extension] Started: ${result.name}`)
+  return result.name
+}
+
+/**
+ * Wait for video extension to complete
+ */
+export async function waitForVideoExtension(
+  operationName: string,
+  maxWaitMs: number = 600000,
+  pollIntervalMs: number = 15000
+): Promise<VideoExtensionResult> {
+  const startTime = Date.now()
+
+  while (Date.now() - startTime < maxWaitMs) {
+    const result = await pollVideoGeneration(operationName)
+
+    if (result.done) {
+      return {
+        operationName,
+        done: true,
+        videoUrl: result.videoUrl,
+        videoBase64: result.videoBase64,
+        error: result.error,
+      }
+    }
+
+    await new Promise(resolve => setTimeout(resolve, pollIntervalMs))
+  }
+
+  return {
+    operationName,
+    done: false,
+    error: 'Video extension timed out',
+  }
+}
+
+/**
+ * Build an extension chain - extends a video multiple times for longer content
+ * Each hop adds ~5-8 seconds
+ *
+ * @param initialVideoGcsUri - GCS URI of the starting video
+ * @param prompts - Array of prompts for each extension hop
+ * @param uploadToGcs - Function to upload video buffer to GCS and return URI
+ */
+export async function buildExtensionChain(
+  initialVideoGcsUri: string,
+  prompts: string[],
+  uploadToGcs: (videoBuffer: Buffer, fileName: string) => Promise<string>
+): Promise<{ finalVideoGcsUri: string; hopCount: number }> {
+  let currentVideoUri = initialVideoGcsUri
+  let hopCount = 0
+
+  for (const prompt of prompts) {
+    console.log(`[Extension Chain] Hop ${hopCount + 1}/${prompts.length}: ${prompt.substring(0, 50)}...`)
+
+    // Start extension
+    const operationName = await startVideoExtension({
+      prompt,
+      sourceVideoGcsUri: currentVideoUri,
+      durationSeconds: 8,
+    })
+
+    // Wait for completion
+    const result = await waitForVideoExtension(operationName)
+
+    if (result.error || !result.videoBase64) {
+      throw new Error(`Extension hop ${hopCount + 1} failed: ${result.error || 'No video returned'}`)
+    }
+
+    // Upload the extended video to GCS for the next hop
+    const videoBuffer = Buffer.from(result.videoBase64, 'base64')
+    const fileName = `extension-hop-${hopCount + 1}-${Date.now()}.mp4`
+    currentVideoUri = await uploadToGcs(videoBuffer, fileName)
+
+    hopCount++
+    console.log(`[Extension Chain] Hop ${hopCount} complete: ${currentVideoUri}`)
+  }
+
+  return {
+    finalVideoGcsUri: currentVideoUri,
+    hopCount,
+  }
+}
+
+/**
+ * Start video generation with output to GCS
+ * Required for video extension (extension requires GCS URI as input)
+ */
+export async function startVideoGenerationToGcs(
+  request: VideoGenerationRequest,
+  outputGcsUri: string
+): Promise<string> {
+  const accessToken = await getAccessToken()
+
+  const endpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/${MODEL}:predictLongRunning`
+
+  const instance: Record<string, unknown> = {
+    prompt: request.prompt,
+  }
+
+  if (request.imageBase64 && request.imageMimeType) {
+    instance.image = {
+      bytesBase64Encoded: request.imageBase64,
+      mimeType: request.imageMimeType,
+    }
+  }
+
+  if (request.endImageBase64 && request.endImageMimeType) {
+    instance.endImage = {
+      bytesBase64Encoded: request.endImageBase64,
+      mimeType: request.endImageMimeType,
+    }
+  }
+
+  const body = {
+    instances: [instance],
+    parameters: {
+      aspectRatio: request.aspectRatio || '16:9',
+      sampleCount: request.sampleCount || 1,
+      durationSeconds: request.durationSeconds || 8,
+      personGeneration: 'allow_adult',
+      generateAudio: true,
+      storageUri: outputGcsUri, // Output directly to GCS
+      ...(request.negativePrompt && { negativePrompt: request.negativePrompt }),
+    },
+  }
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`Veo API error (GCS output): ${response.status} - ${error}`)
+  }
+
+  const result = await response.json()
+
+  if (!result.name) {
+    throw new Error('No operation name returned from Veo API (GCS output)')
+  }
+
+  return result.name
+}

@@ -55,17 +55,18 @@ supabase db push               # Apply migrations
 
 **Video Generation & Orchestration:**
 - `gemini.ts` - Script generation with Gemini (includes `generateMultiChildScript()` for 1-3 children)
-- `nanobanana.ts` - Image generation with reference image support (photo compositing)
-- `veo.ts` - Video generation with async polling (`startVideoGeneration`, `waitForVideoGeneration`)
-- `heygen.ts` - Talking head video generation (Scene 6)
+- `nanobanana.ts` - Image generation with reference image support (photo compositing, "Magical Mirror" concept)
+- `veo.ts` - Video generation + video extension for continuous clips
+- `heygen.ts` - Talking head video (available as premium option, not in main pipeline)
 - `ffmpeg.ts` - Video stitching (`stitchFinalVideo`)
 - `premade-scenes.ts` - 8-scene VFX definitions
 
-**Multi-Child Video Pipeline (NEW):**
+**Multi-Child Video Pipeline:**
 - `photo-alive-generation.ts` - Scene 4: Photo compositing with NanoBanana Pro reference images
-- `scene-generators.ts` - Scenes 5, 6, 8: Personalized scene generation per child
+- `scene-generators.ts` - Scenes 5, 6, 8: Personalized scene generation per child (all Veo-based)
 - `premade-cache.ts` - Pre-made scene caching system (Scenes 1, 2, 3, 7)
 - `video-stitcher.ts` - Scene interleaving by type and FFmpeg coordination
+- `extension-chain-orchestrator.ts` - BLOK A/B/C architecture for continuous video chains
 
 **Utility:**
 - `stripe.ts` - Payment processing
@@ -81,14 +82,21 @@ supabase db push               # Apply migrations
    - Generate multi-child script (Gemini)
    - Load pre-made scenes (cache or generate)
    - Generate personalized scenes per child (parallel):
-     - Scene 4: Photo compositing (NanoBanana + Veo)
+     - Scene 4: Photo compositing (NanoBanana + Veo) - "Magical Mirror" concept
      - Scene 5: Name reveal (NanoBanana + Veo)
-     - Scene 6: Santa's message (HeyGen)
+     - Scene 6: Santa's message (NanoBanana + Veo) - all Veo now
      - Scene 8: Epic launch (NanoBanana + Veo)
    - Poll Veo operations until complete
    - Stitch scenes in interleaved order
    - Upload final video
    - Mark order complete
+
+**Alternative: BLOK Architecture (Video Extension Chains):**
+Uses Veo 3.1 video extension for continuous clips with only 2 cuts:
+- BLOK A: Scenes 1-3 as continuous ~30s video
+- BLOK B: Scenes 4-6 per child as continuous ~45s video
+- BLOK C: Scenes 7-8 as continuous ~20s video
+See `extension-chain-orchestrator.ts` for implementation.
 
 **8-Scene Video Structure:**
 ```
