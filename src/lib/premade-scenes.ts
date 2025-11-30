@@ -1,9 +1,11 @@
 /**
  * Scene definitions for The Santa Experience - "The Brightest Star"
  *
- * 8-scene structure (~95 seconds total):
- * - PRE-MADE (1, 2, 3, 7): Generate once, reuse forever
- * - PERSONALIZED (4, 5, 6, 8): Generate per order with child's data
+ * 8-scene structure (~64 seconds total for 1 child):
+ * - PRE-MADE (1, 2, 3, 7): Generate once, reuse forever (32s total)
+ * - PERSONALIZED (4, 5, 6, 8): Generate per order with child's data (32s per child)
+ *
+ * NOTE: Veo 3.1 supports max 8 seconds per generation (5-8s range)
  */
 
 export interface SceneConfig {
@@ -43,7 +45,7 @@ export const PREMADE_SCENES: SceneConfig[] = [
     sceneNumber: 1,
     name: 'Sky Dive',
     description: 'Epic fly-through clouds into North Pole like roller coaster',
-    durationSeconds: 12,
+    durationSeconds: 8, // Veo max
     type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
@@ -71,7 +73,7 @@ Mood: EXCITING, thrilling, "WOOOAH!", sense of magic and wonder.`,
     sceneNumber: 2,
     name: 'Workshop Wonder',
     description: 'Inside magical workshop with flying toys and acrobatic elves',
-    durationSeconds: 12,
+    durationSeconds: 8, // Veo max
     type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
@@ -100,7 +102,7 @@ Mood: "SO COOL!", wonder, childhood dream come true, pure magic.`,
     sceneNumber: 3,
     name: 'Book Magic',
     description: 'Santa uses telekinesis to summon the Magic Book with golden light explosion',
-    durationSeconds: 10,
+    durationSeconds: 8, // Veo max
     type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
@@ -132,7 +134,7 @@ Mood: "He has POWERS!", real movie magic, wizardly Santa, awe-inspiring.`,
     sceneNumber: 7,
     name: 'Sleigh Ready',
     description: 'Santa walks to door revealing magnificent sleigh with reindeer',
-    durationSeconds: 10,
+    durationSeconds: 8, // Veo max
     type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
@@ -185,7 +187,7 @@ export const PERSONALIZED_SCENE_TEMPLATES: PersonalizedSceneTemplate[] = [
     sceneNumber: 4,
     name: 'Photo Comes Alive',
     description: "Child's photo appears on Magic Book page and comes alive with animation",
-    durationSeconds: 12,
+    durationSeconds: 8, // Veo max
     type: 'personalized',
     videoPromptTemplate: `${CINEMATIC_STYLE}
 
@@ -220,7 +222,7 @@ Mood: "THAT'S ME!!!", magical recognition, personal connection, wonder.`,
     sceneNumber: 5,
     name: 'Name Reveal',
     description: "Child's name rises from book as giant 3D golden letters",
-    durationSeconds: 10,
+    durationSeconds: 8, // Veo max
     type: 'personalized',
     videoPromptTemplate: `${CINEMATIC_STYLE}
 
@@ -253,7 +255,7 @@ Mood: "MY NAME!", personalized magic, spectacular, memorable.`,
     sceneNumber: 6,
     name: "Santa's Message",
     description: 'Santa speaks directly to camera with personalized message about behaviors',
-    durationSeconds: 25,
+    durationSeconds: 8, // Veo max (was 25s with HeyGen)
     type: 'personalized',
     videoPromptTemplate: `${CINEMATIC_STYLE}
 
@@ -297,7 +299,7 @@ Mood: Eyes glued, "He KNOWS me!", emotional, validating, loving.`,
     sceneNumber: 8,
     name: 'Epic Launch',
     description: 'Sleigh rockets into sky with rainbow trail and personalized goodbye',
-    durationSeconds: 10,
+    durationSeconds: 8, // Veo max
     type: 'personalized',
     videoPromptTemplate: `${CINEMATIC_STYLE}
 

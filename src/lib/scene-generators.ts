@@ -72,18 +72,17 @@ This is a premium moment from a $59+ personalized Santa video.`
 
     const keyframeResult = await generateKeyframe(keyframeRequest)
 
-    // Step 2: Animate keyframe with Veo
+    // Step 2: Animate keyframe with Veo (max 8 seconds)
     const videoPrompt = `Animate the golden 3D name "${childData.childName.toUpperCase()}"
 floating in Santa's magical workshop. Letters slowly rotate and glow with warm golden light.
 Magical sparkles surround the name. Santa watches with joy in the background.
-Warm, cozy workshop lighting. Pure magic and wonder.
-Premium cinematic quality, 10 seconds duration.`
+Warm, cozy workshop lighting. Pure magic and wonder. Premium cinematic quality.`
 
     const videoRequest: VideoGenerationRequest = {
       prompt: videoPrompt,
       imageBase64: keyframeResult.imageBase64,
       imageMimeType: keyframeResult.mimeType,
-      durationSeconds: 10,
+      durationSeconds: 8,
       aspectRatio: '16:9',
     }
 
@@ -163,19 +162,17 @@ This is the emotional heart of a $59+ personalized Santa video for ${childData.c
 
     const keyframeResult = await generateKeyframe(keyframeRequest)
 
-    // Step 2: Animate keyframe with Veo
+    // Step 2: Animate keyframe with Veo (max 8 seconds)
     const videoPrompt = `Gentle animation: Santa Claus sitting by warm fireplace, holding golden scroll with "${childData.childName}" written on it.
 Santa looks at the camera with warm, loving eyes and a gentle smile.
 Fireplace flames flicker warmly. Soft candlelight glows.
-Santa nods gently, radiating warmth and care.
-Cozy Christmas atmosphere. Snow falls gently outside the window.
-Intimate, heartfelt moment. Premium cinematic quality. 15 seconds duration.`
+Santa nods gently, radiating warmth and care. Premium cinematic quality.`
 
     const videoRequest: VideoGenerationRequest = {
       prompt: videoPrompt,
       imageBase64: keyframeResult.imageBase64,
       imageMimeType: keyframeResult.mimeType,
-      durationSeconds: 15,
+      durationSeconds: 8,
       aspectRatio: '16:9',
     }
 
@@ -246,19 +243,18 @@ This is the epic finale of a premium $59+ personalized Santa video.`
 
     const keyframeResult = await generateKeyframe(keyframeRequest)
 
-    // Step 2: Animate keyframe with Veo
+    // Step 2: Animate keyframe with Veo (max 8 seconds)
     const videoPrompt = `Epic cinematic animation: Santa's golden sleigh launches into the starry Christmas night sky.
 Magical reindeer in powerful flight. Golden light trail behind the sleigh.
 ${childData.childName}'s name appears glowing in the stars.
 Stars, planets, and magical aurora. Shooting stars and celestial effects.
-Warm golden light contrasts with cool night sky.
-Epic, adventurous, magical finale. 10 seconds duration. Premium cinematic quality.`
+Warm golden light contrasts with cool night sky. Premium cinematic quality.`
 
     const videoRequest: VideoGenerationRequest = {
       prompt: videoPrompt,
       imageBase64: keyframeResult.imageBase64,
       imageMimeType: keyframeResult.mimeType,
-      durationSeconds: 10,
+      durationSeconds: 8,
       aspectRatio: '16:9',
     }
 

@@ -234,14 +234,17 @@ export async function generateScene4ForChild(childData: {
       photoMimeType: mimeType,
     })
 
-    // Animate the keyframe with Veo
-    const videoPrompt = `The child's photograph comes alive in Santa's magical book with golden border and sparkles.\n${childData.name}'s photo is beautifully framed with ornate golden decorations.\nMagical sparkles surround the image as it glows with warm light.\nCinematic, magical, warm atmosphere. 12 seconds duration.`
+    // Animate the keyframe with Veo (max 8 seconds)
+    const videoPrompt = `The child's photograph comes alive in Santa's magical book with golden border and sparkles.
+${childData.name}'s photo is beautifully framed with ornate golden decorations.
+Magical sparkles surround the image as it glows with warm light.
+Cinematic, magical, warm atmosphere. Premium quality.`
 
     const operationName = await startVideoGeneration({
       prompt: videoPrompt,
       imageBase64: keyframeResult.imageBase64,
       imageMimeType: keyframeResult.mimeType,
-      durationSeconds: 12,
+      durationSeconds: 8,
       aspectRatio: '16:9',
     })
 
