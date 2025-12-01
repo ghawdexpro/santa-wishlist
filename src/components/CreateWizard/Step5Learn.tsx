@@ -3,14 +3,14 @@
 import { useWizard } from './WizardContext'
 
 const suggestions = [
-  "riding a bike",
-  "tying their shoes",
-  "reading bigger books",
-  "learning to swim",
-  "making new friends",
-  "trying a new sport",
-  "learning an instrument",
-  "being more independent",
+  "jazda na rowerze",
+  "wiązanie butów",
+  "czytanie trudniejszych książek",
+  "nauka pływania",
+  "zawieranie nowych przyjaźni",
+  "próbowanie nowego sportu",
+  "nauka gry na instrumencie",
+  "bycie bardziej samodzielnym",
 ]
 
 export default function Step5Learn() {
@@ -25,28 +25,28 @@ export default function Step5Learn() {
       <div className="text-center mb-8">
         <div className="text-5xl mb-4">🎯</div>
         <h2 className="text-2xl font-bold glow-gold mb-2">
-          What Should {data.childName || 'Your Child'} Try Next?
+          Co {data.childName || 'Twoje dziecko'} powinno spróbować?
         </h2>
         <p className="text-white/70">
-          Santa will encourage this goal in the new year
+          Mikołaj zachęci do tego celu w nowym roku
         </p>
       </div>
 
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-christmas-gold mb-2">
-            Goal or Skill to Learn *
+            Cel lub umiejętność do nauczenia *
           </label>
           <textarea
             value={data.thingToLearn}
             onChange={(e) => updateData({ thingToLearn: e.target.value })}
-            placeholder="e.g., I hear you want to learn to ride a bike! That's so exciting - I know you can do it if you keep practicing..."
+            placeholder="np. Słyszałem że chcesz nauczyć się jeździć na rowerze! To wspaniałe - wiem że ci się uda jeśli będziesz ćwiczyć..."
             className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-christmas-gold focus:outline-none focus:ring-2 focus:ring-christmas-gold/50 min-h-[120px]"
             maxLength={300}
           />
           <div className="flex justify-between mt-1">
             <p className="text-xs text-white/50">
-              This gives them something to look forward to!
+              To da dziecku coś, na co może się cieszyć!
             </p>
             <p className="text-xs text-white/50">
               {data.thingToLearn.length}/300
@@ -56,7 +56,7 @@ export default function Step5Learn() {
 
         {/* Suggestions */}
         <div>
-          <p className="text-sm text-white/50 mb-2">Popular goals (click to use):</p>
+          <p className="text-sm text-white/50 mb-2">Popularne cele (kliknij aby użyć):</p>
           <div className="flex flex-wrap gap-2">
             {suggestions.map((suggestion) => (
               <button
@@ -81,7 +81,7 @@ export default function Step5Learn() {
           onClick={prevStep}
           className="px-6 py-3 text-white/70 hover:text-white transition-colors"
         >
-          ← Back
+          ← Wstecz
         </button>
         <button
           onClick={nextStep}
@@ -90,7 +90,7 @@ export default function Step5Learn() {
             !isStepValid(5) ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
-          Next Step →
+          Następny krok →
         </button>
       </div>
     </div>

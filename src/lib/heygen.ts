@@ -335,8 +335,8 @@ export async function listVoices(): Promise<HeyGenVoice[]> {
 
 /**
  * Build Scene 6 script for a child
- * Creates a personalized Santa message in English for Malta
- * Part of Il-Milied Magic - Santa's Maltese Adventure
+ * Creates a personalized Santa message in Polish
+ * Part of Magia Świąt - Spersonalizowane Wideo od Mikołaja
  *
  * @param childName - Child's name
  * @param age - Child's age
@@ -359,26 +359,26 @@ export function buildScene6Script(
     return customScript
   }
 
-  // Default English script template for Malta
-  return `Ho ho ho! Hello there, ${childName}!
+  // Default Polish script template
+  return `Ho ho ho! Witaj, ${childName}!
 
-Yes, yes... I'm looking at my special book right here in my secret study in Mdina,
-and I can see your name shining bright! ${childName}, age ${age}.
+Tak, tak... Właśnie patrzę w moją magiczną księgę tu na Biegunie Północnym,
+i widzę twoje imię świecące jasno! ${childName}, lat ${age}.
 
-You know what made me really happy? When you ${goodBehavior}.
-That was wonderful! My elves have been talking about it all week!
+Wiesz co mnie bardzo ucieszyło? Kiedy ${goodBehavior}.
+To było wspaniałe! Moje elfy mówiły o tym przez cały tydzień!
 
-I also know that ${thingToImprove}.
-I believe in you completely - you're such a special child!
+Wiem też, że ${thingToImprove}.
+Wierzę w ciebie całkowicie - jesteś naprawdę wyjątkowym dzieckiem!
 
-And I heard you want to learn ${thingToLearn}!
-What a brilliant idea! Maybe check under the tree...
+Słyszałem też, że chcesz się nauczyć ${thingToLearn}!
+Co za świetny pomysł! Może sprawdź pod choinką...
 
-Remember, dear ${childName} - be kind, listen to your parents,
-and never stop believing in Christmas magic!
+Pamiętaj, drogi ${childName} - bądź grzeczny, słuchaj rodziców,
+i nigdy nie przestawaj wierzyć w magię Świąt!
 
-I'll be flying over Malta, Gozo, and Comino very soon!
-Merry Christmas from Mdina! Ho ho ho!`
+Wkrótce przylecę do Polski!
+Wesołych Świąt z Bieguna Północnego! Ho ho ho!`
 }
 
 // Utility function

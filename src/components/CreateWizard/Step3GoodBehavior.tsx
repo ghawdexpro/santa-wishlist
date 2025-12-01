@@ -3,14 +3,14 @@
 import { useWizard } from './WizardContext'
 
 const suggestions = [
-  "sharing toys with siblings",
-  "helping with chores without being asked",
-  "being kind to friends at school",
-  "working hard on homework",
-  "being patient and waiting their turn",
-  "taking care of a pet",
-  "being brave at the doctor",
-  "trying new foods",
+  "dzielenie się zabawkami z rodzeństwem",
+  "pomaganie w obowiązkach domowych bez proszenia",
+  "bycie miłym dla kolegów w szkole",
+  "pilna praca nad lekcjami",
+  "cierpliwość i czekanie na swoją kolej",
+  "opiekowanie się zwierzątkiem",
+  "bycie dzielnym u lekarza",
+  "próbowanie nowych potraw",
 ]
 
 export default function Step3GoodBehavior() {
@@ -30,28 +30,28 @@ export default function Step3GoodBehavior() {
       <div className="text-center mb-8">
         <div className="text-5xl mb-4">⭐</div>
         <h2 className="text-2xl font-bold glow-gold mb-2">
-          What Has {data.childName || 'Your Child'} Done Well?
+          Co {data.childName || 'Twoje dziecko'} zrobiło dobrze?
         </h2>
         <p className="text-white/70">
-          Santa will praise this specific behavior in the video
+          Mikołaj pochwali to konkretne zachowanie w filmie
         </p>
       </div>
 
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-christmas-gold mb-2">
-            Good Behavior to Praise *
+            Dobre zachowanie do pochwalenia *
           </label>
           <textarea
             value={data.goodBehavior}
             onChange={(e) => updateData({ goodBehavior: e.target.value })}
-            placeholder="e.g., You've been so kind to your little sister this year, always sharing your toys and helping her..."
+            placeholder="np. Byłeś/aś taki miły/a dla swojej siostrzyczki w tym roku, zawsze dzieliłeś/aś się zabawkami i pomagałeś/aś jej..."
             className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-christmas-gold focus:outline-none focus:ring-2 focus:ring-christmas-gold/50 min-h-[120px]"
             maxLength={300}
           />
           <div className="flex justify-between mt-1">
             <p className="text-xs text-white/50">
-              Be specific - it makes the message more personal!
+              Bądź konkretny - to sprawia, że wiadomość jest bardziej osobista!
             </p>
             <p className="text-xs text-white/50">
               {data.goodBehavior.length}/300
@@ -61,7 +61,7 @@ export default function Step3GoodBehavior() {
 
         {/* Suggestions */}
         <div>
-          <p className="text-sm text-white/50 mb-2">Quick suggestions (click to add):</p>
+          <p className="text-sm text-white/50 mb-2">Szybkie sugestie (kliknij aby dodać):</p>
           <div className="flex flex-wrap gap-2">
             {suggestions.map((suggestion) => (
               <button
@@ -82,7 +82,7 @@ export default function Step3GoodBehavior() {
           onClick={prevStep}
           className="px-6 py-3 text-white/70 hover:text-white transition-colors"
         >
-          ← Back
+          ← Wstecz
         </button>
         <button
           onClick={nextStep}
@@ -91,7 +91,7 @@ export default function Step3GoodBehavior() {
             !isStepValid(3) ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
-          Next Step →
+          Następny krok →
         </button>
       </div>
     </div>

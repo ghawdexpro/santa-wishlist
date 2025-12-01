@@ -3,14 +3,14 @@
 import { useWizard } from './WizardContext'
 
 const suggestions = [
-  "keeping their room tidy",
-  "listening the first time",
-  "being patient with siblings",
-  "finishing homework before playing",
-  "eating more vegetables",
-  "going to bed on time",
-  "not whining when asked to help",
-  "using kind words when upset",
+  "utrzymywanie porządku w pokoju",
+  "słuchanie od pierwszego razu",
+  "cierpliwość wobec rodzeństwa",
+  "odrabianie lekcji przed zabawą",
+  "jedzenie więcej warzyw",
+  "chodzenie spać o czasie",
+  "nienarzekanie przy proszeniu o pomoc",
+  "używanie miłych słów gdy jest zdenerwowany/a",
 ]
 
 export default function Step4Improve() {
@@ -25,28 +25,28 @@ export default function Step4Improve() {
       <div className="text-center mb-8">
         <div className="text-5xl mb-4">💪</div>
         <h2 className="text-2xl font-bold glow-gold mb-2">
-          What Could {data.childName || 'Your Child'} Work On?
+          Nad czym {data.childName || 'Twoje dziecko'} może popracować?
         </h2>
         <p className="text-white/70">
-          Santa will gently encourage improvement in this area
+          Mikołaj delikatnie zachęci do poprawy w tym obszarze
         </p>
       </div>
 
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-christmas-gold mb-2">
-            Area for Improvement *
+            Obszar do poprawy *
           </label>
           <textarea
             value={data.thingToImprove}
             onChange={(e) => updateData({ thingToImprove: e.target.value })}
-            placeholder="e.g., Sometimes it's hard to keep your room tidy, and I know mommy and daddy would love to see you try harder..."
+            placeholder="np. Czasem trudno ci utrzymać porządek w pokoju, i wiem że mama i tata chcieliby żebyś bardziej się starał/a..."
             className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-christmas-gold focus:outline-none focus:ring-2 focus:ring-christmas-gold/50 min-h-[120px]"
             maxLength={300}
           />
           <div className="flex justify-between mt-1">
             <p className="text-xs text-white/50">
-              Santa will be gentle and encouraging - never harsh!
+              Mikołaj będzie delikatny i zachęcający - nigdy surowy!
             </p>
             <p className="text-xs text-white/50">
               {data.thingToImprove.length}/300
@@ -56,7 +56,7 @@ export default function Step4Improve() {
 
         {/* Suggestions */}
         <div>
-          <p className="text-sm text-white/50 mb-2">Common areas (click to use):</p>
+          <p className="text-sm text-white/50 mb-2">Popularne obszary (kliknij aby użyć):</p>
           <div className="flex flex-wrap gap-2">
             {suggestions.map((suggestion) => (
               <button
@@ -81,7 +81,7 @@ export default function Step4Improve() {
           onClick={prevStep}
           className="px-6 py-3 text-white/70 hover:text-white transition-colors"
         >
-          ← Back
+          ← Wstecz
         </button>
         <button
           onClick={nextStep}
@@ -90,7 +90,7 @@ export default function Step4Improve() {
             !isStepValid(4) ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
-          Next Step →
+          Następny krok →
         </button>
       </div>
     </div>

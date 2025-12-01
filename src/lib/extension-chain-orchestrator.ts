@@ -247,9 +247,9 @@ His expression shows gentle encouragement and love.
 Warm firelight flickers on his face. 8 seconds.`,
 
     scene6c: `Santa's final words to ${child.name}.
-"You're on my Nice List! Something special awaits you."
+"Jesteś na mojej liście grzecznych dzieci! Coś wspaniałego na ciebie czeka."
 Pure joy and excitement in his expression.
-Magical golden glow surrounds him. Merry Christmas! 8 seconds.`,
+Magical golden glow surrounds him. Wesołych Świąt! 8 seconds.`,
   }
 }
 
@@ -355,7 +355,7 @@ Santa calls out to his reindeer! 8 seconds.`,
 The sleigh launches into the starry night sky!
 Magical golden trail streams behind.
 Reindeer in powerful flight, silhouetted against the moon.
-Stars spell out "MERRY CHRISTMAS!" Epic finale! 8 seconds.`,
+Stars spell out "WESOŁYCH ŚWIĄT!" Epic finale! 8 seconds.`,
 }
 
 /**

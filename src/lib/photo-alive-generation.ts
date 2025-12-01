@@ -55,7 +55,7 @@ function buildScene4Prompt(childName: string): string {
   return `CINEMATIC VFX INSTRUCTION - Scene 4: Photo Comes Alive
 
 CONTEXT:
-You are creating a magical moment from "The Santa Experience" - a premium personalized Santa video.
+You are creating a magical moment from "Magia Świąt" - a premium personalized Santa video for the Polish market.
 This is Scene 4, where the child's own photograph comes alive with magic in Santa's enchanted book.
 
 VISUAL ELEMENTS TO GENERATE:

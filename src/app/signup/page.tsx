@@ -43,14 +43,14 @@ export default function SignupPage() {
       <div className="card-christmas w-full max-w-md">
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">🎄</div>
-          <h1 className="text-3xl font-bold glow-gold">Join the Nice List!</h1>
-          <p className="text-white/70 mt-2">Create your account and start your wishlist</p>
+          <h1 className="text-3xl font-bold glow-gold">Dołącz do nas!</h1>
+          <p className="text-white/70 mt-2">Utwórz konto i zamów magiczny film</p>
         </div>
 
         <form onSubmit={handleSignup} className="space-y-4">
           <div>
             <label htmlFor="fullName" className="block text-sm font-medium text-white/80 mb-1">
-              Your Name
+              Twoje imię
             </label>
             <input
               id="fullName"
@@ -58,7 +58,7 @@ export default function SignupPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="input-christmas"
-              placeholder="Santa Claus"
+              placeholder="Anna Kowalska"
               required
             />
           </div>
@@ -73,14 +73,14 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input-christmas"
-              placeholder="santa@northpole.com"
+              placeholder="twoj@email.pl"
               required
             />
           </div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-white/80 mb-1">
-              Password
+              Hasło
             </label>
             <input
               id="password"
@@ -88,7 +88,7 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="input-christmas"
-              placeholder="At least 6 characters"
+              placeholder="Minimum 6 znaków"
               minLength={6}
               required
             />
@@ -105,15 +105,15 @@ export default function SignupPage() {
             disabled={loading}
             className="btn-christmas w-full text-center"
           >
-            {loading ? 'Creating account...' : 'Create Account 🎁'}
+            {loading ? 'Tworzenie konta...' : 'Utwórz konto 🎁'}
           </button>
         </form>
 
         <div className="mt-6 text-center text-white/60">
           <p>
-            Already have an account?{' '}
+            Masz już konto?{' '}
             <Link href="/login" className="text-christmas-gold hover:underline">
-              Sign in
+              Zaloguj się
             </Link>
           </p>
         </div>

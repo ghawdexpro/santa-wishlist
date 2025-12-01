@@ -2,8 +2,8 @@ import { WizardProvider } from '@/components/CreateWizard/WizardContext'
 import CreateWizard from '@/components/CreateWizard'
 
 export const metadata = {
-  title: 'Create Your Video | The Santa Experience',
-  description: 'Create a personalized Santa video message for your child',
+  title: 'Stwórz film | Magia Świąt',
+  description: 'Stwórz spersonalizowany film od Mikołaja dla swojego dziecka',
 }
 
 export default function CreatePage() {

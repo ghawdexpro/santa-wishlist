@@ -36,9 +36,9 @@ export default function CreateWizard() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold glow-gold">Create Your Santa Experience</h1>
+          <h1 className="text-3xl font-bold glow-gold">Stwórz Film od Mikołaja</h1>
           <p className="text-white/70 mt-2">
-            Fill in the details below to create a magical personalized video
+            Wypełnij poniższe dane, aby stworzyć magiczny, spersonalizowany film
           </p>
         </div>
 
@@ -52,7 +52,7 @@ export default function CreateWizard() {
 
         {/* Price reminder */}
         <div className="text-center mt-6 text-white/50 text-sm">
-          Preview script & visuals before payment • $59 for the complete experience
+          Podgląd scenariusza i wizualizacji przed płatnością • od 259 zł za film
         </div>
       </div>
     </div>

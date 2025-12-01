@@ -28,62 +28,62 @@ export interface SceneGenerationRequest {
 const USE_HEYGEN_FOR_SCENE_6 = process.env.USE_HEYGEN_FOR_SCENE_6 !== 'false'
 
 /**
- * SCENE 5: Name Over Malta
- * Generate keyframe with child's name in golden 3D letters over Valletta skyline, then animate with Veo
- * Part of Il-Milied Magic - Santa's Maltese Adventure
+ * SCENE 5: Imię w Zorzy Polarnej
+ * Generate keyframe with child's name in golden 3D letters in Aurora Borealis, then animate with Veo
+ * Part of Magia Świąt - Spersonalizowane Wideo od Mikołaja
  */
 export async function generateScene5NameReveal(childData: SceneGenerationRequest): Promise<string> {
-  console.log(`[Scene5] Generating Name Over Malta for ${childData.childName}`)
+  console.log(`[Scene5] Generating Name in Aurora for ${childData.childName}`)
 
   try {
     // Step 1: Generate keyframe with NanoBanana
-    const keyframePrompt = `CINEMATIC VFX INSTRUCTION - Scene 5: Name Over Malta
+    const keyframePrompt = `CINEMATIC VFX INSTRUCTION - Scene 5: Name in Aurora Borealis
 
-THE NAME REVEAL - Over the Maltese Skyline!
+THE NAME REVEAL - Written in the Northern Lights!
 
 BACKGROUND SETTING:
-- VALLETTA SKYLINE at dusk, Grand Harbour visible below
-- Iconic domes of St. John's Co-Cathedral and Carmelite Church silhouetted
-- Mediterranean sunset colors - warm orange, pink, and purple blending
-- Ancient bastions and fortifications along the horizon
-- Azure Mediterranean Sea in the distance
-- The THREE ISLANDS of Malta, Gozo, and Comino visible in the background
+- ARCTIC NIGHT SKY filled with spectacular AURORA BOREALIS
+- Swirling curtains of green, purple, and pink northern lights
+- Endless snow-covered landscape of the North Pole below
+- Santa's village with warm glowing lights in the far distance
+- Millions of stars twinkling above the aurora
+- Snow-capped mountains on the horizon
 
 VISUAL FOCUS:
-From below, letters begin to RISE UP over the Maltese capital:
-"${childData.childName.toUpperCase()}" forms in GIANT 3D GOLDEN LETTERS!
+From the dancing aurora, letters begin to FORM in the sky:
+"${childData.childName.toUpperCase()}" materializes as GIANT 3D GOLDEN LETTERS!
 
 LETTER CHARACTERISTICS:
-- Made of luminous, solid GOLD with metallic Mediterranean shine
-- Each letter is MASSIVE, floating majestically over the harbour
-- Letters hover and spin slowly above Valletta's skyline
+- Made of luminous, solid GOLD with magical northern glow
+- Each letter is MASSIVE, floating majestically in the aurora
+- Letters hover and spin slowly among the northern lights
 - Surrounded by golden sparkles and magical light trails
-- Casting golden reflections on the Mediterranean waters below
+- Aurora colors swirl around and through the letters
 - Stars beginning to appear around the floating name
-- Warm honey-colored glow matching Maltese limestone
+- Warm golden glow contrasting with cool aurora colors
 
 ATMOSPHERE:
-- Mediterranean dusk magic
-- Golden hour warmth meeting twilight stars
-- Local pride - Maltese landmarks as backdrop
+- Arctic night magic
+- Northern lights dancing around the name
+- North Pole wonder and mystery
 - Magical, awe-inspiring, personal
 - "${childData.childName.toUpperCase()}!" exclaims Santa with joy
 
 EMOTION:
-- "MY NAME over MY country!" feeling
-- Personalized magic meets local pride
+- "MY NAME written in the stars!" feeling
+- Personalized magic meets Arctic wonder
 - Spectacular, proud, wonder-filled
-- This is THEIR moment over THEIR islands
+- This is THEIR moment in Santa's magical sky
 
 TECHNICAL REQUIREMENTS:
 - Aspect ratio: 16:9
 - Cinematic quality, epic scale
-- Mediterranean sunset palette with golden letters
+- Aurora colors (green, purple, pink) with golden letters
 - Particle effects and sparkle trails
-- Depth showing Valletta architecture below
+- Depth showing Arctic landscape below
 - Fantasy/magical VFX style
 
-This is the premium name reveal from Il-Milied Magic - Santa's Maltese Adventure.`
+This is the premium name reveal from Magia Świąt.`
 
     const keyframeRequest: KeyframeRequest = {
       prompt: keyframePrompt,
@@ -94,11 +94,11 @@ This is the premium name reveal from Il-Milied Magic - Santa's Maltese Adventure
 
     // Step 2: Animate keyframe with Veo (max 8 seconds)
     const videoPrompt = `Animate giant 3D golden letters "${childData.childName.toUpperCase()}"
-rising and floating majestically over Valletta skyline at Mediterranean sunset.
-Letters spin slowly, casting golden light over Grand Harbour and ancient bastions.
-Magical sparkles trail behind the letters. Stars appear in the twilight sky.
-Warm orange and pink sunset colors blend with golden letter glow.
-Epic, proud, magical reveal over Malta. Premium cinematic quality.`
+materializing and floating majestically in spectacular Aurora Borealis at the North Pole.
+Letters spin slowly, aurora colors swirl around them - green, purple, pink.
+Magical sparkles trail behind the letters. Stars twinkle in the Arctic night sky.
+Snow-covered landscape visible below. Warm golden glow meets cool aurora colors.
+Epic, magical name reveal in the northern lights. Premium cinematic quality.`
 
     const videoRequest: VideoGenerationRequest = {
       prompt: videoPrompt,
@@ -297,74 +297,74 @@ Santa nods gently, radiating warmth and care. Premium cinematic quality.`
 }
 
 /**
- * SCENE 8: Epic Launch Over Malta
- * Generate keyframe with sleigh launching from Mdina over three islands, then animate with Veo
- * Part of Il-Milied Magic - Santa's Maltese Adventure
+ * SCENE 8: Epicki Start z Bieguna Północnego
+ * Generate keyframe with sleigh launching from North Pole into the Aurora, then animate with Veo
+ * Part of Magia Świąt - Spersonalizowane Wideo od Mikołaja
  */
 export async function generateScene8EpicLaunch(childData: SceneGenerationRequest): Promise<string> {
-  console.log(`[Scene8] Generating Epic Launch Over Malta for ${childData.childName}`)
+  console.log(`[Scene8] Generating Epic Launch from North Pole for ${childData.childName}`)
 
   try {
     // Step 1: Generate keyframe with NanoBanana
-    const keyframePrompt = `CINEMATIC VFX INSTRUCTION - Scene 8: Epic Launch Over Malta
+    const keyframePrompt = `CINEMATIC VFX INSTRUCTION - Scene 8: Epic Launch from the North Pole
 
-THE EPIC FINALE - Launch from Mdina over Malta!
+THE EPIC FINALE - Santa's Sleigh Launches into the Aurora!
 
 LAUNCH SETTING:
-- Exterior: MDINA'S ANCIENT RAMPARTS at night
-- The magnificent RED AND GOLD SLEIGH on ancient limestone battlements
-- Honey-colored Maltese stone walls glowing with torchlight
-- Mediterranean starlit sky above
+- Exterior: NORTH POLE WORKSHOP rooftop at night
+- The magnificent RED AND GOLD SLEIGH on snow-covered launch platform
+- Santa's workshop below with warm glowing windows
+- Spectacular AURORA BOREALIS filling the Arctic sky
 
 SLEIGH AND REINDEER:
-- Santa in his red suit takes seat in the golden sleigh
-- Eight MAJESTIC REINDEER harnessed and eager
-- RUDOLPH at the front, nose BLAZING bright red, casting red glow on ancient stone
+- Santa in his burgundy velvet coat, pink glasses gleaming
+- Eight MAJESTIC REINDEER harnessed and eager, breath visible in cold air
+- RUDOLPH at the front, nose BLAZING bright red, casting red glow on snow
 - Sleigh piled HIGH with beautifully wrapped presents
-- Cheerful elves waving from the ancient ramparts
+- Cheerful elves waving from the workshop rooftop
 
 THE LAUNCH:
 - Reindeer LEAP into action with powerful upward thrust!
-- Sleigh ROCKETS UPWARD from the ancient Maltese walls!
+- Sleigh ROCKETS UPWARD from the snowy North Pole!
 - A magnificent GOLDEN RAINBOW TRAIL streams behind
 - Golden stardust and magical sparkles swirl in the wake
+- Snow particles scatter in the sleigh's wake
 
 BELOW THE SLEIGH:
-- The THREE ISLANDS OF MALTA spread out below
-- MALTA - the main island with Valletta's twinkling lights
-- GOZO - the green sister island with Citadel visible
-- COMINO - tiny island with Blue Lagoon reflecting moonlight
-- Christmas lights sparkling from villages across all islands
-- Azure Mediterranean Sea glowing with moonlight and starlight
+- Snow-covered Arctic landscape stretching to the horizon
+- Santa's village with twinkling Christmas lights
+- Frozen lakes reflecting the aurora colors
+- Snow-capped mountains in the distance
+- Northern lights dancing across the sky
 
 THE PERSONALIZED MOMENT:
-- In the starlit sky, "${childData.childName.toUpperCase()}" appears written as a GLOWING CONSTELLATION!
-- The name sparkles with golden light among the stars
-- A heart-shaped AURORA forms over the Mediterranean
-- Santa waves back: "See you soon, ${childData.childName}! Merry Christmas from Malta!"
+- In the aurora-filled sky, "${childData.childName.toUpperCase()}" appears written as a GLOWING CONSTELLATION!
+- The name sparkles with golden light among the northern lights
+- Aurora colors dance around the letters - green, purple, pink
+- Santa waves back: "Lecę do ciebie, ${childData.childName}! Wesołych Świąt!"
 
 ATMOSPHERE:
-- Epic, triumphant, magical farewell over Malta
-- Warm golden sleigh lights against cool Mediterranean night
-- The promise of Christmas coming to the islands
+- Epic, triumphant, magical farewell from the North Pole
+- Warm golden sleigh lights against cool Arctic night
+- The promise of Christmas coming to Poland
 - Exhilarating, joyful, unforgettable
 
 EMOTION:
 - "GO GO GO!" excitement
-- Perfect Maltese ending
-- Local pride meets Christmas magic
+- Epic adventure finale
+- Arctic magic meets Christmas wonder
 - Anticipation for Christmas morning
-- Memorable farewell from their own islands
+- Memorable farewell - Santa is coming!
 
 TECHNICAL REQUIREMENTS:
 - Aspect ratio: 16:9
 - Cinematic quality, epic scale
-- Night sky with Mediterranean blue tones
+- Night sky with aurora colors (green, purple, pink)
 - Golden light trails and magical particles
-- Epic scope showing all three islands below
+- Epic scope showing Arctic landscape below
 - Fantasy/magical VFX style
 
-This is the epic finale of Il-Milied Magic - Santa's Maltese Adventure.`
+This is the epic finale of Magia Świąt.`
 
     const keyframeRequest: KeyframeRequest = {
       prompt: keyframePrompt,
@@ -374,13 +374,13 @@ This is the epic finale of Il-Milied Magic - Santa's Maltese Adventure.`
     const keyframeResult = await generateKeyframe(keyframeRequest)
 
     // Step 2: Animate keyframe with Veo (max 8 seconds)
-    const videoPrompt = `Epic cinematic animation: Santa's golden sleigh LAUNCHES from ancient Mdina ramparts into starlit Mediterranean sky!
-Reindeer in powerful upward flight, Rudolph's red nose blazing.
-Golden rainbow trail streams behind over the THREE ISLANDS OF MALTA below.
-${childData.childName.toUpperCase()} appears as glowing constellation letters in the stars.
-Heart-shaped aurora forms over the Mediterranean Sea.
-Christmas lights twinkle from Maltese villages below.
-Warm golden sleigh glow against cool Mediterranean night. Premium cinematic quality.`
+    const videoPrompt = `Epic cinematic animation: Santa's golden sleigh LAUNCHES from North Pole workshop into spectacular Aurora Borealis!
+Reindeer in powerful upward flight, Rudolph's red nose blazing, breath visible in cold air.
+Golden rainbow trail streams behind over snow-covered Arctic landscape.
+${childData.childName.toUpperCase()} appears as glowing constellation letters in the aurora.
+Northern lights dance around the sleigh - green, purple, pink.
+Santa's village with Christmas lights twinkling below.
+Warm golden sleigh glow against cool Arctic night. Premium cinematic quality.`
 
     const videoRequest: VideoGenerationRequest = {
       prompt: videoPrompt,

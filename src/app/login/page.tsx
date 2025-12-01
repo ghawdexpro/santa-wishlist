@@ -37,8 +37,8 @@ export default function LoginPage() {
       <div className="card-christmas w-full max-w-md">
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">🎅</div>
-          <h1 className="text-3xl font-bold glow-gold">Welcome Back!</h1>
-          <p className="text-white/70 mt-2">Sign in to manage your wishlists</p>
+          <h1 className="text-3xl font-bold glow-gold">Witaj ponownie!</h1>
+          <p className="text-white/70 mt-2">Zaloguj się aby zarządzać swoimi filmami</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -52,14 +52,14 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input-christmas"
-              placeholder="santa@northpole.com"
+              placeholder="twoj@email.pl"
               required
             />
           </div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-white/80 mb-1">
-              Password
+              Hasło
             </label>
             <input
               id="password"
@@ -67,7 +67,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="input-christmas"
-              placeholder="Your secret password"
+              placeholder="Twoje tajne hasło"
               required
             />
           </div>
@@ -83,15 +83,15 @@ export default function LoginPage() {
             disabled={loading}
             className="btn-christmas w-full text-center"
           >
-            {loading ? 'Signing in...' : 'Sign In 🔔'}
+            {loading ? 'Logowanie...' : 'Zaloguj się 🔔'}
           </button>
         </form>
 
         <div className="mt-6 text-center text-white/60">
           <p>
-            Don&apos;t have an account?{' '}
+            Nie masz jeszcze konta?{' '}
             <Link href="/signup" className="text-christmas-gold hover:underline">
-              Create one
+              Utwórz konto
             </Link>
           </p>
         </div>
