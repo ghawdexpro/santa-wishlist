@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const orderId = searchParams.get('id')
+    const locale = getLocale()
 
     const locale = getLocale()
 
