@@ -38,10 +38,12 @@ supabase db push               # Apply migrations
 - **Auth:** Supabase Auth
 - **Storage:** Supabase Storage
 - **Payments:** Stripe
-- **AI Services:** Vertex AI (Gemini, NanoBanana, Veo)
+- **AI Services:** Vertex AI (Gemini, NanoBanana, Veo), HeyGen (Avatar Videos & Streaming)
 - **Deployment:** Railway
 
-### AI Services (all via Vertex AI REST API)
+### AI Services
+
+#### Vertex AI (Google Cloud)
 
 | Service | Model ID | Purpose |
 |---------|----------|---------|
@@ -51,19 +53,37 @@ supabase db push               # Apply migrations
 
 **Service Account:** `vertex-express@primal-turbine-478412-k9.iam.gserviceaccount.com`
 
+#### HeyGen (Scene 6 Talking Avatar + Future Live Calls)
+
+| Product | Type | Purpose | Documentation |
+|---------|------|---------|---------------|
+| **Video Generation API** | Async REST API | Scene 6: Santa's Message (30-60s talking head) | `docs/HEYGEN-VIDEO-API-BIBLE.md` |
+| **Streaming Avatar (LiveAvatar)** | Real-time WebRTC | Future: Live video calls with Santa | `docs/HEYGEN-STREAMING-AVATAR-BIBLE.md` |
+
+**Scene 6 Integration:**
+- HeyGen generates 30-60 second talking Santa videos (vs 8s Veo)
+- Premium tier uses HeyGen, Basic tier falls back to Veo
+- Toggle: `USE_HEYGEN_FOR_SCENE_6=true/false`
+
+**Key Differences:**
+- **Video API:** Generate videos async (30s-5min), costs 1-2 credits/min, max 5000 chars
+- **Streaming:** Real-time conversation (<1s latency), costs 0.2 credits/min, max 1000 chars/message
+
 ### Core Libraries (`src/lib/`)
 
 **Video Generation & Orchestration:**
 - `gemini.ts` - Script generation with Gemini (includes `generateMultiChildScript()` for 1-3 children)
 - `nanobanana.ts` - Image generation with reference image support (photo compositing, "Magical Mirror" concept)
 - `veo.ts` - Video generation + video extension for continuous clips
-- `heygen.ts` - Talking head video (available as premium option, not in main pipeline)
+- `heygen.ts` - Scene 6: HeyGen talking avatar video generation (30-60s Santa messages)
+- `hollywood-scene-generator.ts` - Dual-keyframe Hollywood-quality scene generation
 - `ffmpeg.ts` - Video stitching (`stitchFinalVideo`)
 - `premade-scenes.ts` - 8-scene VFX definitions
 
 **Multi-Child Video Pipeline:**
 - `photo-alive-generation.ts` - Scene 4: Photo compositing with NanoBanana Pro reference images
-- `scene-generators.ts` - Scenes 5, 6, 8: Personalized scene generation per child (all Veo-based)
+- `scene-generators.ts` - Scene 6: HeyGen talking avatar (or Veo fallback)
+- `hollywood-scene-generator.ts` - Scenes 4, 5, 8: Hollywood-quality dual-keyframe generation
 - `premade-cache.ts` - Pre-made scene caching system (Scenes 1, 2, 3, 7)
 - `video-stitcher.ts` - Scene interleaving by type and FFmpeg coordination
 - `extension-chain-orchestrator.ts` - BLOK A/B/C architecture for continuous video chains
@@ -74,7 +94,7 @@ supabase db push               # Apply migrations
 
 ### Key Flows
 
-**Order Flow (Updated for Multi-Child):**
+**Order Flow (Updated for Multi-Child + HeyGen):**
 1. User fills wizard with 1-3 children
 2. Create order with children records in database
 3. Stripe payment triggers webhook
@@ -82,11 +102,11 @@ supabase db push               # Apply migrations
    - Generate multi-child script (Gemini)
    - Load pre-made scenes (cache or generate)
    - Generate personalized scenes per child (parallel):
-     - Scene 4: Photo compositing (NanoBanana + Veo) - "Magical Mirror" concept
-     - Scene 5: Name reveal (NanoBanana + Veo)
-     - Scene 6: Santa's message (NanoBanana + Veo) - all Veo now
-     - Scene 8: Epic launch (NanoBanana + Veo)
-   - Poll Veo operations until complete
+     - Scene 4: Photo compositing (Hollywood dual-keyframe) - 8s
+     - Scene 5: Name reveal (Hollywood dual-keyframe) - 8s
+     - Scene 6: Santa's message (HeyGen talking avatar) - 30-60s
+     - Scene 8: Epic launch (Hollywood dual-keyframe) - 8s
+   - Poll Veo operations (HeyGen already complete)
    - Stitch scenes in interleaved order
    - Upload final video
    - Mark order complete
@@ -100,23 +120,37 @@ See `extension-chain-orchestrator.ts` for implementation.
 
 **8-Scene Video Structure:**
 ```
-PRE-MADE (Cached):
-  Scene 1: Sky Dive (12s)
-  Scene 2: Workshop (12s)
-  Scene 3: Book Magic (10s)
-  Scene 7: Sleigh Ready (10s)
-  = 44 seconds (reused for all orders)
+Veo 3.1 Duration Limits:
+- Image-to-video (with keyframe): 8 seconds ONLY
+- Extension: 6 seconds per extension (no images allowed)
+- Text-to-video: 4, 6, or 8 seconds
+
+HeyGen Video API:
+- Talking avatar videos: 30-60 seconds (Scene 6)
+- Cost: ~0.5-1 credit per video (~$0.50-1.00)
+
+PRE-MADE (Cached - Veo) - 8 seconds each:
+  Scene 1: Sky Dive (8s)
+  Scene 2: Workshop (8s)
+  Scene 3: Book Magic (8s)
+  Scene 7: Sleigh Ready (8s)
+  = 32 seconds (reused for all orders)
 
 PERSONALIZED (Per Child):
-  Scene 4: Photo Comes Alive (12s) - photo reference + Veo
-  Scene 5: Name Reveal (10s) - golden 3D text + Veo
-  Scene 6: Santa's Message (25s) - HeyGen talking head
-  Scene 8: Epic Launch (10s) - sleigh + Veo
-  = 57 seconds per child
+  Scene 4: Photo Comes Alive (8s) - photo reference + Veo
+  Scene 5: Name Reveal (8s) - keyframe + Veo
+  Scene 6: Santa's Message (45s avg) - HeyGen talking avatar
+  Scene 8: Epic Launch (8s) - keyframe + Veo
+  = ~69 seconds per child (premium with HeyGen)
+  = ~32 seconds per child (basic with Veo fallback)
 
 INTERLEAVING ORDER (for 2 children):
 [1] [2] [3] [4-Child1] [4-Child2] [5-Child1] [5-Child2] [6-Child1] [6-Child2] [7] [8-Child1] [8-Child2]
-Total: ~158 seconds (2:38) for 2 children
+
+Total Duration (Premium with HeyGen):
+- 1 child: 32 + 69 = ~101s (1:41)
+- 2 children: 32 + 138 = ~170s (2:50)
+- 3 children: 32 + 207 = ~239s (3:59)
 ```
 
 ### Database Tables
@@ -140,16 +174,32 @@ Total: ~158 seconds (2:38) for 2 children
 
 Required in `.env.local` and Railway:
 ```
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
+
+# Google Cloud (Vertex AI)
 GOOGLE_CLOUD_PROJECT
 GOOGLE_CLOUD_LOCATION
 GOOGLE_APPLICATION_CREDENTIALS_JSON
+
+# HeyGen (Required for Premium Tier Scene 6)
+HEYGEN_API_KEY                         # API key from HeyGen dashboard
+NEXT_PUBLIC_SANTA_AVATAR_ID            # Avatar ID for Santa (from /v2/avatars)
+NEXT_PUBLIC_SANTA_VOICE_ID             # Voice ID for Santa (from /v2/voices)
+USE_HEYGEN_FOR_SCENE_6=true            # Set to 'false' for basic tier (Veo fallback)
+
+# Stripe
 STRIPE_SECRET_KEY
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 STRIPE_WEBHOOK_SECRET
+
+# App
 NEXT_PUBLIC_APP_URL
+
+# OpenAI (optional - for future Live Santa Chat LLM)
+OPENAI_API_KEY                         # Only needed if implementing Streaming Avatar
 ```
 
 ## Critical Rules
@@ -166,41 +216,19 @@ NEXT_PUBLIC_APP_URL
 
 ## Current Implementation Status
 
-**✅ COMPLETE (Phase 9):**
-- Multi-child video generation (1-3 children per order)
-- 8-scene orchestration pipeline
-- Photo compositing with NanoBanana Pro reference images
-- Pre-made scene caching system
-- All AI service integrations (Gemini, NanoBanana, Veo, HeyGen)
-- Database schema with children table
-- Comprehensive testing plan
-- Production deployment guide
-
-**📍 Currently Deployed:**
-- GitHub: `main` branch (commit `5d025de`)
-- Railway: Ready for deployment (needs environment variables + webhook setup)
-- Supabase: Migration file created, needs application
-
-**Next Steps:**
-1. Set environment variables in Railway dashboard
-2. Apply database migration to Supabase
-3. Configure Stripe webhook
-4. Run test scenarios (1, 2, 3 children)
-5. Monitor logs during video generation
-
-## Current Implementation Status
-
 ### ✅ Completed Features
-- **Dual-Keyframe Video Generation** - Veo 3.1 supports start + end keyframes for guided generation
-- **Admin Panel** - Full UI for managing pre-made scenes with granular controls
-- **Script Page UX** - All scenes expand by default to show Santa's dialogue immediately
-- **Customer Flow** - Create → Script generation → Payment → Video generation → Download
-- **Database Schema** - `premade_scenes` table with all necessary fields for dual-keyframe pipeline
+- Multi-child video generation (1-3 children per order)
+- 8-scene orchestration pipeline with Veo 3.1 for ALL scenes
+- Photo compositing with NanoBanana Pro reference images
+- Dual-keyframe video generation (start + end keyframes)
+- Pre-made scene caching system
+- Admin Panel for managing pre-made scenes
+- Customer flow: Create → Script generation → Payment → Video generation → Download
 
 ### ⏳ Pending Tasks
-- Generate pre-made scene keyframes for scenes 1, 2, 3, 7 (cost: ~$0.32 total)
-- Test pre-made scene video generation end-to-end
-- Monitor production stability on Railway
+- Generate pre-made scene keyframes for scenes 1, 2, 3, 7
+- Configure Stripe webhook in production
+- End-to-end testing with real orders
 
 ## Frontend Pages & UX
 
@@ -212,11 +240,16 @@ NEXT_PUBLIC_APP_URL
 
 ## Documentation
 
+### Project Docs
 - `IMPLEMENTATION-SUMMARY.md` - Complete technical overview of multi-child system
 - `PHASE-8-TESTING-PLAN.md` - Test scenarios and validation criteria
 - `PHASE-9-DEPLOYMENT-GUIDE.md` - Full deployment procedures
 - `DEPLOYMENT-CHECKLIST.md` - Pre-deployment setup and validation
 - `DEPLOYMENT-STATUS.md` - Current status and next actions
+
+### AI Service Bibles (in `docs/`)
+- `docs/HEYGEN-VIDEO-API-BIBLE.md` - **HeyGen Video Generation API** - Pre-rendered avatar videos
+- `docs/HEYGEN-STREAMING-AVATAR-BIBLE.md` - **HeyGen Streaming Avatar (LiveAvatar)** - Real-time video calls
 - `docs/NANOBANANA-BIBLE.md` - Comprehensive NanoBanana guide
 - `docs/NANOBANANA-QUICK.md` - Quick reference
 
@@ -269,11 +302,11 @@ Generate pre-made scenes with granular control over keyframes and videos.
 2. Generate unified multi-child script (Gemini 2.0 Flash in Polish)
 3. Load pre-made scenes (check cache in `premade_scenes`, generate if missing)
 4. **For each child (in parallel):**
-   - Scene 4: Download photo → NanoBanana (reference image) → Veo (animate) → operation name
-   - Scene 5: NanoBanana (keyframe) → Veo (animate) → operation name
-   - Scene 6: HeyGen (returns URL immediately)
-   - Scene 8: NanoBanana (keyframe) → Veo (animate) → operation name
-5. Poll all Veo operations until complete (9 parallel operations for 3 children)
+   - Scene 4: Download photo → NanoBanana (reference image) → Veo (animate) - 8s
+   - Scene 5: NanoBanana (keyframe) → Veo (animate) - 8s
+   - Scene 6: HeyGen talking avatar (30-60s) - returns URL immediately
+   - Scene 8: NanoBanana (keyframe) → Veo (animate) - 8s
+5. Poll Veo operations until complete (Scene 6 HeyGen already done)
 6. Generate interleaved stitch order: [1][2][3][4-all][5-all][6-all][7][8-all]
 7. FFmpeg stitch all scenes in correct order
 8. Upload final video to Supabase Storage
@@ -284,7 +317,8 @@ Generate pre-made scenes with granular control over keyframes and videos.
 - `stitchVideoSegments()` in video-stitcher.ts - Coordinates FFmpeg concatenation
 - `getAllPremadeScenes()` in premade-cache.ts - Loads/caches scenes 1,2,3,7
 - `generateScene4ForChild()` in photo-alive-generation.ts - Photo compositing pipeline
-- `generateScene5/6/8ForChild()` in scene-generators.ts - Personalized scene generation
+- `generateScene5/8ForChild()` in scene-generators.ts - Veo-based scene generation
+- `generateScene6SantasMessage()` in scene-generators.ts - HeyGen or Veo (configurable)
 
 ## Supabase Migrations
 

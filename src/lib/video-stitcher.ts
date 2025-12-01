@@ -1,16 +1,22 @@
 /**
  * Video Stitcher for Multi-Child Orders
  * Handles scene ordering and FFmpeg concatenation
+ *
+ * Scene durations:
+ * - Pre-made (Veo): 8 seconds each
+ * - Personalized (Veo): 8 seconds each
+ * - Scene 6 (HeyGen): 30-60 seconds (variable, talking avatar)
  */
 
 import { stitchFinalVideo } from './ffmpeg'
 import { Child } from '@/types/database'
+import { Scene6Result } from './scene-generators'
 
 export interface PersonalizedSceneVideos {
-  scene4: string // Veo operation name or video URL
-  scene5: string // Veo operation name or video URL
-  scene6: string // HeyGen video URL
-  scene8: string // Veo operation name or video URL
+  scene4: string // Veo video URL
+  scene5: string // Veo video URL
+  scene6: Scene6Result // HeyGen video URL (with duration) or Veo fallback
+  scene8: string // Veo video URL
 }
 
 export interface VideoSegment {
@@ -91,11 +97,13 @@ export function generateStitchOrder(
   }
 
   // Scene 6: Santa's Message (all children)
+  // Scene 6 uses HeyGen talking avatar (30-60s) or Veo fallback (8s)
   for (const child of children) {
     const videos = childSceneVideos.get(child.id)
     if (videos?.scene6) {
       order.push({
-        url: videos.scene6,
+        url: videos.scene6.value,
+        duration: videos.scene6.duration,
         type: 'personalized',
         sceneNumber: 6,
         childId: child.id,
@@ -159,35 +167,67 @@ export async function stitchVideoSegments(
 
 /**
  * Calculate total video duration from segments
+ *
+ * @param children - Number of children
+ * @param useHeyGen - Whether Scene 6 uses HeyGen (true) or Veo (false)
  */
-export function calculateTotalDuration(children: number): number {
-  // Pre-made scenes: 1(12) + 2(12) + 3(10) + 7(10) = 44 seconds
-  const premadeDuration = 44
+export function calculateTotalDuration(children: number, useHeyGen: boolean = true): number {
+  // Pre-made scenes (Veo): 1(8) + 2(8) + 3(8) + 7(8) = 32 seconds
+  const premadeDuration = 32
 
-  // Personalized per child: 4(12) + 5(10) + 6(25) + 8(10) = 57 seconds
-  const personalizedPerChild = 57
+  // Personalized per child with HeyGen Scene 6:
+  // 4(8) + 5(8) + 6(45 avg) + 8(8) = 69 seconds per child
+  const personalizedWithHeyGen = 69
 
+  // Personalized per child with Veo Scene 6 (fallback):
+  // 4(8) + 5(8) + 6(8) + 8(8) = 32 seconds per child
+  const personalizedWithVeo = 32
+
+  const personalizedPerChild = useHeyGen ? personalizedWithHeyGen : personalizedWithVeo
   const totalDuration = premadeDuration + personalizedPerChild * children
 
   return totalDuration
 }
 
 /**
- * Estimate video generation time based on children count
+ * Calculate actual total duration from segments with known durations
  */
-export function estimateGenerationTime(children: number): number {
+export function calculateActualDuration(segments: VideoSegment[]): number {
+  let total = 0
+
+  for (const segment of segments) {
+    if (segment.duration) {
+      total += segment.duration
+    } else {
+      // Default to 8 seconds for Veo scenes
+      total += 8
+    }
+  }
+
+  return total
+}
+
+/**
+ * Estimate video generation time based on children count
+ *
+ * @param children - Number of children
+ * @param useHeyGen - Whether Scene 6 uses HeyGen (adds ~90s per child)
+ */
+export function estimateGenerationTime(children: number, useHeyGen: boolean = true): number {
   // Rough estimates in seconds:
   // - Script generation: 15s
   // - Pre-made scenes (parallel): 30s (max of any single scene)
-  // - Personalized scenes per child: ~60s (can be somewhat parallel)
-  // - Stitching: 20s
+  // - Personalized Veo scenes per child: ~60s (can be somewhat parallel)
+  // - HeyGen Scene 6 per child: ~90s (sequential, render time)
+  // - Stitching: 30s
   // - Upload: 30s
 
   const scriptTime = 15
   const premadeTime = 30
-  const personalizedTime = 60 * Math.min(children, 2) // Can parallelize 2 children
-  const stitchTime = 20
+  const veoPersonalizedTime = 60 * Math.min(children, 2) // Parallelize up to 2
+  const heyGenTime = useHeyGen ? 90 * children : 0 // HeyGen renders are sequential
+  const stitchTime = 30
   const uploadTime = 30
 
-  return scriptTime + premadeTime + personalizedTime + stitchTime + uploadTime
+  return scriptTime + premadeTime + veoPersonalizedTime + heyGenTime + stitchTime + uploadTime
 }

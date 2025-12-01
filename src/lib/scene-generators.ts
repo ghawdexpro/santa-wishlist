@@ -1,11 +1,19 @@
 /**
  * Scene Generators for Scenes 5, 6, and 8
  * Personalized scene generation for each child
- * All scenes use NanoBanana (keyframes) + Veo (video generation)
+ *
+ * Scene 5 & 8: NanoBanana (keyframes) + Veo (video generation)
+ * Scene 6: HeyGen Talking Avatar (30-60 second Santa message)
  */
 
 import { generateKeyframe, KeyframeRequest } from './nanobanana'
 import { startVideoGeneration, VideoGenerationRequest } from './veo'
+import {
+  generateSantaVideo,
+  waitForVideoCompletion,
+  buildScene6Script,
+  validateHeyGenConfig,
+} from './heygen'
 
 export interface SceneGenerationRequest {
   childName: string
@@ -15,6 +23,9 @@ export interface SceneGenerationRequest {
   thingToLearn: string
   personalizedScript?: string // From Gemini for Scene 6
 }
+
+// Flag to use HeyGen for Scene 6 (premium tier) or Veo (basic tier)
+const USE_HEYGEN_FOR_SCENE_6 = process.env.USE_HEYGEN_FOR_SCENE_6 !== 'false'
 
 /**
  * SCENE 5: Name Reveal
@@ -99,11 +110,101 @@ Warm, cozy workshop lighting. Pure magic and wonder. Premium cinematic quality.`
 
 /**
  * SCENE 6: Santa's Personal Message
- * Generate keyframe with Santa and personalized message, then animate with Veo
- * (Temporarily using Veo instead of HeyGen)
+ *
+ * Premium Tier (HeyGen): 30-60 second talking Santa avatar with personalized script
+ * Basic Tier (Veo): 8 second animated Santa keyframe
+ *
+ * HeyGen provides a realistic talking head with lip-sync, perfect for personal messages.
+ * Returns: HeyGen video URL (ready to use) OR Veo operation name (needs polling)
  */
-export async function generateScene6SantasMessage(childData: SceneGenerationRequest): Promise<string> {
+export async function generateScene6SantasMessage(
+  childData: SceneGenerationRequest
+): Promise<{ type: 'heygen' | 'veo'; value: string; duration?: number }> {
   console.log(`[Scene6] Generating Santa's Message for ${childData.childName}`)
+  console.log(`[Scene6] Using ${USE_HEYGEN_FOR_SCENE_6 ? 'HeyGen (premium)' : 'Veo (basic)'} mode`)
+
+  if (USE_HEYGEN_FOR_SCENE_6) {
+    // PREMIUM: HeyGen Talking Avatar (30-60 seconds)
+    return generateScene6WithHeyGen(childData)
+  } else {
+    // BASIC: Veo animated keyframe (8 seconds)
+    return generateScene6WithVeo(childData)
+  }
+}
+
+/**
+ * Scene 6 with HeyGen Talking Avatar (Premium Tier)
+ * Generates a 30-60 second video of Santa speaking the personalized script
+ */
+async function generateScene6WithHeyGen(
+  childData: SceneGenerationRequest
+): Promise<{ type: 'heygen'; value: string; duration: number }> {
+  console.log(`[Scene6-HeyGen] Starting HeyGen generation for ${childData.childName}`)
+
+  // Validate HeyGen is configured
+  const config = validateHeyGenConfig()
+  if (!config.valid) {
+    console.error(`[Scene6-HeyGen] Missing config: ${config.missing.join(', ')}`)
+    throw new Error(`HeyGen not configured. Missing: ${config.missing.join(', ')}`)
+  }
+
+  try {
+    // Build script - use pre-generated Gemini script or default template
+    const script = buildScene6Script(
+      childData.childName,
+      childData.childAge,
+      childData.goodBehavior,
+      childData.thingToImprove,
+      childData.thingToLearn,
+      childData.personalizedScript
+    )
+
+    console.log(`[Scene6-HeyGen] Script length: ${script.length} characters`)
+
+    // Start HeyGen video generation
+    const videoId = await generateSantaVideo({
+      script,
+      childName: childData.childName,
+    })
+
+    console.log(`[Scene6-HeyGen] Video started: ${videoId}`)
+
+    // Wait for completion (HeyGen takes 30-120 seconds typically)
+    const videoUrl = await waitForVideoCompletion(videoId, 60)
+
+    console.log(`[Scene6-HeyGen] Video completed for ${childData.childName}`)
+
+    // Estimate duration based on script length (~2.5 words per second)
+    const wordCount = script.split(/\s+/).length
+    const estimatedDuration = Math.max(30, Math.min(60, wordCount / 2.5))
+
+    return {
+      type: 'heygen',
+      value: videoUrl,
+      duration: estimatedDuration,
+    }
+  } catch (error) {
+    console.error(`[Scene6-HeyGen] Failed for ${childData.childName}:`, error)
+
+    // Fallback to Veo if HeyGen fails
+    console.log(`[Scene6-HeyGen] Falling back to Veo for ${childData.childName}`)
+    const veoResult = await generateScene6WithVeo(childData)
+    return {
+      type: 'heygen', // Keep type for consistency
+      value: veoResult.value,
+      duration: 8,
+    }
+  }
+}
+
+/**
+ * Scene 6 with Veo (Basic Tier / Fallback)
+ * Generates an 8-second animated keyframe of Santa
+ */
+async function generateScene6WithVeo(
+  childData: SceneGenerationRequest
+): Promise<{ type: 'veo'; value: string; duration: number }> {
+  console.log(`[Scene6-Veo] Starting Veo generation for ${childData.childName}`)
 
   try {
     // Step 1: Generate keyframe with NanoBanana
@@ -140,20 +241,13 @@ ATMOSPHERE:
 - Cozy Christmas Eve feeling
 - Safe, magical, special
 
-EMOTION:
-- Pure love and warmth from Santa
-- "You are special" feeling
-- Personal connection
-- Christmas magic at its most heartfelt
-
 TECHNICAL REQUIREMENTS:
 - Aspect ratio: 16:9
 - Cinematic quality, soft focus background
 - Warm golden color palette
-- Santa should be the clear focus
 - Premium, professional quality
 
-This is the emotional heart of a $59+ personalized Santa video for ${childData.childName}.`
+This is the emotional heart of a personalized Santa video for ${childData.childName}.`
 
     const keyframeRequest: KeyframeRequest = {
       prompt: keyframePrompt,
@@ -178,17 +272,18 @@ Santa nods gently, radiating warmth and care. Premium cinematic quality.`
 
     const operationName = await startVideoGeneration(videoRequest)
 
-    console.log(`[Scene6] Successfully started video generation for ${childData.childName}`)
+    console.log(`[Scene6-Veo] Video generation started for ${childData.childName}`)
 
-    return operationName
+    return {
+      type: 'veo',
+      value: operationName,
+      duration: 8,
+    }
   } catch (error) {
-    console.error(`[Scene6] Failed to generate Scene 6 for ${childData.childName}:`, error)
+    console.error(`[Scene6-Veo] Failed for ${childData.childName}:`, error)
     throw error
   }
 }
-
-// Note: buildScene6Script removed - no longer needed since HeyGen is disabled
-// Scene 6 now uses visual generation (NanoBanana + Veo) instead of talking head
 
 /**
  * SCENE 8: Epic Launch
@@ -270,24 +365,35 @@ Warm golden light contrasts with cool night sky. Premium cinematic quality.`
 }
 
 /**
+ * Scene 6 result type for the orchestration pipeline
+ */
+export interface Scene6Result {
+  type: 'heygen' | 'veo'
+  value: string // HeyGen video URL or Veo operation name
+  duration: number
+}
+
+/**
  * Generate all personalized scenes for a single child
  * Used in the main orchestration pipeline
- * All scenes now use NanoBanana + Veo (HeyGen disabled temporarily)
+ *
+ * Scene 5 & 8: NanoBanana + Veo (returns operation name, needs polling)
+ * Scene 6: HeyGen (returns video URL) or Veo (returns operation name)
  */
 export async function generateAllPersonalizedScenesForChild(
   childData: SceneGenerationRequest
 ): Promise<{
-  scene4: string // Veo operation name
+  scene4: string // Veo operation name (set by photo-alive-generation.ts)
   scene5: string // Veo operation name
-  scene6: string // Veo operation name (was HeyGen URL)
+  scene6: Scene6Result // HeyGen video URL or Veo operation name
   scene8: string // Veo operation name
 }> {
   console.log(`[Orchestration] Generating all personalized scenes for ${childData.childName}`)
 
   try {
-    // Generate all scenes in parallel for speed
-    // All scenes now return Veo operation names
-    const [scene5Op, scene6Op, scene8Op] = await Promise.all([
+    // Generate scenes in parallel for speed
+    // Scene 6 may take longer if using HeyGen (30-120 sec render time)
+    const [scene5Op, scene6Result, scene8Op] = await Promise.all([
       generateScene5NameReveal(childData),
       generateScene6SantasMessage(childData),
       generateScene8EpicLaunch(childData),
@@ -296,12 +402,13 @@ export async function generateAllPersonalizedScenesForChild(
     // Note: Scene 4 should be generated separately using photo-alive-generation.ts
     // as it requires the child's photo as a reference image
 
-    console.log(`[Orchestration] Successfully started all personalized scene generations for ${childData.childName}`)
+    console.log(`[Orchestration] Successfully generated personalized scenes for ${childData.childName}`)
+    console.log(`[Orchestration] Scene 6 type: ${scene6Result.type}, duration: ${scene6Result.duration}s`)
 
     return {
       scene4: '', // Will be set by photo-alive-generation.ts
       scene5: scene5Op,
-      scene6: scene6Op, // Now Veo operation name, not HeyGen URL
+      scene6: scene6Result,
       scene8: scene8Op,
     }
   } catch (error) {
