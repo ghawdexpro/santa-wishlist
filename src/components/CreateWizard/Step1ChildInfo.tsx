@@ -50,9 +50,9 @@ export default function Step1ChildInfo() {
     <div className="max-w-xl mx-auto">
       <div className="text-center mb-8">
         <div className="text-5xl mb-4">👶</div>
-        <h2 className="text-2xl font-bold glow-gold mb-2">Opowiedz nam o swoim dziecku</h2>
+        <h2 className="text-2xl font-bold glow-gold mb-2">Tell Us About Your Child</h2>
         <p className="text-white/70">
-          Mikołaj musi wiedzieć, do kogo mówi!
+          Santa needs to know who he&apos;s talking to!
         </p>
       </div>
 
@@ -60,25 +60,25 @@ export default function Step1ChildInfo() {
         {/* Child's Name */}
         <div>
           <label className="block text-sm font-medium text-christmas-gold mb-2">
-            Imię dziecka *
+            Child&apos;s Name *
           </label>
           <input
             type="text"
             value={data.childName}
             onChange={(e) => updateData({ childName: e.target.value })}
-            placeholder="Wpisz imię dziecka"
+            placeholder="Enter child's name"
             className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-christmas-gold focus:outline-none focus:ring-2 focus:ring-christmas-gold/50"
             maxLength={50}
           />
           <p className="mt-1 text-xs text-white/50">
-            Mikołaj będzie zwracał się do dziecka tym imieniem w filmie
+            Santa will address your child by this name in the video
           </p>
         </div>
 
         {/* Photo Upload */}
         <div>
           <label className="block text-sm font-medium text-christmas-gold mb-2">
-            Zdjęcie dziecka (opcjonalne)
+            Child&apos;s Photo (optional)
           </label>
           <div
             className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
@@ -103,7 +103,7 @@ export default function Step1ChildInfo() {
               <div className="space-y-4">
                 <img
                   src={data.childPhotoPreview}
-                  alt="Podgląd zdjęcia"
+                  alt="Photo preview"
                   className="w-32 h-32 object-cover rounded-full mx-auto border-4 border-christmas-gold"
                 />
                 <button
@@ -113,7 +113,7 @@ export default function Step1ChildInfo() {
                   }}
                   className="text-sm text-christmas-red hover:underline"
                 >
-                  Usuń zdjęcie
+                  Remove photo
                 </button>
               </div>
             ) : (
@@ -123,10 +123,10 @@ export default function Step1ChildInfo() {
               >
                 <div className="text-4xl mb-2">📷</div>
                 <p className="text-white/70">
-                  Przeciągnij i upuść zdjęcie tutaj, lub kliknij aby wybrać
+                  Drag and drop a photo here, or click to select
                 </p>
                 <p className="text-xs text-white/50 mt-2">
-                  To zdjęcie pojawi się w magicznej księdze Mikołaja
+                  This photo will appear in Santa&apos;s magical book
                 </p>
               </div>
             )}
@@ -143,7 +143,7 @@ export default function Step1ChildInfo() {
             !isStepValid(1) ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
-          Następny krok →
+          Next Step →
         </button>
       </div>
     </div>

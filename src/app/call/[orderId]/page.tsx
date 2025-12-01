@@ -52,14 +52,14 @@ export default function CallPage() {
           .single()
 
         if (orderError || !orderData) {
-          setError('Zamówienie nie znalezione')
+          setError('Order not found')
           setLoading(false)
           return
         }
 
         // Verify ownership
         if (orderData.user_id !== user.id) {
-          setError('Brak dostępu do tego zamówienia')
+          setError('Access denied to this order')
           setLoading(false)
           return
         }
@@ -88,13 +88,13 @@ export default function CallPage() {
           // This handles orders created before multi-child support
           setChildren([{
             id: 'legacy',
-            name: (orderData as unknown as { child_name?: string }).child_name || 'Dziecko',
+            name: (orderData as unknown as { child_name?: string }).child_name || 'Child',
             age: (orderData as unknown as { child_age?: number }).child_age || 8,
             sequence_number: 1,
           }])
           setSelectedChild({
             id: 'legacy',
-            name: (orderData as unknown as { child_name?: string }).child_name || 'Dziecko',
+            name: (orderData as unknown as { child_name?: string }).child_name || 'Child',
             age: (orderData as unknown as { child_age?: number }).child_age || 8,
             sequence_number: 1,
           })
@@ -103,7 +103,7 @@ export default function CallPage() {
         setLoading(false)
       } catch (err) {
         console.error('Error loading order:', err)
-        setError('Błąd ładowania zamówienia')
+        setError('Error loading order')
         setLoading(false)
       }
     }
@@ -127,7 +127,7 @@ export default function CallPage() {
         <Snowfall />
         <div className="text-center">
           <div className="text-6xl animate-bounce mb-4">🎅</div>
-          <p className="text-white text-xl">Ładowanie...</p>
+          <p className="text-white text-xl">Loading...</p>
         </div>
       </div>
     )
@@ -139,13 +139,13 @@ export default function CallPage() {
         <Snowfall />
         <div className="card-christmas max-w-md text-center">
           <div className="text-6xl mb-4">❄️</div>
-          <h1 className="text-2xl font-bold text-christmas-red mb-4">Błąd</h1>
+          <h1 className="text-2xl font-bold text-christmas-red mb-4">Error</h1>
           <p className="text-white/70 mb-6">{error}</p>
           <button
             onClick={() => router.push('/dashboard')}
             className="btn-christmas"
           >
-            Powrót do panelu
+            Return to Dashboard
           </button>
         </div>
       </div>
@@ -161,10 +161,10 @@ export default function CallPage() {
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">🎅</div>
             <h1 className="text-3xl font-bold glow-gold mb-2">
-              Rozmowa ze Świętym Mikołajem
+              Call with Santa Claus
             </h1>
             <p className="text-white/70">
-              Wybierz dziecko, które będzie rozmawiać z Mikołajem
+              Select the child who will talk to Santa
             </p>
           </div>
 
@@ -182,7 +182,7 @@ export default function CallPage() {
                       {child.name}
                     </h3>
                     <p className="text-white/60">
-                      {child.age} lat
+                      {child.age} years old
                     </p>
                   </div>
                   <div className="ml-auto text-christmas-gold">
@@ -198,7 +198,7 @@ export default function CallPage() {
               onClick={() => router.push('/dashboard')}
               className="text-white/60 hover:text-white transition-colors"
             >
-              ← Powrót do panelu
+              ← Return to Dashboard
             </button>
           </div>
         </div>
@@ -214,13 +214,13 @@ export default function CallPage() {
         <div className="card-christmas max-w-md text-center">
           <div className="text-6xl mb-4">🎄</div>
           <h1 className="text-3xl font-bold glow-gold mb-4">
-            Wesołych Świąt!
+            Merry Christmas!
           </h1>
           <p className="text-white/70 mb-2">
-            {selectedChild?.name} świetnie porozmawiał z Mikołajem!
+            {selectedChild?.name} had a wonderful chat with Santa!
           </p>
           <p className="text-white/50 text-sm mb-6">
-            Mikołaj pamięta o wszystkich grzecznych dzieciach.
+            Santa remembers all the good children.
           </p>
 
           <div className="space-y-3">
@@ -232,14 +232,14 @@ export default function CallPage() {
                 }}
                 className="btn-christmas w-full"
               >
-                Wybierz inne dziecko
+                Select Another Child
               </button>
             )}
             <button
               onClick={() => router.push('/dashboard')}
               className="w-full bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl transition-colors"
             >
-              Powrót do panelu
+              Return to Dashboard
             </button>
           </div>
         </div>
@@ -256,11 +256,11 @@ export default function CallPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold glow-gold mb-2">
-            Rozmowa ze Świętym Mikołajem
+            Call with Santa Claus
           </h1>
           {selectedChild && (
             <p className="text-white/70">
-              Dziecko: <span className="text-christmas-gold font-medium">{selectedChild.name}</span>
+              Child: <span className="text-christmas-gold font-medium">{selectedChild.name}</span>
             </p>
           )}
         </div>
@@ -283,7 +283,7 @@ export default function CallPage() {
               onClick={() => setSelectedChild(null)}
               className="text-white/60 hover:text-white transition-colors"
             >
-              ← Wybierz inne dziecko
+              ← Select Another Child
             </button>
           )}
         </div>

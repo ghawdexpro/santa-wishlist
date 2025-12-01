@@ -11,9 +11,9 @@ export default function Step2Age() {
     <div className="max-w-xl mx-auto">
       <div className="text-center mb-8">
         <div className="text-5xl mb-4">🎂</div>
-        <h2 className="text-2xl font-bold glow-gold mb-2">Ile lat ma {data.childName || 'Twoje dziecko'}?</h2>
+        <h2 className="text-2xl font-bold glow-gold mb-2">How old is {data.childName || 'your child'}?</h2>
         <p className="text-white/70">
-          Mikołaj dostosuje swoją wiadomość do odpowiedniego wieku
+          Santa will adjust his message to the right age level
         </p>
       </div>
 
@@ -35,10 +35,10 @@ export default function Step2Age() {
 
       {data.childAge && (
         <p className="text-center mt-4 text-christmas-gold">
-          {data.childAge <= 5 && "Idealny wiek na magiczne cuda! 🌟"}
-          {data.childAge > 5 && data.childAge <= 8 && "Wciąż wierzy w magię! ✨"}
-          {data.childAge > 8 && data.childAge <= 12 && "Dość duży na ważną wiadomość! 🎄"}
-          {data.childAge > 12 && "Specjalna wiadomość dla młodego człowieka! 🎁"}
+          {data.childAge <= 5 && "Perfect age for magical wonders! 🌟"}
+          {data.childAge > 5 && data.childAge <= 8 && "Still believes in the magic! ✨"}
+          {data.childAge > 8 && data.childAge <= 12 && "Big enough for an important message! 🎄"}
+          {data.childAge > 12 && "A special message for a young person! 🎁"}
         </p>
       )}
 
@@ -48,7 +48,7 @@ export default function Step2Age() {
           onClick={prevStep}
           className="px-6 py-3 text-white/70 hover:text-white transition-colors"
         >
-          ← Wstecz
+          ← Back
         </button>
         <button
           onClick={nextStep}
@@ -57,7 +57,7 @@ export default function Step2Age() {
             !isStepValid(2) ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
-          Następny krok →
+          Next Step →
         </button>
       </div>
     </div>

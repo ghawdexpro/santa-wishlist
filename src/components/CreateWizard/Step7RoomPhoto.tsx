@@ -69,27 +69,27 @@ export default function Step7RoomPhoto() {
     <div className="max-w-xl mx-auto">
       <div className="text-center mb-8">
         <div className="text-5xl mb-4">🧝</div>
-        <h2 className="text-2xl font-bold glow-gold mb-2">Elfy sprawdzą Twój dom!</h2>
+        <h2 className="text-2xl font-bold glow-gold mb-2">Elf Scout Mission!</h2>
         <p className="text-white/70">
-          Wyślij zdjęcie pokoju z choinką - nasze elfy pojawią się w nim jak prawdziwi zwiadowcy Mikołaja!
+          Upload a photo of your room with the Christmas tree - our elves will appear in it as Santa&apos;s scouts!
         </p>
       </div>
 
       {/* Feature explanation */}
       <div className="bg-christmas-green/20 border border-christmas-green/40 rounded-lg p-4 mb-6">
-        <h3 className="font-semibold text-christmas-gold mb-2">Co zyskujesz?</h3>
+        <h3 className="font-semibold text-christmas-gold mb-2">What you get:</h3>
         <ul className="text-sm text-white/80 space-y-2">
           <li className="flex items-start gap-2">
             <span>👀</span>
-            <span>Elf zagląda zza choinki - sprawdza czy dziecko śpi</span>
+            <span>Elf peeking from behind the tree - checking if your child is asleep</span>
           </li>
           <li className="flex items-start gap-2">
             <span>📋</span>
-            <span>Elfy robią notatki - &quot;Dom sprawdzony, gotowy na wizytę!&quot;</span>
+            <span>Elves taking notes - &quot;House checked, ready for Santa&apos;s visit!&quot;</span>
           </li>
           <li className="flex items-start gap-2">
             <span>✨</span>
-            <span>Magiczne ujęcia w PRAWDZIWYM pokoju Twojego dziecka!</span>
+            <span>Magical scenes in YOUR child&apos;s REAL room!</span>
           </li>
         </ul>
       </div>
@@ -98,7 +98,7 @@ export default function Step7RoomPhoto() {
         {/* Room Photo Upload */}
         <div>
           <label className="block text-sm font-medium text-christmas-gold mb-2">
-            Zdjęcie pokoju z choinką (opcjonalne)
+            Photo of room with Christmas tree (optional)
           </label>
           <div
             className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
@@ -123,11 +123,11 @@ export default function Step7RoomPhoto() {
               <div className="space-y-4">
                 <img
                   src={data.roomPhotoPreview}
-                  alt="Podgląd pokoju"
+                  alt="Room preview"
                   className="w-full max-w-xs mx-auto rounded-lg border-2 border-christmas-gold"
                 />
                 <p className="text-sm text-christmas-gold">
-                  Super! Elfy już planują wizytę w tym pokoju!
+                  Perfect! The elves are already planning their visit to this room!
                 </p>
                 <button
                   onClick={() => {
@@ -136,7 +136,7 @@ export default function Step7RoomPhoto() {
                   }}
                   className="text-sm text-christmas-red hover:underline"
                 >
-                  Usuń zdjęcie
+                  Remove photo
                 </button>
               </div>
             ) : (
@@ -146,10 +146,10 @@ export default function Step7RoomPhoto() {
               >
                 <div className="text-4xl mb-2">🎄</div>
                 <p className="text-white/70">
-                  Przeciągnij i upuść zdjęcie pokoju z choinką
+                  Drag and drop a photo of your room with the Christmas tree
                 </p>
                 <p className="text-xs text-white/50 mt-2">
-                  Najlepiej całe zdjęcie pokoju ze stojącą choinką
+                  Best if you capture the whole room with the standing tree
                 </p>
               </div>
             )}
@@ -157,11 +157,11 @@ export default function Step7RoomPhoto() {
 
           {/* Tips */}
           <div className="mt-4 text-xs text-white/50 space-y-1">
-            <p>💡 <strong>Wskazówki:</strong></p>
+            <p>💡 <strong>Tips:</strong></p>
             <ul className="list-disc list-inside pl-4 space-y-1">
-              <li>Zrób zdjęcie w dzień przy dobrym oświetleniu</li>
-              <li>Pokaż całą choinkę i trochę podłogi</li>
-              <li>Im więcej widać pokoju, tym lepiej dla elfów!</li>
+              <li>Take the photo during daytime with good lighting</li>
+              <li>Show the whole tree and some floor space</li>
+              <li>The more of the room visible, the better for the elves!</li>
             </ul>
           </div>
         </div>
@@ -173,14 +173,14 @@ export default function Step7RoomPhoto() {
           onClick={prevStep}
           className="px-6 py-3 text-white/70 hover:text-white transition-colors"
         >
-          ← Wróć
+          ← Back
         </button>
         <button
           onClick={handleSubmit}
           disabled={isSubmitting}
           className={`btn-christmas px-8 py-3 ${isSubmitting ? 'opacity-50' : ''}`}
         >
-          {isSubmitting ? 'Przygotowuję...' : 'Zobacz podgląd i zapłać →'}
+          {isSubmitting ? 'Preparing...' : 'Preview & Pay →'}
         </button>
       </div>
 
@@ -192,7 +192,7 @@ export default function Step7RoomPhoto() {
             disabled={isSubmitting}
             className="text-sm text-white/50 hover:text-white/70 underline"
           >
-            Pomiń ten krok - nie chcę scen z elfami
+            Skip this step - I don&apos;t want elf scenes
           </button>
         </div>
       )}

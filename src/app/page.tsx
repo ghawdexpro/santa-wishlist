@@ -30,10 +30,10 @@ export default function Home() {
                   <span className="text-4xl animate-pulse delay-100">✨</span>
                 </div>
                 <p className="text-christmas-gold font-bold text-lg">
-                  &quot;Ho ho ho! Cześć Tomek!&quot;
+                  &quot;Ho ho ho! Hello Emma!&quot;
                 </p>
                 <p className="text-white/60 text-sm mt-2">
-                  Mikołaj wymówi imię Twojego dziecka
+                  Santa will say your child&apos;s name
                 </p>
               </div>
               {/* Play button overlay */}
@@ -135,7 +135,7 @@ export default function Home() {
                 <div>
                   <h3 className="text-xl font-bold mb-2 text-christmas-gold">Premium Quality</h3>
                   <p className="text-white/70">
-                    Film w jakości HD z Mikołajem w magicznej świątecznej scenerii Bieguna Północnego.
+                    HD quality video with Santa in a magical North Pole Christmas setting.
                   </p>
                 </div>
               </div>
@@ -159,77 +159,77 @@ export default function Home() {
       <section className="py-20 px-4 bg-black/20">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 glow-gold">
-            Wybierz Swój Pakiet
+            Choose Your Package
           </h2>
           <p className="text-white/70 mb-8">
-            Magiczny film lub pełne doświadczenie z rozmową na żywo
+            A magical video or the complete experience with a live call
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* Basic Package */}
             <div className="card-christmas">
               <div className="text-5xl mb-4">🎬</div>
-              <h3 className="text-2xl font-bold mb-2 text-christmas-gold">Film od Mikołaja</h3>
-              <div className="text-4xl font-bold mb-4">259 zł</div>
+              <h3 className="text-2xl font-bold mb-2 text-christmas-gold">Santa Video</h3>
+              <div className="text-4xl font-bold mb-4">$59</div>
               <ul className="text-left text-white/80 space-y-3 mb-8">
                 <li className="flex items-center gap-2">
                   <span className="text-christmas-green">✓</span>
-                  ~2 minutowy spersonalizowany film
+                  ~2 minute personalized video
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-christmas-green">✓</span>
-                  Imię dziecka wymówione przez Mikołaja
+                  Child&apos;s name spoken by Santa
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-christmas-green">✓</span>
-                  Zdjęcie w magicznej księdze
+                  Photo in the magical book
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-christmas-green">✓</span>
-                  Personalizowana wiadomość
+                  Personalized message
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-christmas-green">✓</span>
-                  Pobieranie HD na zawsze
+                  HD download forever
                 </li>
               </ul>
               <Link href="/create" className="btn-christmas text-lg px-8 py-4 w-full block">
-                Stwórz Film
+                Create Video
               </Link>
             </div>
 
             {/* Premium Package */}
             <div className="card-christmas border-2 border-christmas-gold relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-christmas-gold text-black px-4 py-1 rounded-full text-sm font-bold">
-                NAJPOPULARNIEJSZY
+                MOST POPULAR
               </div>
               <div className="text-5xl mb-4">🎅📞</div>
-              <h3 className="text-2xl font-bold mb-2 text-christmas-gold">Film + Rozmowa</h3>
-              <div className="text-4xl font-bold mb-4">399 zł</div>
+              <h3 className="text-2xl font-bold mb-2 text-christmas-gold">Video + Live Call</h3>
+              <div className="text-4xl font-bold mb-4">$99</div>
               <ul className="text-left text-white/80 space-y-3 mb-8">
                 <li className="flex items-center gap-2">
                   <span className="text-christmas-green">✓</span>
-                  Wszystko z pakietu podstawowego
+                  Everything in the basic package
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-christmas-gold">⭐</span>
-                  <strong>Rozmowa video z Mikołajem NA ŻYWO!</strong>
+                  <strong>LIVE video call with Santa!</strong>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-christmas-gold">⭐</span>
-                  Mikołaj odpowiada na pytania dziecka
+                  Santa answers your child&apos;s questions
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-christmas-gold">⭐</span>
-                  Spersonalizowana bajka od Mikołaja
+                  Personalized conversation from Santa
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-christmas-gold">⭐</span>
-                  5 minut magicznej rozmowy
+                  5 minutes of magical conversation
                 </li>
               </ul>
               <Link href="/create" className="btn-christmas text-lg px-8 py-4 w-full block bg-christmas-gold text-black hover:bg-yellow-400">
-                Wybierz Premium
+                Choose Premium
               </Link>
             </div>
           </div>
@@ -296,8 +296,8 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-white/10">
         <div className="max-w-6xl mx-auto text-center text-white/50">
-          <p>Magia Świąt - Spersonalizowane Wideo od Mikołaja 🎅</p>
-          <p className="text-xs mt-2">Stworzone z miłością | 2024</p>
+          <p>The Santa Experience - Personalized Video from Santa 🎅</p>
+          <p className="text-xs mt-2">Created with love | 2024</p>
         </div>
       </footer>
     </div>

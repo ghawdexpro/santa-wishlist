@@ -43,13 +43,13 @@ export default async function VideoPage({ params }: Props) {
         <div className="card-christmas max-w-md text-center">
           <div className="text-6xl mb-4">⏳</div>
           <h1 className="text-2xl font-bold text-christmas-gold mb-4">
-            Film jeszcze nie jest gotowy
+            Video Not Ready Yet
           </h1>
           <p className="text-white/70 mb-6">
-            Ten film jest jeszcze w trakcie tworzenia. Sprawdź ponownie za chwilę!
+            This video is still being created. Please check back soon!
           </p>
           <Link href="/" className="btn-christmas inline-block">
-            Strona główna
+            Home
           </Link>
         </div>
       </div>
@@ -57,7 +57,7 @@ export default async function VideoPage({ params }: Props) {
   }
 
   // Get children names
-  const childrenNames = order.children?.map((c: { name: string }) => c.name).join(' i ') || 'Dziecko'
+  const childrenNames = order.children?.map((c: { name: string }) => c.name).join(' and ') || 'Child'
 
   return (
     <div className="min-h-screen py-8 px-4">
@@ -68,10 +68,10 @@ export default async function VideoPage({ params }: Props) {
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">🎅</div>
           <h1 className="text-3xl md:text-4xl font-bold glow-gold mb-2">
-            Film od Świętego Mikołaja
+            Video from Santa Claus
           </h1>
           <p className="text-xl text-white/80">
-            Specjalnie dla: <span className="text-christmas-gold font-bold">{childrenNames}</span>
+            Specially for: <span className="text-christmas-gold font-bold">{childrenNames}</span>
           </p>
         </div>
 
@@ -86,10 +86,10 @@ export default async function VideoPage({ params }: Props) {
         {/* Share Section */}
         <div className="card-christmas text-center">
           <h2 className="text-xl font-bold text-christmas-gold mb-4">
-            Udostępnij ten magiczny moment!
+            Share this magical moment!
           </h2>
           <p className="text-white/70 mb-6">
-            Wyślij ten link rodzinie i przyjaciołom
+            Send this link to family and friends
           </p>
 
           {/* Share URL */}
@@ -106,12 +106,12 @@ export default async function VideoPage({ params }: Props) {
             <ShareButton
               platform="whatsapp"
               url={`${process.env.NEXT_PUBLIC_APP_URL}/video/${orderId}`}
-              text={`Zobacz magiczny film od Mikołaja dla ${childrenNames}! 🎅🎄`}
+              text={`Watch the magical video from Santa for ${childrenNames}! 🎅🎄`}
             />
             <ShareButton
               platform="facebook"
               url={`${process.env.NEXT_PUBLIC_APP_URL}/video/${orderId}`}
-              text={`Zobacz magiczny film od Mikołaja! 🎅`}
+              text={`Watch the magical video from Santa! 🎅`}
             />
             <ShareButton
               platform="copy"
@@ -124,10 +124,10 @@ export default async function VideoPage({ params }: Props) {
         {/* CTA */}
         <div className="text-center mt-8">
           <p className="text-white/60 mb-4">
-            Chcesz stworzyć własny film od Mikołaja?
+            Want to create your own Santa video?
           </p>
           <Link href="/create" className="btn-christmas inline-block">
-            Stwórz Swój Film 🎁
+            Create Your Video 🎁
           </Link>
         </div>
       </div>
@@ -159,7 +159,7 @@ function ShareButton({
   const config = {
     whatsapp: { icon: '📱', label: 'WhatsApp', color: 'bg-green-600 hover:bg-green-700' },
     facebook: { icon: '📘', label: 'Facebook', color: 'bg-blue-600 hover:bg-blue-700' },
-    copy: { icon: '📋', label: 'Kopiuj link', color: 'bg-white/20 hover:bg-white/30' },
+    copy: { icon: '📋', label: 'Copy Link', color: 'bg-white/20 hover:bg-white/30' },
   }
 
   const { icon, label, color } = config[platform]
@@ -169,7 +169,7 @@ function ShareButton({
       <button
         onClick={() => {
           navigator.clipboard.writeText(url)
-          alert('Link skopiowany!')
+          alert('Link copied!')
         }}
         className={`px-4 py-2 rounded-xl text-white transition-colors flex items-center gap-2 ${color}`}
       >

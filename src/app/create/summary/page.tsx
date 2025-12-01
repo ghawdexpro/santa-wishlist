@@ -88,9 +88,9 @@ export default function SummaryPage() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">✨</div>
-          <h1 className="text-3xl font-bold glow-gold">Gotowe do stworzenia magii!</h1>
+          <h1 className="text-3xl font-bold glow-gold">Ready to Create Magic!</h1>
           <p className="text-white/70 mt-2">
-            Sprawdź dane przed przejściem do płatności
+            Review your details before proceeding to payment
           </p>
         </div>
 
@@ -110,7 +110,7 @@ export default function SummaryPage() {
             )}
             <div>
               <h2 className="text-2xl font-bold text-christmas-gold">{data.childName}</h2>
-              <p className="text-white/70">{data.childAge} lat</p>
+              <p className="text-white/70">{data.childAge} years old</p>
             </div>
           </div>
 
@@ -118,21 +118,21 @@ export default function SummaryPage() {
           <div className="space-y-4">
             <div>
               <h3 className="text-sm font-medium text-christmas-gold mb-1">
-                Dobre zachowanie ⭐
+                Good Behavior ⭐
               </h3>
               <p className="text-white/80">{data.goodBehavior}</p>
             </div>
 
             <div>
               <h3 className="text-sm font-medium text-christmas-gold mb-1">
-                Do poprawy 💪
+                To Improve 💪
               </h3>
               <p className="text-white/80">{data.thingToImprove}</p>
             </div>
 
             <div>
               <h3 className="text-sm font-medium text-christmas-gold mb-1">
-                Cel do osiągnięcia 🎯
+                Goal to Achieve 🎯
               </h3>
               <p className="text-white/80">{data.thingToLearn}</p>
             </div>
@@ -140,7 +140,7 @@ export default function SummaryPage() {
             {data.customMessage && (
               <div>
                 <h3 className="text-sm font-medium text-christmas-gold mb-1">
-                  Własna wiadomość 💌
+                  Custom Message 💌
                 </h3>
                 <p className="text-white/80">{data.customMessage}</p>
               </div>
@@ -150,7 +150,7 @@ export default function SummaryPage() {
 
         {/* Tier Selection */}
         <div className="mt-6 space-y-4">
-          <h3 className="text-lg font-bold text-christmas-gold text-center">Wybierz pakiet</h3>
+          <h3 className="text-lg font-bold text-christmas-gold text-center">Choose Your Package</h3>
 
           {/* Basic Tier */}
           <div
@@ -169,26 +169,26 @@ export default function SummaryPage() {
                   {selectedTier === 'basic' && <span className="text-black text-xs">✓</span>}
                 </div>
                 <div>
-                  <h4 className="font-bold text-white">Film od Mikołaja</h4>
-                  <p className="text-white/60 text-sm">~2 minutowy spersonalizowany film</p>
+                  <h4 className="font-bold text-white">Santa Video</h4>
+                  <p className="text-white/60 text-sm">~2 minute personalized video</p>
                 </div>
               </div>
               <div className="text-right">
-                <span className="text-2xl font-bold text-christmas-gold">259 zł</span>
+                <span className="text-2xl font-bold text-christmas-gold">$59</span>
               </div>
             </div>
             <ul className="space-y-1 text-white/70 text-sm pl-8">
               <li className="flex items-center gap-2">
                 <span className="text-christmas-green">✓</span>
-                Mikołaj mówi do {data.childName}
+                Santa speaks to {data.childName}
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-christmas-green">✓</span>
-                Zdjęcie w magicznej księdze
+                Photo in the magical book
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-christmas-green">✓</span>
-                Pobieranie HD na zawsze
+                HD download forever
               </li>
             </ul>
           </div>
@@ -203,7 +203,7 @@ export default function SummaryPage() {
             }`}
           >
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-christmas-gold text-black px-3 py-0.5 rounded-full text-xs font-bold">
-              NAJPOPULARNIEJSZY
+              MOST POPULAR
             </div>
             <div className="flex items-center justify-between mb-3 mt-2">
               <div className="flex items-center gap-3">
@@ -213,30 +213,30 @@ export default function SummaryPage() {
                   {selectedTier === 'premium' && <span className="text-black text-xs">✓</span>}
                 </div>
                 <div>
-                  <h4 className="font-bold text-white">Film + Rozmowa z Mikołajem</h4>
-                  <p className="text-white/60 text-sm">Film + 5 minut rozmowy video na żywo!</p>
+                  <h4 className="font-bold text-white">Video + Live Call with Santa</h4>
+                  <p className="text-white/60 text-sm">Video + 5 minute live video call!</p>
                 </div>
               </div>
               <div className="text-right">
-                <span className="text-2xl font-bold text-christmas-gold">399 zł</span>
+                <span className="text-2xl font-bold text-christmas-gold">$99</span>
               </div>
             </div>
             <ul className="space-y-1 text-white/70 text-sm pl-8">
               <li className="flex items-center gap-2">
                 <span className="text-christmas-green">✓</span>
-                Wszystko z pakietu podstawowego
+                Everything in the basic package
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-christmas-gold">⭐</span>
-                Rozmowa video z Mikołajem NA ŻYWO!
+                LIVE video call with Santa!
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-christmas-gold">⭐</span>
-                Mikołaj odpowiada na pytania dziecka
+                Santa answers your child&apos;s questions
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-christmas-gold">⭐</span>
-                Spersonalizowana bajka od Mikołaja
+                Personalized story from Santa
               </li>
             </ul>
           </div>
@@ -255,7 +255,7 @@ export default function SummaryPage() {
             href="/create"
             className="px-6 py-3 text-white/70 hover:text-white transition-colors text-center"
           >
-            ← Edytuj dane
+            ← Edit Details
           </Link>
           <button
             onClick={handleProceedToPayment}
@@ -267,18 +267,18 @@ export default function SummaryPage() {
             {isProcessing ? (
               <>
                 <span className="animate-spin">⏳</span>
-                Przetwarzanie...
+                Processing...
               </>
             ) : (
               <>
-                Przejdź do płatności <span className="text-xl">💳</span>
+                Proceed to Payment <span className="text-xl">💳</span>
               </>
             )}
           </button>
         </div>
 
         <p className="text-center mt-4 text-white/50 text-sm">
-          Bezpieczna płatność przez Stripe 🔒
+          Secure payment via Stripe 🔒
         </p>
       </div>
     </div>

@@ -1,23 +1,12 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import Snowfall from '@/components/Snowfall'
 import Header from '@/components/Header'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
-
 export const metadata: Metadata = {
-  title: "Magia Świąt - Spersonalizowane Wideo od Mikołaja | Video od Świętego Mikołaja",
-  description: 'Podaruj swojemu dziecku magiczne, spersonalizowane wideo od Świętego Mikołaja. Mikołaj mówi bezpośrednio do Twojego dziecka po imieniu. Niezapomniany prezent na Święta!',
-  keywords: ['wideo mikołaj', 'spersonalizowany mikołaj', 'prezent świąteczny', 'wiadomość od mikołaja', 'święta dla dzieci', 'magia świąt', 'film od mikołaja'],
+  title: "The Santa Experience - Personalized Video from Santa Claus",
+  description: 'Give your child a magical, personalized video from Santa Claus. Santa speaks directly to your child by name. An unforgettable Christmas gift!',
+  keywords: ['santa video', 'personalized santa', 'christmas gift', 'message from santa', 'christmas for kids', 'christmas magic', 'santa claus video'],
 }
 
 export default function RootLayout({
@@ -27,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className="font-sans antialiased">
         <Snowfall />
         <Header />
         <main className="pt-16 min-h-screen">

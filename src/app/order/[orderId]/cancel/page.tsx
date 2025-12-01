@@ -18,21 +18,21 @@ export default function PaymentCancelPage() {
         </div>
 
         <h1 className="text-3xl font-bold mb-4">
-          Płatność anulowana
+          Payment Cancelled
         </h1>
 
         <p className="text-lg text-white/80 mb-8">
-          Nie martw się! Twoje zamówienie zostało zapisane. Możesz dokończyć
-          zakup kiedy będziesz gotowy.
+          Don&apos;t worry! Your order has been saved. You can complete your
+          purchase when you&apos;re ready.
         </p>
 
         <div className="card-christmas mb-8">
           <p className="text-white/70 text-sm mb-4">
-            Numer zamówienia: <span className="font-mono">{orderId}</span>
+            Order number: <span className="font-mono">{orderId}</span>
           </p>
           <p className="text-white/60 text-sm">
-            Twoje zamówienie będzie zapisane przez 24 godziny. Po tym czasie może być
-            konieczne ponowne wprowadzenie danych.
+            Your order will be saved for 24 hours. After that, you may need
+            to re-enter your information.
           </p>
         </div>
 
@@ -41,19 +41,19 @@ export default function PaymentCancelPage() {
             href="/create/summary"
             className="btn-christmas px-6 py-3"
           >
-            Spróbuj ponownie 🎅
+            Try Again 🎅
           </Link>
           <Link
             href="/"
             className="px-6 py-3 text-white/70 hover:text-white transition-colors"
           >
-            Wróć na stronę główną
+            Return to Home
           </Link>
         </div>
 
         {/* Encouragement */}
         <p className="mt-8 text-white/50 text-sm">
-          Pytania? Napisz do nas na magiaswiat@kontakt.pl
+          Questions? Contact us at support@thesantaexperience.com
         </p>
       </div>
     </div>

@@ -85,7 +85,7 @@ export default function PaymentSuccessPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin text-6xl mb-4">🎅</div>
-          <p className="text-white/60">Ładowanie zamówienia...</p>
+          <p className="text-white/60">Loading order...</p>
         </div>
       </div>
     )
@@ -98,10 +98,10 @@ export default function PaymentSuccessPage() {
           <div className="w-24 h-24 mx-auto rounded-full bg-red-600 flex items-center justify-center mb-8">
             <span className="text-5xl">⚠️</span>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-4">Coś poszło nie tak</h1>
-          <p className="text-white/70 mb-8">{error || 'Nie znaleziono zamówienia'}</p>
+          <h1 className="text-3xl font-bold text-white mb-4">Something went wrong</h1>
+          <p className="text-white/70 mb-8">{error || 'Order not found'}</p>
           <Link href="/" className="btn-christmas px-6 py-3">
-            Wróć do strony głównej
+            Return to Home
           </Link>
         </div>
       </div>
@@ -131,18 +131,18 @@ export default function PaymentSuccessPage() {
 
         {/* Title */}
         <h1 className="text-4xl font-bold glow-gold mb-4">
-          {isComplete ? 'Film gotowy! 🎄' :
-           isFailed ? 'Wystąpił problem' :
-           'Tworzymy Twoją magię! 🎅'}
+          {isComplete ? 'Video Ready! 🎄' :
+           isFailed ? 'Something Went Wrong' :
+           'Creating Your Magic! 🎅'}
         </h1>
 
         {/* Subtitle */}
         <p className="text-xl text-white/80 mb-8">
           {isComplete
-            ? `Magiczny film od Mikołaja dla ${childrenText} jest gotowy!`
+            ? `The magical video from Santa for ${childrenText} is ready!`
             : isFailed
-            ? 'Wystąpił problem z tworzeniem filmu. Nasz zespół pracuje nad tym!'
-            : `Elfy Mikołaja tworzą magiczny film dla ${childrenText}...`}
+            ? 'There was a problem creating your video. Our team is working on it!'
+            : `Santa&apos;s elves are creating a magical video for ${childrenText}...`}
         </p>
 
         {/* Progress Card (Generating) */}
@@ -161,8 +161,8 @@ export default function PaymentSuccessPage() {
             </div>
 
             <div className="flex justify-between text-sm text-white/70 mb-4">
-              <span>{status.progress.percentage}% ukończone</span>
-              <span>{status.progress.scenesComplete} z {status.progress.totalScenes} scen</span>
+              <span>{status.progress.percentage}% complete</span>
+              <span>{status.progress.scenesComplete} of {status.progress.totalScenes} scenes</span>
             </div>
 
             {/* Time estimate */}
@@ -190,7 +190,7 @@ export default function PaymentSuccessPage() {
 
             <div className="border-t border-white/10 pt-4 mt-4">
               <p className="text-white/50 text-xs">
-                Możesz zamknąć tę stronę - wyślemy Ci email gdy film będzie gotowy!
+                You can close this page - we&apos;ll email you when your video is ready!
               </p>
             </div>
           </div>
@@ -200,11 +200,11 @@ export default function PaymentSuccessPage() {
         {isComplete && status.videoUrl && (
           <div className="card-christmas mb-8">
             <h2 className="text-lg font-bold text-christmas-gold mb-4">
-              Twój magiczny film jest gotowy!
+              Your magical video is ready!
             </h2>
             <p className="text-white/80 mb-6">
-              Mikołaj stworzył specjalną wiadomość dla {childrenText}.
-              Pobierz teraz i podziel się magią!
+              Santa has created a special message for {childrenText}.
+              Download now and share the magic!
             </p>
             <div className="space-y-4">
               <a
@@ -213,15 +213,15 @@ export default function PaymentSuccessPage() {
                 rel="noopener noreferrer"
                 className="btn-christmas px-8 py-4 inline-block text-lg"
               >
-                Obejrzyj film 🎬
+                Watch Video 🎬
               </a>
               <div>
                 <a
                   href={status.videoUrl}
-                  download={`mikolaj-film-${status.childrenNames.join('-')}.mp4`}
+                  download={`santa-video-${status.childrenNames.join('-')}.mp4`}
                   className="text-christmas-gold hover:text-christmas-gold/80 underline text-sm"
                 >
-                  Pobierz MP4
+                  Download MP4
                 </a>
               </div>
             </div>
@@ -234,29 +234,29 @@ export default function PaymentSuccessPage() {
             <div className="text-center">
               <div className="text-5xl mb-4">📞🎅</div>
               <h2 className="text-2xl font-bold text-christmas-gold mb-2">
-                Porozmawiaj z Mikołajem NA ŻYWO!
+                Talk to Santa LIVE!
               </h2>
               <p className="text-white/80 mb-4">
-                Twój film jest gotowy - teraz {childrenText} może porozmawiać
-                z Mikołajem na żywo!
+                Your video is ready - now {childrenText} can talk
+                to Santa live!
               </p>
               <div className="bg-black/20 rounded-lg p-4 mb-6">
                 <ul className="text-white/70 text-sm space-y-2 text-left max-w-xs mx-auto">
                   <li className="flex items-center gap-2">
                     <span className="text-christmas-green">✓</span>
-                    Mikołaj wie wszystko o {childrenText}
+                    Santa knows everything about {childrenText}
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-christmas-green">✓</span>
-                    Rozmowa w czasie rzeczywistym
+                    Real-time conversation
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-christmas-green">✓</span>
-                    Zadawaj Mikołajowi pytania na żywo!
+                    Ask Santa questions live!
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-christmas-gold">⚡</span>
-                    Wymaga stabilnego połączenia internetowego
+                    Requires stable internet connection
                   </li>
                 </ul>
               </div>
@@ -264,7 +264,7 @@ export default function PaymentSuccessPage() {
                 href={`/call/${orderId}`}
                 className="btn-christmas px-8 py-4 text-lg inline-flex items-center gap-2 animate-pulse hover:animate-none"
               >
-                <span>Rozpocznij rozmowę z Mikołajem</span>
+                <span>Start Call with Santa</span>
                 <span className="text-2xl">🎄</span>
               </Link>
             </div>
@@ -275,11 +275,11 @@ export default function PaymentSuccessPage() {
         {isFailed && (
           <div className="card-christmas border-red-500/50 mb-8">
             <h2 className="text-lg font-bold text-red-400 mb-4">
-              Napotkaliśmy problem
+              We encountered a problem
             </h2>
             <p className="text-white/80 mb-4">
-              Elfy Mikołaja napotkały problem podczas tworzenia filmu.
-              Nie martw się - nasz zespół został powiadomiony i pracuje nad tym!
+              Santa&apos;s elves encountered an issue while creating your video.
+              Don&apos;t worry - our team has been notified and is working on it!
             </p>
             {status.errorMessage && (
               <p className="text-white/50 text-xs font-mono bg-white/5 p-2 rounded mb-4">
@@ -287,8 +287,8 @@ export default function PaymentSuccessPage() {
               </p>
             )}
             <p className="text-white/70 text-sm">
-              Wyślemy Ci email gdy problem zostanie rozwiązany. Jeśli nie usłyszysz od nas w ciągu 24 godzin,
-              skontaktuj się z nami.
+              We&apos;ll email you when the issue is resolved. If you don&apos;t hear from us within 24 hours,
+              please contact us.
             </p>
           </div>
         )}
@@ -296,7 +296,7 @@ export default function PaymentSuccessPage() {
         {/* Order Info */}
         <div className="space-y-4">
           <p className="text-white/60 text-sm">
-            Numer zamówienia: <span className="font-mono">{orderId}</span>
+            Order number: <span className="font-mono">{orderId}</span>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -304,13 +304,13 @@ export default function PaymentSuccessPage() {
               href="/dashboard"
               className="btn-christmas px-6 py-3"
             >
-              Moje zamówienia
+              My Orders
             </Link>
             <Link
               href="/"
               className="px-6 py-3 text-white/70 hover:text-white transition-colors"
             >
-              Wróć na stronę główną
+              Return to Home
             </Link>
           </div>
         </div>
@@ -320,9 +320,9 @@ export default function PaymentSuccessPage() {
           🎁 🎄 ⭐ 🎄 🎁
         </div>
 
-        {/* Polish branding */}
+        {/* Branding */}
         <p className="mt-8 text-white/30 text-xs">
-          Magia Świąt - Spersonalizowane Wideo od Mikołaja 🎅
+          The Santa Experience - Personalized Video from Santa 🎅
         </p>
       </div>
     </div>
