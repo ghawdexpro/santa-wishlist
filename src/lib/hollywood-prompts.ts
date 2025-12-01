@@ -436,127 +436,148 @@ This is about Santa's love for ${childName}.`,
 }
 
 // =============================================================================
-// SCENE 8: EPIC LAUNCH (Child's Name/Face in Stars)
+// SCENE 8: ELVES REPORT SUCCESS → SLEIGH LAUNCH
+// Narrative loop closure: Elves checked the room → Now they confirm → Santa launches
+// USES CHILD'S ROOM PHOTO (same as Elf Reconnaissance)
 // =============================================================================
 
 export const SCENE_8_PROMPTS = {
   /**
-   * START KEYFRAME: Sleigh launching, night sky
+   * START KEYFRAME: Elf in child's room giving the OK signal
+   * USES ROOM PHOTO - same as Elf Reconnaissance feature
+   * This creates narrative continuity: elves scouted → now they confirm
    */
-  startKeyframe: (childName: string) => `PHOTOREALISTIC KEYFRAME - Scene 8 Start
+  startKeyframe: (childName: string) => `PHOTOREALISTIC KEYFRAME - Scene 8 Start: Elf Report
 
 ${CINEMATOGRAPHY.camera}
-${CINEMATOGRAPHY.vfx}
+${CINEMATOGRAPHY.lighting}
+
+CONTEXT:
+This scene uses the CHILD'S ACTUAL ROOM/CHRISTMAS TREE photo as background.
+The elf from earlier reconnaissance scenes is now REPORTING SUCCESS.
+Narrative closure: The elves checked ${childName}'s home → Now they confirm it's ready.
 
 COMPOSITION:
-Epic wide shot - Santa's sleigh launching into Christmas night.
-Ground level angle looking UP at the ascending sleigh.
-Vast starfield backdrop with subtle aurora glow.
+Child's room/Christmas tree clearly visible as the main background (60% of frame).
+ONE ELF in foreground - the "reporting" elf from reconnaissance.
+Elf is communicating to the North Pole - mission accomplished!
 
-THE SLEIGH:
-- Ornate golden sleigh, baroque scrollwork details
-- Piled high with wrapped presents (practical, not CGI)
-- Runners leaving trails of golden light
-- Motion blur on outer edges (speed implied)
+THE ELF - HERO MOMENT:
+- Same elf character as reconnaissance scenes (use elf reference if available)
+- Holding a magical glowing tablet/book showing a GREEN CHECKMARK
+- Expression: proud, satisfied, job well done
+- Giving subtle thumbs up or OK gesture
+- Positioned to not obscure the room/tree behind
 
-THE REINDEER:
-- Eight majestic reindeer in powerful flight formation
-- Rudolph at lead - nose glowing (practical light effect, not cartoon)
-- Breath visible in cold air
-- Harness bells catching starlight
-- Muscular, powerful, REAL animals not cartoon
+THE ROOM (BACKGROUND):
+- Child's ACTUAL room from their photo - MUST be recognizable
+- Christmas tree visible and prominent
+- Warm, cozy Christmas lighting
+- This is ${childName}'s REAL home - the magic happened HERE
 
-ENVIRONMENT:
-- Snow-covered rooftops below receding
-- Starfield: realistic night sky photography
-- Aurora borealis ribbons (subtle, not overwhelming)
-- Moon partially visible, providing rim light
+MAGICAL ELEMENTS:
+- Golden sparkles rising from the elf's tablet (sending report)
+- Soft magical glow around the elf
+- Text on tablet: "✓ ${childName.toUpperCase()}" or checkmark symbol
+- Sense of magical communication happening
 
 LIGHTING:
-- Sleigh lit by its own golden glow
-- Rudolph's nose: warm red practical light
-- Stars: points of light with subtle diffraction
-- Snow below reflects moonlight
+- Warm Christmas room lighting (from the photo)
+- Elf lit by their own magical glow
+- Golden particles catching the light
+- Cozy, intimate atmosphere
 
-TECHNICAL:
-- Epic scope and scale
-- Movement implied through motion blur
-- Photorealistic - ILM-quality visual effects
-- This is the beginning of the finale`,
+MOOD: "Mission accomplished. ${childName}'s home is READY for Santa."
+Pride. Satisfaction. The payoff of the elf reconnaissance.`,
 
   /**
-   * END KEYFRAME: Sleigh distant, child's constellation visible
+   * END KEYFRAME: Split screen or transition - Elf signal → Sleigh launches
+   * The confirmation triggers the launch
    */
-  endKeyframe: (childName: string) => `PHOTOREALISTIC KEYFRAME - Scene 8 End
+  endKeyframe: (childName: string) => `PHOTOREALISTIC KEYFRAME - Scene 8 End: Launch Confirmed
 
 ${CINEMATOGRAPHY.camera}
 ${CINEMATOGRAPHY.vfx}
 
 COMPOSITION:
-Sleigh now distant - a streak of golden light among stars.
-HERO ELEMENT: Child's name "${childName.toUpperCase()}" visible in STARS.
-Like a constellation - stars connected by subtle golden lines.
+TRANSITION MOMENT - from elf confirmation to sleigh launch.
+Option A: Elf's golden signal rises up, camera follows to reveal sleigh launching
+Option B: Quick magical transition wipe from room to North Pole sky
 
-THE CONSTELLATION:
-- Child's name formed by ACTUAL STARS
-- Stars are brighter along the letters
-- Faint golden lines connecting stars (like constellation maps)
-- Subtle twinkle animation implied
-- OPTIONAL: Child's face faintly visible in nebula cloud nearby
+THE LAUNCH:
+- Santa's magnificent sleigh LAUNCHING into the night sky
+- Low angle looking UP - epic, powerful
+- Reindeer in formation, Rudolph's nose blazing
+- Motion blur conveying explosive energy
+- Golden light trail streaming behind
 
-THE DEPARTURE:
-- Sleigh: small golden light with rainbow trail
-- Trail forms subtle heart shape as it recedes
-- Stars around sleigh seem to part for its passage
-- Sense of speed and purpose
+THE SLEIGH:
+- Ornate gold and crimson, baroque details
+- Overflowing with wrapped presents
+- Runners leaving trails of golden sparkles
+- This is THE moment - Santa is coming!
+
+THE REINDEER:
+- Eight majestic reindeer + Rudolph leading
+- Powerful muscles, breath visible in cold air
+- Harness bells gleaming
+- Rudolph's nose: warm red glow (practical light)
 
 ENVIRONMENT:
-- Deep space blue-black gradient sky
-- Milky Way visible across frame
-- Earth's curve visible at bottom edge
-- Aurora glow illuminates horizon
+- Night sky filled with stars
+- Northern lights dancing
+- Snow swirling from the takeoff
+- North Pole buildings visible below
 
-EMOTIONAL BEAT:
-${childName}'s name written in the stars.
-Permanent. Eternal. "You matter to the universe."
-Tears-in-eyes level of emotional payoff.
+EMOTIONAL CONNECTION:
+Santa is launching BECAUSE the elves confirmed ${childName}'s home is ready.
+The child's room check → leads directly to → Santa coming to THEM.
+Cause and effect. Personal. Meaningful.
 
-TECHNICAL:
-- Astrophotography quality starfield
-- Constellation effect: subtle, elegant, not garish
-- Sleigh trail: physically plausible light behavior
-- This is the FINAL IMAGE of the video`,
+MOOD: "It's GO TIME! Santa is on his way to ${childName}!"
+Excitement. Anticipation. "He's coming for ME!"`,
 
   /**
-   * VIDEO PROMPT: Epic farewell sequence
+   * VIDEO PROMPT: Elf confirmation → Sleigh launch sequence
+   * Connects the reconnaissance to the finale
    */
-  videoPrompt: (childName: string) => `Epic finale: Santa's sleigh launches into the Christmas night, revealing ${childName}'s name written in the stars.
+  videoPrompt: (childName: string) => `Finale: Elf confirms ${childName}'s home is ready → Santa's sleigh launches!
 
-MOTION:
-- Sleigh ROCKETS upward from snowy ground
-- Golden light trail streams behind
-- Reindeer in powerful galloping flight
-- Camera follows upward, then settles on sky
-- Stars rearrange to reveal child's name
+NARRATIVE ARC:
+The elves checked ${childName}'s room earlier.
+Now they send the final confirmation.
+Santa receives the signal and LAUNCHES.
+Direct cause-and-effect → makes it PERSONAL.
 
 SEQUENCE:
-1. Ground level: Sleigh launches with explosive energy
-2. Mid-sky: Sleigh arcs across frame trailing light
-3. High sky: Sleigh becomes distant point of light
-4. Stars: "${childName.toUpperCase()}" constellation reveals itself
-5. Final: Sleigh light winks goodbye near the name
+1. Elf in ${childName}'s room, holding glowing tablet with checkmark
+2. Elf gives thumbs up - "Gotowe!" (Ready!)
+3. Golden sparkles rise from tablet, floating upward
+4. MAGICAL TRANSITION - sparkles become stars
+5. Camera reveals: North Pole sky, sleigh on launchpad
+6. Santa receives the signal, grabs reins
+7. "HO HO HO! Lecę do ${childName}!"
+8. EXPLOSIVE LAUNCH - sleigh rockets into the sky
+9. Reindeer in powerful formation, Rudolph leading
+10. Sleigh becomes golden streak heading toward camera/viewer
 
 AUDIO CUES:
-- Sleigh bells crescendo
-- Whoosh of takeoff
-- Wind rush
-- Distant "Ho Ho Ho!"
-- Magical chimes as name appears in stars
-- Emotional orchestral finale
+- Magical confirmation chime from elf's tablet
+- Whoosh of magical signal ascending
+- Transition sound (magical shimmer)
+- Sleigh bells building
+- Santa's "Ho Ho Ho!"
+- Explosive launch whoosh
+- Wind rush, bells crescendo
+- Triumphant orchestral finale
 
-This is the TRIUMPHANT ENDING.
-${childName}'s name written eternally in the stars.
-There won't be a dry eye in the house.`,
+THE HOOK (for live call):
+End implies: "Santa is coming... and he wants to TALK to you!"
+Sets up the interactive avatar call perfectly.
+
+This connects EVERYTHING:
+Elf recon → Elf confirmation → Santa launches → (Live call next)
+${childName} is at the CENTER of the entire story.`,
 }
 
 // =============================================================================
@@ -915,17 +936,38 @@ export function getScenePrompts(sceneNumber: SceneNumber, childName?: string): K
 }
 
 /**
- * Scenes that require child's photo as reference image
- * Scene 4: Photo in magical book (photo is hero)
- * Scene 6: Photo in Santa's hands (photo is hero)
- * NOT Scene 5: Just golden letters, no photo needed
- * NOT Scene 8: Name in stars, no photo needed
+ * Scenes that require child's FACE PHOTO as reference image
+ * Scene 4: Photo in magical book (child's face is hero)
+ * Scene 6: Photo in Santa's hands (child's face is hero)
  */
-export const SCENES_WITH_PHOTO_REFERENCE = [4, 6] as const
+export const SCENES_WITH_CHILD_PHOTO = [4, 6] as const
 
 /**
- * Check if a scene should use child's photo as reference
+ * Scenes that require child's ROOM PHOTO as reference image
+ * Scene 8: Elf confirms in child's room → sleigh launches (room is background)
+ * These scenes use the same room photo as Elf Reconnaissance
  */
+export const SCENES_WITH_ROOM_PHOTO = [8] as const
+
+/**
+ * Check if a scene should use child's face photo as reference
+ */
+export function sceneUsesChildPhoto(sceneNumber: SceneNumber): boolean {
+  return SCENES_WITH_CHILD_PHOTO.includes(sceneNumber as 4 | 6)
+}
+
+/**
+ * Check if a scene should use child's room photo as reference
+ */
+export function sceneUsesRoomPhoto(sceneNumber: SceneNumber): boolean {
+  return SCENES_WITH_ROOM_PHOTO.includes(sceneNumber as 8)
+}
+
+/**
+ * Legacy alias for backward compatibility
+ * @deprecated Use sceneUsesChildPhoto instead
+ */
+export const SCENES_WITH_PHOTO_REFERENCE = SCENES_WITH_CHILD_PHOTO
 export function sceneUsesPhotoReference(sceneNumber: SceneNumber): boolean {
-  return SCENES_WITH_PHOTO_REFERENCE.includes(sceneNumber as 4 | 6)
+  return sceneUsesChildPhoto(sceneNumber)
 }

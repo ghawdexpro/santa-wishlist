@@ -1,0 +1,28 @@
+{
+  "name": "Santa Hotline - Telefon do Mikołaja",
+  "short_name": "Santa Hotline",
+  "description": "Magiczny telefon do Świętego Mikołaja! Rozmawiaj, pisz i odbieraj wiadomości z Bieguna Północnego.",
+  "start_url": "/santa/",
+  "scope": "/santa/",
+  "display": "standalone",
+  "background_color": "#7f1d1d",
+  "theme_color": "#991b1b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/santa-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/santa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "kids"],
+  "lang": "pl",
+  "dir": "ltr"
+}
