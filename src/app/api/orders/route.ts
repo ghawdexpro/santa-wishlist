@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { getLocale } from '@/lib/locale'
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +28,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create the order
+    // Create the order with locale
+    const locale = getLocale()
     const { data: order, error } = await supabase
       .from('orders')
       .insert({
@@ -40,6 +42,7 @@ export async function POST(request: NextRequest) {
         thing_to_learn: thingToLearn,
         custom_message: customMessage || null,
         status: 'draft',
+        locale,
       })
       .select()
       .single()
@@ -77,13 +80,16 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const orderId = searchParams.get('id')
 
+    const locale = getLocale()
+
     if (orderId) {
-      // Get specific order
+      // Get specific order (filtered by locale)
       const { data: order, error } = await supabase
         .from('orders')
         .select('*')
         .eq('id', orderId)
         .eq('user_id', user.id)
+        .eq('locale', locale)
         .single()
 
       if (error || !order) {
@@ -96,7 +102,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ order })
     }
 
-    // Get all orders for user with children
+    // Get all orders for user with children (filtered by locale)
     const { data: orders, error } = await supabase
       .from('orders')
       .select(`
@@ -104,6 +110,7 @@ export async function GET(request: NextRequest) {
         children (*)
       `)
       .eq('user_id', user.id)
+      .eq('locale', locale)
       .order('created_at', { ascending: false })
 
     if (error) {

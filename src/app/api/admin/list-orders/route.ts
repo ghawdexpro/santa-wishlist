@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { getLocale } from '@/lib/locale'
 
 const ADMIN_KEY = process.env.ADMIN_KEY || 'santa-admin-2024'
 
@@ -21,9 +22,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const locale = getLocale()
     const { data: orders, error } = await supabaseAdmin
       .from('orders')
-      .select('id, status, created_at, child_count, final_video_url, error_message, keyframe_urls, children(name)')
+      .select('id, status, created_at, child_count, final_video_url, error_message, keyframe_urls, locale, children(name)')
+      .eq('locale', locale)
       .order('created_at', { ascending: false })
       .limit(100)
 
