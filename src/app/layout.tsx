@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "The Santa Experience - Personalized Santa Video Messages",
-  description: 'Give your child a magical, personalized video message from Santa himself. A premium Christmas gift they will never forget.',
-  keywords: ['santa video', 'personalized santa', 'christmas gift', 'santa message', 'kids christmas'],
+  title: "Il-Milied Magic - Santa's Maltese Adventure | Personalized Santa Videos",
+  description: 'Give your child a magical, personalized video message from Santa in Malta. Santa visits Mdina and speaks directly to your child by name. A premium Christmas gift they will never forget.',
+  keywords: ['santa video', 'personalized santa', 'christmas gift', 'santa message', 'kids christmas', 'malta christmas', 'il-milied', 'maltese santa'],
 }
 
 export default function RootLayout({

@@ -28,6 +28,15 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import type { OrderWithChildren } from '@/types/database'
+import { sendVideoReadyEmail, sendVideoFailedEmail } from '@/lib/email'
+import { calculateOrderCost } from '@/lib/cost-tracker'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+
+// Admin client for fetching profile email
+const supabaseAdmin = createSupabaseClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export const maxDuration = 900 // 15 minutes for multi-child processing
 
@@ -359,7 +368,12 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Orchestration] Video uploaded: ${finalVideoUrl}`)
 
-    // 8. Update order with final video URL
+    // 8. Calculate cost breakdown
+    const useHeygenForScene6 = process.env.USE_HEYGEN_FOR_SCENE_6 !== 'false'
+    const costBreakdown = calculateOrderCost(children.length, useHeygenForScene6)
+    console.log(`[Orchestration] Estimated cost for order ${orderId}: $${costBreakdown.total}`)
+
+    // 9. Update order with final video URL and cost
     const { error: updateError } = await supabase
       .from('orders')
       .update({
@@ -367,6 +381,7 @@ export async function POST(request: NextRequest) {
         status: 'complete',
         completed_at: new Date().toISOString(),
         generation_progress: progress,
+        cost_breakdown: costBreakdown,
       })
       .eq('id', orderId)
 
@@ -376,7 +391,29 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Orchestration] Order ${orderId} completed successfully`)
 
-    // 9. Cleanup
+    // 10. Send success email
+    try {
+      // Get customer email
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('email')
+        .eq('id', order.user_id)
+        .single()
+
+      if (profile?.email) {
+        await sendVideoReadyEmail({
+          orderId,
+          customerEmail: profile.email,
+          childrenNames: children.map(c => c.name),
+          videoUrl: finalVideoUrl,
+        })
+      }
+    } catch (emailErr) {
+      console.error('[Orchestration] Failed to send success email:', emailErr)
+      // Don't fail the request if email fails
+    }
+
+    // 11. Cleanup
     try {
       await fs.unlink(tempOutputPath)
     } catch (err) {
@@ -394,16 +431,40 @@ export async function POST(request: NextRequest) {
 
     // Update order with error status
     try {
-      const supabase = await createClient()
-      await supabase
+      await supabaseAdmin
         .from('orders')
         .update({
           status: 'failed',
           error_message: error instanceof Error ? error.message : 'Unknown error',
         })
         .eq('id', orderId)
+
+      // Send failure email
+      const { data: orderData } = await supabaseAdmin
+        .from('orders')
+        .select('user_id, children(name)')
+        .eq('id', orderId)
+        .single()
+
+      if (orderData?.user_id) {
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('email')
+          .eq('id', orderData.user_id)
+          .single()
+
+        if (profile?.email) {
+          const childrenNames = (orderData.children || []).map((c: { name: string }) => c.name)
+          await sendVideoFailedEmail({
+            orderId,
+            customerEmail: profile.email,
+            childrenNames,
+            errorMessage: error instanceof Error ? error.message : undefined,
+          })
+        }
+      }
     } catch (updateErr) {
-      console.error('[Orchestration] Error update failed:', updateErr)
+      console.error('[Orchestration] Error update/email failed:', updateErr)
     }
 
     return NextResponse.json(

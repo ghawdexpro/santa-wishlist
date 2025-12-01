@@ -135,7 +135,7 @@ export default function Home() {
                 <div>
                   <h3 className="text-xl font-bold mb-2 text-christmas-gold">Premium Quality</h3>
                   <p className="text-white/70">
-                    High-definition video with professional Santa in a beautiful North Pole setting.
+                    High-definition video with Santa in a magical Maltese Christmas setting.
                   </p>
                 </div>
               </div>
@@ -296,7 +296,8 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-white/10">
         <div className="max-w-6xl mx-auto text-center text-white/50">
-          <p>Made with love and holiday magic | The Santa Experience 2024</p>
+          <p>Il-Milied Magic - Santa's Maltese Adventure 🇲🇹</p>
+          <p className="text-xs mt-2">Made with love from Malta | 2024</p>
         </div>
       </footer>
     </div>

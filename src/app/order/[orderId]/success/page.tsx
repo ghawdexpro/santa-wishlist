@@ -1,239 +1,256 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 
-interface VideoOperation {
-  sceneNumber: number
-  status: 'pending' | 'generating' | 'complete' | 'failed'
-  operationName: string
+interface StatusResponse {
+  orderId: string
+  status: 'draft' | 'paid' | 'generating' | 'complete' | 'failed'
+  progress: {
+    stage: string
+    stageLabel: string
+    percentage: number
+    scenesComplete: number
+    totalScenes: number
+    estimatedTimeRemaining?: number
+  }
   videoUrl?: string
-  error?: string
+  errorMessage?: string
+  childrenNames: string[]
+  createdAt: string
+  updatedAt: string
 }
 
 export default function PaymentSuccessPage() {
   const params = useParams()
-  const searchParams = useSearchParams()
   const orderId = params.orderId as string
-  const sessionId = searchParams.get('session_id')
   const [loading, setLoading] = useState(true)
-  const [generationStarted, setGenerationStarted] = useState(false)
-  const [operations, setOperations] = useState<VideoOperation[]>([])
-  const [generationStatus, setGenerationStatus] = useState<'idle' | 'generating' | 'complete' | 'failed'>('idle')
-  const [completedCount, setCompletedCount] = useState(0)
-  const [totalCount, setTotalCount] = useState(0)
+  const [status, setStatus] = useState<StatusResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  // Start video generation
-  const startVideoGeneration = useCallback(async () => {
-    // Get stored script and keyframes from session
-    const storedScript = sessionStorage.getItem('generatedScript')
-    const storedKeyframes = sessionStorage.getItem('generatedKeyframes')
-
-    if (!storedScript) {
-      console.log('No script found, skipping video generation')
-      return
-    }
-
-    const script = JSON.parse(storedScript)
-    const keyframes = storedKeyframes ? JSON.parse(storedKeyframes) : []
-
+  // Fetch order status
+  const fetchStatus = useCallback(async () => {
     try {
-      const response = await fetch('/api/generate-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderId,
-          scenes: script.scenes,
-          keyframes,
-        }),
-      })
-
+      const response = await fetch(`/api/orders/${orderId}/status`)
       if (response.ok) {
         const data = await response.json()
-        setOperations(data.operations)
-        setTotalCount(data.operationsCount)
-        setGenerationStarted(true)
-        setGenerationStatus('generating')
+        setStatus(data)
+        setError(null)
+      } else {
+        const data = await response.json()
+        setError(data.error || 'Failed to fetch status')
       }
-    } catch (error) {
-      console.error('Failed to start video generation:', error)
+    } catch (err) {
+      console.error('Failed to fetch status:', err)
+      setError('Failed to connect to server')
+    } finally {
+      setLoading(false)
     }
   }, [orderId])
 
-  // Poll for status updates
-  const pollStatus = useCallback(async () => {
-    if (operations.length === 0 || generationStatus !== 'generating') return
-
-    try {
-      const response = await fetch('/api/generate-video/status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderId,
-          operations,
-        }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setOperations(data.operations)
-        setCompletedCount(data.completedCount)
-
-        if (data.allComplete) {
-          setGenerationStatus(data.anyFailed ? 'failed' : 'complete')
-        }
-      }
-    } catch (error) {
-      console.error('Failed to poll status:', error)
-    }
-  }, [orderId, operations, generationStatus])
-
+  // Initial fetch
   useEffect(() => {
-    // Clear the pending order from session storage after capturing data
-    const initGeneration = async () => {
-      await startVideoGeneration()
-      sessionStorage.removeItem('pendingOrder')
-      setLoading(false)
-    }
-    initGeneration()
-  }, [startVideoGeneration])
+    fetchStatus()
+  }, [fetchStatus])
 
-  // Poll every 15 seconds while generating
+  // Poll every 10 seconds while generating or paid
   useEffect(() => {
-    if (generationStatus !== 'generating') return
+    if (!status || status.status === 'complete' || status.status === 'failed') {
+      return
+    }
 
-    const interval = setInterval(pollStatus, 15000)
+    const interval = setInterval(fetchStatus, 10000)
     return () => clearInterval(interval)
-  }, [generationStatus, pollStatus])
+  }, [status, fetchStatus])
+
+  // Format time remaining
+  const formatTime = (seconds: number): string => {
+    if (seconds < 60) return `${seconds} seconds`
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return secs > 0 ? `${mins}m ${secs}s` : `${mins} minutes`
+  }
+
+  // Format children names for display
+  const formatChildrenNames = (names: string[]): string => {
+    if (names.length === 0) return 'your child'
+    if (names.length === 1) return names[0]
+    if (names.length === 2) return `${names[0]} and ${names[1]}`
+    return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`
+  }
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin text-4xl">🎅</div>
+        <div className="text-center">
+          <div className="animate-spin text-6xl mb-4">🎅</div>
+          <p className="text-white/60">Loading your order...</p>
+        </div>
       </div>
     )
   }
 
+  if (error || !status) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-lg mx-auto text-center">
+          <div className="w-24 h-24 mx-auto rounded-full bg-red-600 flex items-center justify-center mb-8">
+            <span className="text-5xl">⚠️</span>
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-4">Something went wrong</h1>
+          <p className="text-white/70 mb-8">{error || 'Order not found'}</p>
+          <Link href="/" className="btn-christmas px-6 py-3">
+            Return Home
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  const childrenText = formatChildrenNames(status.childrenNames)
+  const isGenerating = status.status === 'generating' || status.status === 'paid'
+  const isComplete = status.status === 'complete'
+  const isFailed = status.status === 'failed'
+
   return (
     <div className="min-h-screen px-4 py-8 flex items-center justify-center">
       <div className="max-w-lg mx-auto text-center">
-        {/* Success Animation */}
+        {/* Status Icon */}
         <div className="mb-8">
           <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center ${
-            generationStatus === 'complete' ? 'bg-christmas-green' :
-            generationStatus === 'failed' ? 'bg-red-600' :
+            isComplete ? 'bg-christmas-green' :
+            isFailed ? 'bg-red-600' :
             'bg-christmas-gold animate-pulse'
           }`}>
             <span className="text-5xl">
-              {generationStatus === 'complete' ? '✓' :
-               generationStatus === 'failed' ? '✗' : '🎬'}
+              {isComplete ? '✓' : isFailed ? '✗' : '🎬'}
             </span>
           </div>
         </div>
 
+        {/* Title */}
         <h1 className="text-4xl font-bold glow-gold mb-4">
-          {generationStatus === 'complete' ? 'Video Complete! 🎄' :
-           generationStatus === 'failed' ? 'Generation Issue' :
-           'Payment Successful! 🎄'}
+          {isComplete ? 'Video Ready! 🎄' :
+           isFailed ? 'Generation Issue' :
+           'Creating Your Magic! 🎅'}
         </h1>
 
+        {/* Subtitle */}
         <p className="text-xl text-white/80 mb-8">
-          {generationStatus === 'complete'
-            ? 'Your magical Santa video is ready!'
-            : generationStatus === 'failed'
-            ? 'There was an issue generating some scenes. Our team will look into it.'
-            : generationStatus === 'generating'
-            ? 'The elves are creating your magical video right now...'
-            : 'Thank you for your order!'}
+          {isComplete
+            ? `Santa's magical video for ${childrenText} is ready!`
+            : isFailed
+            ? 'There was an issue creating your video. Our team is on it!'
+            : `Santa's elves are creating a magical video for ${childrenText}...`}
         </p>
 
-        {/* Video Generation Progress */}
-        {generationStarted && generationStatus === 'generating' && (
+        {/* Progress Card (Generating) */}
+        {isGenerating && (
           <div className="card-christmas mb-8">
-            <h2 className="text-lg font-bold text-christmas-gold mb-4">Video Generation Progress</h2>
+            <h2 className="text-lg font-bold text-christmas-gold mb-4">
+              {status.progress.stageLabel}
+            </h2>
 
             {/* Progress bar */}
-            <div className="w-full bg-white/10 rounded-full h-4 mb-4">
+            <div className="w-full bg-white/10 rounded-full h-4 mb-4 overflow-hidden">
               <div
-                className="bg-christmas-green h-4 rounded-full transition-all duration-500"
-                style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+                className="bg-gradient-to-r from-christmas-green to-christmas-gold h-4 rounded-full transition-all duration-1000 ease-out"
+                style={{ width: `${status.progress.percentage}%` }}
               />
             </div>
-            <p className="text-white/70 mb-4">
-              {completedCount} of {totalCount} scenes complete
-            </p>
 
-            {/* Scene status list */}
-            <div className="space-y-2 text-left">
-              {operations.map((op) => (
-                <div key={op.sceneNumber} className="flex items-center gap-3 text-sm">
-                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                    op.status === 'complete' ? 'bg-christmas-green' :
-                    op.status === 'failed' ? 'bg-red-600' :
-                    op.status === 'generating' ? 'bg-christmas-gold animate-pulse' :
-                    'bg-white/20'
-                  }`}>
-                    {op.status === 'complete' ? '✓' :
-                     op.status === 'failed' ? '✗' :
-                     op.status === 'generating' ? '⏳' : op.sceneNumber}
-                  </span>
-                  <span className="text-white/80">Scene {op.sceneNumber}</span>
-                  <span className={`ml-auto text-xs ${
-                    op.status === 'complete' ? 'text-green-400' :
-                    op.status === 'failed' ? 'text-red-400' :
-                    op.status === 'generating' ? 'text-yellow-400' :
-                    'text-white/40'
-                  }`}>
-                    {op.status}
-                  </span>
+            <div className="flex justify-between text-sm text-white/70 mb-4">
+              <span>{status.progress.percentage}% complete</span>
+              <span>{status.progress.scenesComplete} of {status.progress.totalScenes} scenes</span>
+            </div>
+
+            {/* Time estimate */}
+            {status.progress.estimatedTimeRemaining && (
+              <p className="text-white/60 text-sm mb-4">
+                Estimated time remaining: {formatTime(status.progress.estimatedTimeRemaining)}
+              </p>
+            )}
+
+            {/* Scene progress visualization */}
+            <div className="flex justify-center gap-2 mb-4">
+              {Array.from({ length: 8 }, (_, i) => i + 1).map((sceneNum) => (
+                <div
+                  key={sceneNum}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${
+                    sceneNum <= status.progress.scenesComplete
+                      ? 'bg-christmas-green text-white'
+                      : 'bg-white/10 text-white/40'
+                  }`}
+                >
+                  {sceneNum <= status.progress.scenesComplete ? '✓' : sceneNum}
                 </div>
               ))}
             </div>
 
-            <p className="text-white/50 text-xs mt-4">
-              This may take 5-10 minutes. Feel free to leave this page - we&apos;ll email you when ready!
-            </p>
+            <div className="border-t border-white/10 pt-4 mt-4">
+              <p className="text-white/50 text-xs">
+                Feel free to close this page - we'll email you when your video is ready!
+              </p>
+            </div>
           </div>
         )}
 
-        {/* Completed state */}
-        {generationStatus === 'complete' && (
-          <div className="card-christmas text-left mb-8">
-            <h2 className="text-lg font-bold text-christmas-gold mb-4">Your video is ready!</h2>
+        {/* Complete Card */}
+        {isComplete && status.videoUrl && (
+          <div className="card-christmas mb-8">
+            <h2 className="text-lg font-bold text-christmas-gold mb-4">
+              Your magical video is ready!
+            </h2>
+            <p className="text-white/80 mb-6">
+              Santa has created a special message for {childrenText}.
+              Download it now and share the magic!
+            </p>
+            <div className="space-y-4">
+              <a
+                href={status.videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-christmas px-8 py-4 inline-block text-lg"
+              >
+                Watch Video 🎬
+              </a>
+              <div>
+                <a
+                  href={status.videoUrl}
+                  download={`santa-video-${status.childrenNames.join('-')}.mp4`}
+                  className="text-christmas-gold hover:text-christmas-gold/80 underline text-sm"
+                >
+                  Download MP4
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Failed Card */}
+        {isFailed && (
+          <div className="card-christmas border-red-500/50 mb-8">
+            <h2 className="text-lg font-bold text-red-400 mb-4">
+              We hit a snag
+            </h2>
             <p className="text-white/80 mb-4">
-              Your personalized Santa video has been created. You can download it from your dashboard.
+              Santa's elves encountered an issue while creating your video.
+              Don't worry - our team has been notified and we're working on it!
             </p>
-            <Link
-              href="/dashboard"
-              className="btn-christmas px-6 py-3 inline-block"
-            >
-              Download Video 📥
-            </Link>
+            {status.errorMessage && (
+              <p className="text-white/50 text-xs font-mono bg-white/5 p-2 rounded mb-4">
+                {status.errorMessage}
+              </p>
+            )}
+            <p className="text-white/70 text-sm">
+              We'll email you once the issue is resolved. If you don't hear from us within 24 hours,
+              please contact support.
+            </p>
           </div>
         )}
 
-        {/* Default info (when not generating) */}
-        {!generationStarted && (
-          <div className="card-christmas text-left mb-8">
-            <h2 className="text-lg font-bold text-christmas-gold mb-4">What happens next?</h2>
-            <ol className="space-y-3 text-white/80">
-              <li className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-christmas-red flex items-center justify-center text-sm font-bold">1</span>
-                <span>Our team will start generating your personalized video</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-christmas-red flex items-center justify-center text-sm font-bold">2</span>
-                <span>You&apos;ll receive an email when your video is ready (within 24-48 hours)</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-christmas-green flex items-center justify-center text-sm font-bold">3</span>
-                <span>Download and share the magic with your child!</span>
-              </li>
-            </ol>
-          </div>
-        )}
-
+        {/* Order Info */}
         <div className="space-y-4">
           <p className="text-white/60 text-sm">
             Order ID: <span className="font-mono">{orderId}</span>
@@ -259,6 +276,11 @@ export default function PaymentSuccessPage() {
         <div className="mt-12 text-4xl space-x-4">
           🎁 🎄 ⭐ 🎄 🎁
         </div>
+
+        {/* Malta branding */}
+        <p className="mt-8 text-white/30 text-xs">
+          Il-Milied Magic - Santa's Maltese Adventure 🇲🇹
+        </p>
       </div>
     </div>
   )
