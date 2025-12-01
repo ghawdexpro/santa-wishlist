@@ -81,8 +81,6 @@ export async function GET(request: NextRequest) {
     const orderId = searchParams.get('id')
     const locale = getLocale()
 
-    const locale = getLocale()
-
     if (orderId) {
       // Get specific order (filtered by locale)
       const { data: order, error } = await supabase
