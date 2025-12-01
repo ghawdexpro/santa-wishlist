@@ -1,5 +1,5 @@
 // Order status type
-export type OrderStatus = 'draft' | 'script_approved' | 'keyframes_approved' | 'paid' | 'generating' | 'complete' | 'failed'
+export type OrderStatus = 'draft' | 'script_approved' | 'keyframes_approved' | 'keyframes_ready' | 'paid' | 'generating' | 'generating_videos' | 'complete' | 'failed'
 
 // Script scene structure (matches gemini.ts output)
 export interface ScriptScene {

@@ -96,10 +96,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ order })
     }
 
-    // Get all orders for user
+    // Get all orders for user with children
     const { data: orders, error } = await supabase
       .from('orders')
-      .select('*')
+      .select(`
+        *,
+        children (*)
+      `)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 

@@ -38,8 +38,9 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: string
   failed: { label: 'Błąd', color: 'bg-red-500', icon: '❌' },
 }
 
-export function OrderCard({ order }: { order: Order }) {
+export function OrderCard({ order, onRetry }: { order: Order; onRetry?: (orderId: string) => void }) {
   const [downloading, setDownloading] = useState(false)
+  const [retrying, setRetrying] = useState(false)
 
   const statusConfig = STATUS_CONFIG[order.status] || STATUS_CONFIG.draft
   const isComplete = order.status === 'complete'
@@ -67,6 +68,29 @@ export function OrderCard({ order }: { order: Order }) {
       window.open(order.final_video_url, '_blank')
     } finally {
       setDownloading(false)
+    }
+  }
+
+  const handleRetry = async () => {
+    setRetrying(true)
+    try {
+      const response = await fetch('/api/retry-generation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: order.id }),
+      })
+
+      if (response.ok) {
+        onRetry?.(order.id)
+        window.location.reload()
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Nie udało się ponowić generowania')
+      }
+    } catch {
+      alert('Wystąpił błąd. Spróbuj ponownie.')
+    } finally {
+      setRetrying(false)
     }
   }
 
@@ -217,10 +241,21 @@ export function OrderCard({ order }: { order: Order }) {
         {/* Retry Failed */}
         {hasFailed && (
           <button
-            className="px-4 py-2 bg-christmas-red hover:bg-red-600 rounded-xl text-white transition-colors flex items-center gap-2"
+            onClick={handleRetry}
+            disabled={retrying}
+            className="px-4 py-2 bg-christmas-red hover:bg-red-600 rounded-xl text-white transition-colors flex items-center gap-2 disabled:opacity-50"
           >
-            <span>🔄</span>
-            Spróbuj ponownie
+            {retrying ? (
+              <>
+                <span className="animate-spin">⏳</span>
+                Ponawiam...
+              </>
+            ) : (
+              <>
+                <span>🔄</span>
+                Spróbuj ponownie
+              </>
+            )}
           </button>
         )}
       </div>

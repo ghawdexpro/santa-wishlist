@@ -1,4 +1,4 @@
-import { stripe, PRODUCT_PRICE } from '@/lib/stripe'
+import { stripe, PRICING, PricingTier } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
     const body = await request.json()
-    const { orderId } = body
+    const { orderId, tier = 'basic' } = body as { orderId: string; tier?: PricingTier }
 
     if (!orderId) {
       return NextResponse.json(
@@ -14,6 +14,16 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Validate tier
+    if (!PRICING[tier]) {
+      return NextResponse.json(
+        { error: 'Invalid pricing tier' },
+        { status: 400 }
+      )
+    }
+
+    const selectedPricing = PRICING[tier]
 
     // Get the order to verify it exists
     const { data: order, error: orderError } = await supabase
@@ -65,17 +75,17 @@ export async function POST(request: NextRequest) {
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'p24', 'blik'], // PLN payment methods
       line_items: [
         {
           price_data: {
-            currency: 'usd',
+            currency: selectedPricing.currency,
             product_data: {
-              name: 'The Santa Experience',
-              description,
+              name: selectedPricing.name,
+              description: `${selectedPricing.description} - ${description}`,
               images: [`${appUrl}/santa-product.png`],
             },
-            unit_amount: PRODUCT_PRICE,
+            unit_amount: selectedPricing.amount,
           },
           quantity: 1,
         },
@@ -86,6 +96,8 @@ export async function POST(request: NextRequest) {
       metadata: {
         orderId: orderId,
         childCount: String(children?.length || 1),
+        tier: tier,
+        includesLiveCall: String(selectedPricing.includesLiveCall),
       },
     })
 
