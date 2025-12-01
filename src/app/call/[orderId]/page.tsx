@@ -17,7 +17,6 @@ interface Order {
   id: string
   status: string
   child_count: number
-  includes_live_call?: boolean
 }
 
 export default function CallPage() {
@@ -64,13 +63,6 @@ export default function CallPage() {
           setLoading(false)
           return
         }
-
-        // Check if call is included (optional - depends on your business logic)
-        // if (!orderData.includes_live_call) {
-        //   setError('Rozmowa z Mikołajem nie jest dostępna dla tego zamówienia')
-        //   setLoading(false)
-        //   return
-        // }
 
         setOrder(orderData)
 

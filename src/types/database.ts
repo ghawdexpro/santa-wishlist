@@ -37,7 +37,7 @@ export interface Child {
   thing_to_learn: string | null
   custom_message: string | null
 
-  // Extended personalization for live calls
+  // Extended personalization for live calls (already in DB)
   favorite_toy: string | null
   favorite_animal: string | null
   favorite_color: string | null
@@ -47,7 +47,7 @@ export interface Child {
   story_moral: string | null
   special_achievement: string | null
 
-  // AI-generated content for live calls
+  // AI-generated content for live calls (already in DB)
   santa_conversation_context: SantaConversationContext | null
   santa_story: string | null
 
@@ -55,7 +55,7 @@ export interface Child {
   updated_at: string
 }
 
-// Santa conversation context (AI-generated)
+// Santa conversation context (AI-generated, stored as JSONB in children table)
 export interface SantaConversationContext {
   personalizedGreeting: string
   thingsToMention: string[]
@@ -99,7 +99,7 @@ export interface GeneratedScript {
   generatedAt: string
 }
 
-// Order type (updated for multi-child support)
+// Order type
 export interface Order {
   id: string
   user_id: string
@@ -127,18 +127,12 @@ export interface Order {
   stripe_session_id: string | null
   amount_paid: number | null
 
-  // Live call ("Talk to Santa") feature
-  includes_live_call: boolean
-  call_scheduled_at: string | null
-  call_completed_at: string | null
-  call_duration_seconds: number | null
-
   // Timestamps
   created_at: string
   updated_at: string
   completed_at: string | null
 
-  // Backward compatibility (old single-child fields, can be deprecated)
+  // Backward compatibility (old single-child fields)
   child_name?: string
   child_photo_url?: string | null
   child_age?: number | null
@@ -175,11 +169,6 @@ export interface OrderUpdate {
   stripe_session_id?: string | null
   amount_paid?: number | null
   completed_at?: string | null
-  // Live call fields
-  includes_live_call?: boolean
-  call_scheduled_at?: string | null
-  call_completed_at?: string | null
-  call_duration_seconds?: number | null
   // Backward compatibility
   child_name?: string
   child_photo_url?: string | null
@@ -193,39 +182,6 @@ export interface OrderUpdate {
 // Extended order type that includes children array
 export interface OrderWithChildren extends Order {
   children: Child[]
-}
-
-// Live call session type (for "Talk to Santa" feature)
-export type LiveCallStatus = 'active' | 'completed' | 'failed'
-
-export interface LiveCallSession {
-  id: string
-  order_id: string
-  child_id: string | null
-  session_id: string | null
-  started_at: string
-  ended_at: string | null
-  duration_seconds: number | null
-  credits_used: number | null
-  status: LiveCallStatus
-  error_message: string | null
-  created_at: string
-}
-
-export interface LiveCallSessionInsert {
-  order_id: string
-  child_id?: string | null
-  session_id?: string | null
-  status?: LiveCallStatus
-}
-
-export interface LiveCallSessionUpdate {
-  session_id?: string | null
-  ended_at?: string | null
-  duration_seconds?: number | null
-  credits_used?: number | null
-  status?: LiveCallStatus
-  error_message?: string | null
 }
 
 // Premade scene type
@@ -264,11 +220,6 @@ export interface Database {
         Row: PremadeScene
         Insert: Omit<PremadeScene, 'id' | 'created_at'>
         Update: Partial<Omit<PremadeScene, 'id' | 'created_at'>>
-      }
-      live_call_sessions: {
-        Row: LiveCallSession
-        Insert: LiveCallSessionInsert
-        Update: LiveCallSessionUpdate
       }
     }
   }
