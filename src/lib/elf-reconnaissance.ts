@@ -65,7 +65,7 @@ function buildElfReconPrompt(childName: string, variant: ElfSceneVariant, hasElf
   const baseContext = `CINEMATIC VFX INSTRUCTION - Elf Reconnaissance Scene${elfReferenceNote}
 
 CONTEXT:
-You are creating a magical moment from "Magia Świąt" - a premium personalized Santa video for the Polish market.
+You are creating a magical moment from "The Santa Experience" - a premium personalized Santa video.
 This scene shows Santa's elves secretly checking out ${childName}'s home before Christmas Eve.
 The reference image is the ACTUAL room/Christmas tree from the child's home - this MUST be preserved and recognizable.
 
@@ -75,7 +75,7 @@ CRITICAL RULES:
 - The room/tree should be instantly recognizable to the child
 - Elves should look like they're ACTUALLY IN the room
 - Warm, magical lighting that enhances but doesn't obscure the room
-- Premium cinematic quality (259+ PLN product)
+- Premium cinematic quality ($99+ product)
 
 ELF APPEARANCE:
 - Classic Christmas elves with pointy ears and festive outfits
@@ -96,7 +96,7 @@ SPECIFIC SCENE: "Elf Peeking" 👀
 - The elf is clearly checking if the coast is clear
 
 MOOD: Sneaky, playful, excited anticipation
-CAPTION (if visible): "Psst... to tutaj mieszka ${childName}!"`,
+CAPTION (if visible): "Psst... this is where ${childName} lives!"`,
 
     inspecting: `${baseContext}
 
@@ -109,7 +109,7 @@ SPECIFIC SCENE: "Elves Inspecting Gifts" 🎁
 - They're clearly doing important Christmas preparation work
 
 MOOD: Busy, professional, magical efficiency
-CAPTION (if visible): "Sprawdzamy czy wszystko gotowe dla ${childName}!"`,
+CAPTION (if visible): "Checking if everything is ready for ${childName}!"`,
 
     reporting: `${baseContext}
 
@@ -122,7 +122,7 @@ SPECIFIC SCENE: "Elf Reporting to North Pole" 📝
 - Elf's expression says "This home is APPROVED for Santa's visit"
 
 MOOD: Satisfied, accomplished, magical connection to North Pole
-CAPTION (if visible): "Melduję Mikołajowi: ${childName} - dom sprawdzony! ✓"`,
+CAPTION (if visible): "Reporting to Santa: ${childName} - home checked! ✓"`,
   }
 
   return `${variants[variant]}
