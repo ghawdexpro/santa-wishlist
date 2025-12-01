@@ -10,7 +10,8 @@ import { createClient } from '@supabase/supabase-js'
 import { startVideoGeneration, waitForVideoGeneration } from '@/lib/veo'
 import { getScenePrompts, SceneNumber } from '@/lib/hollywood-prompts'
 import { getAllPremadeScenes } from '@/lib/premade-cache'
-import { generateStitchOrder, stitchVideoSegments } from '@/lib/video-stitcher'
+import { generateStitchOrder, stitchVideoSegments, PersonalizedSceneVideos } from '@/lib/video-stitcher'
+import { Scene6Result } from '@/lib/scene-generators'
 import fs from 'fs/promises'
 
 export const maxDuration = 900 // 15 minutes for video generation
@@ -146,11 +147,17 @@ export async function POST(request: NextRequest) {
     // Poll for completions
     console.log(`[ApproveGenerate] Polling ${veoOperations.length} Veo operations...`)
 
-    const childSceneVideos = new Map<string, { scene4: string; scene5: string; scene6: string; scene8: string }>()
+    const childSceneVideos = new Map<string, PersonalizedSceneVideos>()
 
     // Initialize maps for each child
+    // Scene 6 uses Veo in this approval flow (keyframe-based generation)
     for (const child of children) {
-      childSceneVideos.set(child.id, { scene4: '', scene5: '', scene6: '', scene8: '' })
+      childSceneVideos.set(child.id, {
+        scene4: '',
+        scene5: '',
+        scene6: { type: 'veo', value: '', duration: 8 } as Scene6Result,
+        scene8: ''
+      })
     }
 
     // Poll all operations
@@ -160,8 +167,13 @@ export async function POST(request: NextRequest) {
           const result = await waitForVideoGeneration(op.operationName)
           const videos = childSceneVideos.get(op.childId)
           if (videos && result.videoUrl) {
-            const sceneKey = `scene${op.sceneNumber}` as keyof typeof videos
-            videos[sceneKey] = result.videoUrl
+            // Scene 6 has special structure (Scene6Result)
+            if (op.sceneNumber === 6) {
+              videos.scene6 = { type: 'veo', value: result.videoUrl, duration: 8 }
+            } else {
+              const sceneKey = `scene${op.sceneNumber}` as 'scene4' | 'scene5' | 'scene8'
+              videos[sceneKey] = result.videoUrl
+            }
             console.log(`[ApproveGenerate] Scene ${op.sceneNumber} complete for ${op.childName}`)
           }
         } catch (error) {
