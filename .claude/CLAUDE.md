@@ -62,18 +62,20 @@ railway up --detach             # Deploy to Railway (manual)
 
 ### Key Flows
 
-**Video Order Flow:**
+**Video Order Flow (AUTO_APPROVE=true, default):**
 1. User fills wizard (`/create`) with 1-3 children
-2. Script generation (Gemini) → Script preview
+2. Script generation (Gemini) → Script preview → Keyframe preview
 3. Stripe payment → status: `paid`
-4. Keyframe generation → Admin review (`/admin/review/[orderId]`)
-5. Video generation (Veo) → Final stitching → `complete`
+4. Webhook triggers `/api/generate-full-video` directly
+5. Video generation (Veo + HeyGen) → Final stitching → `complete`
+6. Email notification sent → Success page shows video + Live Call option
 
 **Live Call Flow (`/call/[orderId]`):**
-1. User selects child (if multi-child order)
-2. Clicks "Call Santa" → HeyGen Streaming Avatar connects
-3. Santa greets child with personalized greeting
-4. Real-time conversation: Child speaks → Gemini LLM → Santa responds
+1. Available after video is complete (linked from success page)
+2. User selects child (if multi-child order)
+3. Clicks "Call Santa" → HeyGen Streaming Avatar connects
+4. Santa greets child with personalized greeting (uses child's context)
+5. Real-time conversation: Child speaks → Gemini LLM → Santa responds
 
 ### 8-Scene Video Structure
 
@@ -107,8 +109,16 @@ HEYGEN_API_KEY
 NEXT_PUBLIC_SANTA_AVATAR_ID
 NEXT_PUBLIC_SANTA_VOICE_ID
 
+# Email (SMTP)
+SMTP_HOST
+SMTP_PORT
+SMTP_USER
+SMTP_PASS
+SMTP_FROM
+
 # App
 NEXT_PUBLIC_APP_URL
+AUTO_APPROVE_VIDEOS          # default: true (skip admin review)
 ```
 
 ## Critical Rules
@@ -123,6 +133,17 @@ NEXT_PUBLIC_APP_URL
 
 - **URL:** `/admin/scenes` (password: `santa-admin-2024`)
 - **Purpose:** Generate and manage pre-made scene keyframes and videos
+
+## Key Libraries
+
+- `src/lib/gemini.ts` - Script generation with Gemini
+- `src/lib/nanobanana.ts` - Keyframe image generation
+- `src/lib/veo.ts` - Video generation with Veo
+- `src/lib/heygen.ts` - HeyGen talking avatar (Scene 6) + streaming
+- `src/lib/video-stitcher.ts` - FFmpeg video assembly
+- `src/lib/email.ts` - SMTP email notifications (nodemailer)
+- `src/lib/retry.ts` - Retry logic with exponential backoff
+- `src/lib/cost-tracker.ts` - AI service cost tracking
 
 ## Documentation
 

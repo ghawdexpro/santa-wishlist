@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 
 export default function Step7RoomPhoto() {
   const router = useRouter()
-  const { data, updateData, prevStep, isStepValid } = useWizard()
+  const { data, updateData, prevStep } = useWizard()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [dragActive, setDragActive] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
