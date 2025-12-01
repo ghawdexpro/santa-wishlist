@@ -34,7 +34,7 @@ function getTransporter(): nodemailer.Transporter | null {
   return transporter
 }
 
-const FROM_EMAIL = process.env.SMTP_FROM || process.env.SMTP_USER || 'Santa <santa@il-milied.mt>'
+const FROM_EMAIL = process.env.SMTP_FROM || process.env.SMTP_USER || 'Mikołaj <mikolaj@magiaswiat.pl>'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://santapl-production.up.railway.app'
 
 interface OrderEmailData {
@@ -75,8 +75,8 @@ export async function sendOrderConfirmedEmail(data: OrderEmailData): Promise<boo
   <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); border-radius: 20px; padding: 40px; border: 2px solid #c9a227;">
 
     <div style="text-align: center; margin-bottom: 30px;">
-      <h1 style="color: #c9a227; font-size: 32px; margin: 0;">Il-Milied Magic</h1>
-      <p style="color: #e8d5b7; font-size: 14px; margin-top: 5px;">Santa's Maltese Adventure</p>
+      <h1 style="color: #c9a227; font-size: 32px; margin: 0;">Magia Świąt</h1>
+      <p style="color: #e8d5b7; font-size: 14px; margin-top: 5px;">Spersonalizowane Wideo od Mikołaja</p>
     </div>
 
     <div style="background: rgba(201, 162, 39, 0.1); border-radius: 15px; padding: 25px; margin-bottom: 25px;">
@@ -85,7 +85,7 @@ export async function sendOrderConfirmedEmail(data: OrderEmailData): Promise<boo
         Santa has received your order and is now creating a magical personalized video for <strong style="color: #c9a227;">${childrenText}</strong>!
       </p>
       <p style="color: #e8d5b7; line-height: 1.8; font-size: 16px;">
-        Our elves in Mdina are working their magic. This usually takes about <strong>10-15 minutes</strong>.
+        Nasze elfy w warsztacie Mikołaja pracują nad Twoim filmem. To zwykle trwa około <strong>10-15 minut</strong>.
       </p>
     </div>
 
@@ -109,8 +109,8 @@ export async function sendOrderConfirmedEmail(data: OrderEmailData): Promise<boo
     <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(201, 162, 39, 0.3);">
       <p style="color: #888; font-size: 12px; margin: 0;">
         Order ID: ${data.orderId}<br>
-        Il-Milied Magic - Santa's Maltese Adventure<br>
-        Made with love from Malta
+        Magia Świąt - Spersonalizowane Wideo od Mikołaja<br>
+        Stworzone z miłością
       </p>
     </div>
   </div>
@@ -160,7 +160,7 @@ export async function sendVideoReadyEmail(data: OrderEmailData & { videoUrl: str
 
     <div style="text-align: center; margin-bottom: 30px;">
       <h1 style="color: #c9a227; font-size: 32px; margin: 0;">It's Ready!</h1>
-      <p style="color: #e8d5b7; font-size: 14px; margin-top: 5px;">Il-Milied Magic - Santa's Maltese Adventure</p>
+      <p style="color: #e8d5b7; font-size: 14px; margin-top: 5px;">Magia Świąt - Spersonalizowane Wideo od Mikołaja</p>
     </div>
 
     <div style="background: rgba(201, 162, 39, 0.1); border-radius: 15px; padding: 25px; margin-bottom: 25px;">
@@ -169,7 +169,7 @@ export async function sendVideoReadyEmail(data: OrderEmailData & { videoUrl: str
         Santa's magical video for <strong style="color: #c9a227;">${childrenText}</strong> is now ready to watch!
       </p>
       <p style="color: #e8d5b7; line-height: 1.8; font-size: 16px;">
-        This is a moment they'll never forget. Santa flew all the way from his secret workshop in Mdina, Malta just for them!
+        To chwila, której nigdy nie zapomną. Mikołaj przyleciał specjalnie dla nich z Bieguna Północnego!
       </p>
     </div>
 
@@ -193,8 +193,8 @@ export async function sendVideoReadyEmail(data: OrderEmailData & { videoUrl: str
     <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(201, 162, 39, 0.3);">
       <p style="color: #888; font-size: 12px; margin: 0;">
         Order ID: ${data.orderId}<br>
-        Il-Milied Magic - Santa's Maltese Adventure<br>
-        Merry Christmas from Malta!
+        Magia Świąt - Spersonalizowane Wideo od Mikołaja<br>
+        Wesołych Świąt!
       </p>
     </div>
   </div>
@@ -268,7 +268,7 @@ export async function sendVideoFailedEmail(data: OrderEmailData & { errorMessage
     <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(201, 162, 39, 0.3);">
       <p style="color: #888; font-size: 12px; margin: 0;">
         Order ID: ${data.orderId}<br>
-        Il-Milied Magic - Santa's Maltese Adventure
+        Magia Świąt - Spersonalizowane Wideo od Mikołaja
       </p>
     </div>
   </div>

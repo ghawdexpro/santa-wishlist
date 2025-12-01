@@ -135,7 +135,7 @@ export default function Home() {
                 <div>
                   <h3 className="text-xl font-bold mb-2 text-christmas-gold">Premium Quality</h3>
                   <p className="text-white/70">
-                    High-definition video with Santa in a magical Maltese Christmas setting.
+                    Film w jakości HD z Mikołajem w magicznej świątecznej scenerii Bieguna Północnego.
                   </p>
                 </div>
               </div>
@@ -296,8 +296,8 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-white/10">
         <div className="max-w-6xl mx-auto text-center text-white/50">
-          <p>Il-Milied Magic - Santa's Maltese Adventure 🇲🇹</p>
-          <p className="text-xs mt-2">Made with love from Malta | 2024</p>
+          <p>Magia Świąt - Spersonalizowane Wideo od Mikołaja 🎅</p>
+          <p className="text-xs mt-2">Stworzone z miłością | 2024</p>
         </div>
       </footer>
     </div>
