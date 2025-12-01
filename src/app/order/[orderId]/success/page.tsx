@@ -228,6 +228,49 @@ export default function PaymentSuccessPage() {
           </div>
         )}
 
+        {/* Live Santa Call - Premium Bonus (only after video is ready) */}
+        {isComplete && (
+          <div className="card-christmas mb-8 border-2 border-christmas-gold/50 bg-gradient-to-br from-christmas-red/20 to-christmas-green/20">
+            <div className="text-center">
+              <div className="text-5xl mb-4">📞🎅</div>
+              <h2 className="text-2xl font-bold text-christmas-gold mb-2">
+                Talk to Santa LIVE!
+              </h2>
+              <p className="text-white/80 mb-4">
+                Your video is ready - now {childrenText} can have a real-time
+                video conversation with Santa himself!
+              </p>
+              <div className="bg-black/20 rounded-lg p-4 mb-6">
+                <ul className="text-white/70 text-sm space-y-2 text-left max-w-xs mx-auto">
+                  <li className="flex items-center gap-2">
+                    <span className="text-christmas-green">✓</span>
+                    Santa knows everything about {childrenText}
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-christmas-green">✓</span>
+                    Real-time interactive conversation
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-christmas-green">✓</span>
+                    Ask Santa questions live!
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-christmas-gold">⚡</span>
+                    Requires stable internet connection
+                  </li>
+                </ul>
+              </div>
+              <Link
+                href={`/call/${orderId}`}
+                className="btn-christmas px-8 py-4 text-lg inline-flex items-center gap-2 animate-pulse hover:animate-none"
+              >
+                <span>Start Live Call with Santa</span>
+                <span className="text-2xl">🎄</span>
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Failed Card */}
         {isFailed && (
           <div className="card-christmas border-red-500/50 mb-8">
