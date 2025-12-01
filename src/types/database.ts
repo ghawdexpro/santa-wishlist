@@ -30,6 +30,7 @@ export interface Child {
   age: number | null
   sequence_number: 1 | 2 | 3
   photo_url: string | null
+  room_photo_url: string | null  // For Elf Reconnaissance feature
 
   // Basic personalization
   good_behavior: string | null
@@ -74,6 +75,7 @@ export interface ChildInsert {
   age?: number | null
   sequence_number: 1 | 2 | 3
   photo_url?: string | null
+  room_photo_url?: string | null  // For Elf Reconnaissance feature
   good_behavior?: string | null
   thing_to_improve?: string | null
   thing_to_learn?: string | null

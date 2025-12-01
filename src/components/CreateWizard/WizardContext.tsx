@@ -22,6 +22,10 @@ export interface WizardData {
 
   // Step 6: Custom message (optional)
   customMessage: string
+
+  // Step 7: Room photo for Elf Reconnaissance (optional)
+  roomPhoto: File | null
+  roomPhotoPreview: string | null
 }
 
 interface WizardContextType {
@@ -44,6 +48,8 @@ const initialData: WizardData = {
   thingToImprove: '',
   thingToLearn: '',
   customMessage: '',
+  roomPhoto: null,
+  roomPhotoPreview: null,
 }
 
 const WizardContext = createContext<WizardContextType | undefined>(undefined)
@@ -58,7 +64,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
         try {
           const parsed = JSON.parse(saved)
           // Don't restore file objects, only text data
-          return { ...initialData, ...parsed, childPhoto: null }
+          return { ...initialData, ...parsed, childPhoto: null, roomPhoto: null }
         } catch {
           return initialData
         }
@@ -67,14 +73,20 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     return initialData
   })
 
-  const totalSteps = 6
+  const totalSteps = 7
 
   const updateData = (updates: Partial<WizardData>) => {
     setData(prev => {
       const newData = { ...prev, ...updates }
-      // Save to localStorage (except file)
+      // Save to localStorage (except file objects)
       if (typeof window !== 'undefined') {
-        const toSave = { ...newData, childPhoto: null, childPhotoPreview: null }
+        const toSave = {
+          ...newData,
+          childPhoto: null,
+          childPhotoPreview: null,
+          roomPhoto: null,
+          roomPhotoPreview: null,
+        }
         localStorage.setItem('santaWizardData', JSON.stringify(toSave))
       }
       return newData
@@ -107,6 +119,8 @@ export function WizardProvider({ children }: { children: ReactNode }) {
         return data.thingToLearn.trim().length >= 10
       case 6:
         return true // Optional step
+      case 7:
+        return true // Optional step - room photo for elf reconnaissance
       default:
         return false
     }

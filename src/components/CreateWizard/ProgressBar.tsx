@@ -3,12 +3,13 @@
 import { useWizard } from './WizardContext'
 
 const stepLabels = [
-  'Child Info',
-  'Age',
-  'Good Behavior',
-  'To Improve',
-  'Goals',
-  'Message',
+  'Dziecko',
+  'Wiek',
+  'Pochwała',
+  'Poprawa',
+  'Cel',
+  'Wiadomość',
+  'Elfy',
 ]
 
 export default function ProgressBar() {

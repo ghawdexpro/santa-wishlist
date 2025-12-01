@@ -1,29 +1,9 @@
 'use client'
 
 import { useWizard } from './WizardContext'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 
 export default function Step6CustomMessage() {
-  const { data, updateData, prevStep } = useWizard()
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const handleSubmit = async () => {
-    setIsSubmitting(true)
-
-    try {
-      // Store data in sessionStorage for the script generation page
-      sessionStorage.setItem('pendingOrder', JSON.stringify(data))
-      // Clear any previously generated script
-      sessionStorage.removeItem('generatedScript')
-      sessionStorage.removeItem('scriptApproved')
-      router.push('/create/script')
-    } catch (error) {
-      console.error('Error submitting:', error)
-      setIsSubmitting(false)
-    }
-  }
+  const { data, updateData, prevStep, nextStep } = useWizard()
 
   return (
     <div className="max-w-xl mx-auto">
@@ -102,22 +82,10 @@ export default function Step6CustomMessage() {
           ← Wstecz
         </button>
         <button
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className={`btn-christmas px-8 py-3 flex items-center gap-2 ${
-            isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+          onClick={nextStep}
+          className="btn-christmas px-8 py-3 flex items-center gap-2"
         >
-          {isSubmitting ? (
-            <>
-              <span className="animate-spin">⏳</span>
-              Przetwarzanie...
-            </>
-          ) : (
-            <>
-              Sprawdź i kontynuuj <span className="text-xl">🎅</span>
-            </>
-          )}
+          Następny krok <span className="text-xl">→</span>
         </button>
       </div>
     </div>

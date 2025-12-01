@@ -8,6 +8,7 @@ import Step3GoodBehavior from './Step3GoodBehavior'
 import Step4Improve from './Step4Improve'
 import Step5Learn from './Step5Learn'
 import Step6CustomMessage from './Step6CustomMessage'
+import Step7RoomPhoto from './Step7RoomPhoto'
 
 export default function CreateWizard() {
   const { currentStep } = useWizard()
@@ -26,6 +27,8 @@ export default function CreateWizard() {
         return <Step5Learn />
       case 6:
         return <Step6CustomMessage />
+      case 7:
+        return <Step7RoomPhoto />
       default:
         return <Step1ChildInfo />
     }
