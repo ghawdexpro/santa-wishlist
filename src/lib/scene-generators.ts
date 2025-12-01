@@ -28,53 +28,62 @@ export interface SceneGenerationRequest {
 const USE_HEYGEN_FOR_SCENE_6 = process.env.USE_HEYGEN_FOR_SCENE_6 !== 'false'
 
 /**
- * SCENE 5: Name Reveal
- * Generate keyframe with child's name in golden 3D letters, then animate with Veo
+ * SCENE 5: Name Over Malta
+ * Generate keyframe with child's name in golden 3D letters over Valletta skyline, then animate with Veo
+ * Part of Il-Milied Magic - Santa's Maltese Adventure
  */
 export async function generateScene5NameReveal(childData: SceneGenerationRequest): Promise<string> {
-  console.log(`[Scene5] Generating Name Reveal for ${childData.childName}`)
+  console.log(`[Scene5] Generating Name Over Malta for ${childData.childName}`)
 
   try {
     // Step 1: Generate keyframe with NanoBanana
-    const keyframePrompt = `CINEMATIC VFX INSTRUCTION - Scene 5: Name Reveal
+    const keyframePrompt = `CINEMATIC VFX INSTRUCTION - Scene 5: Name Over Malta
 
-MAGICAL NAME REVEAL MOMENT
-Santa's workshop, magical atmosphere. Golden Christmas decorations glow with warm light.
+THE NAME REVEAL - Over the Maltese Skyline!
+
+BACKGROUND SETTING:
+- VALLETTA SKYLINE at dusk, Grand Harbour visible below
+- Iconic domes of St. John's Co-Cathedral and Carmelite Church silhouetted
+- Mediterranean sunset colors - warm orange, pink, and purple blending
+- Ancient bastions and fortifications along the horizon
+- Azure Mediterranean Sea in the distance
+- The THREE ISLANDS of Malta, Gozo, and Comino visible in the background
 
 VISUAL FOCUS:
-Massive, three-dimensional GOLDEN LETTERS appear floating and slowly rotating in the magical workshop air.
-The letters spell: "${childData.childName.toUpperCase()}"
+From below, letters begin to RISE UP over the Maltese capital:
+"${childData.childName.toUpperCase()}" forms in GIANT 3D GOLDEN LETTERS!
 
 LETTER CHARACTERISTICS:
-- Made of gleaming, solid GOLD with metallic shine
-- Each letter is MASSIVE, filling the frame
-- Letters float and rotate slowly in space
-- Surrounded by magical golden sparkles
-- Bright, warm golden light illuminates the letters
-- Subtle glow/halo effect around each letter
-- Christmas decoration bokeh in background
+- Made of luminous, solid GOLD with metallic Mediterranean shine
+- Each letter is MASSIVE, floating majestically over the harbour
+- Letters hover and spin slowly above Valletta's skyline
+- Surrounded by golden sparkles and magical light trails
+- Casting golden reflections on the Mediterranean waters below
+- Stars beginning to appear around the floating name
+- Warm honey-colored glow matching Maltese limestone
 
 ATMOSPHERE:
-- Santa in background, watching with delight and amazement
-- Workshop setting: magical tools, twinkling lights, cozy warmth
-- Golden particles floating in the air
-- Ethereal, magical, joyful atmosphere
+- Mediterranean dusk magic
+- Golden hour warmth meeting twilight stars
+- Local pride - Maltese landmarks as backdrop
+- Magical, awe-inspiring, personal
+- "${childData.childName.toUpperCase()}!" exclaims Santa with joy
 
 EMOTION:
-- This is the BIG REVEAL moment
-- Pure joy and wonder
-- "THAT'S MY NAME!!!" feeling
-- Empowerment and excitement
+- "MY NAME over MY country!" feeling
+- Personalized magic meets local pride
+- Spectacular, proud, wonder-filled
+- This is THEIR moment over THEIR islands
 
 TECHNICAL REQUIREMENTS:
 - Aspect ratio: 16:9
-- Cinematic quality
-- Warm golden color palette
-- Particles and sparkles
-- Depth and dimension
+- Cinematic quality, epic scale
+- Mediterranean sunset palette with golden letters
+- Particle effects and sparkle trails
+- Depth showing Valletta architecture below
 - Fantasy/magical VFX style
 
-This is a premium moment from a $59+ personalized Santa video.`
+This is the premium name reveal from Il-Milied Magic - Santa's Maltese Adventure.`
 
     const keyframeRequest: KeyframeRequest = {
       prompt: keyframePrompt,
@@ -84,10 +93,12 @@ This is a premium moment from a $59+ personalized Santa video.`
     const keyframeResult = await generateKeyframe(keyframeRequest)
 
     // Step 2: Animate keyframe with Veo (max 8 seconds)
-    const videoPrompt = `Animate the golden 3D name "${childData.childName.toUpperCase()}"
-floating in Santa's magical workshop. Letters slowly rotate and glow with warm golden light.
-Magical sparkles surround the name. Santa watches with joy in the background.
-Warm, cozy workshop lighting. Pure magic and wonder. Premium cinematic quality.`
+    const videoPrompt = `Animate giant 3D golden letters "${childData.childName.toUpperCase()}"
+rising and floating majestically over Valletta skyline at Mediterranean sunset.
+Letters spin slowly, casting golden light over Grand Harbour and ancient bastions.
+Magical sparkles trail behind the letters. Stars appear in the twilight sky.
+Warm orange and pink sunset colors blend with golden letter glow.
+Epic, proud, magical reveal over Malta. Premium cinematic quality.`
 
     const videoRequest: VideoGenerationRequest = {
       prompt: videoPrompt,
@@ -119,7 +130,7 @@ Warm, cozy workshop lighting. Pure magic and wonder. Premium cinematic quality.`
  */
 export async function generateScene6SantasMessage(
   childData: SceneGenerationRequest
-): Promise<{ type: 'heygen' | 'veo'; value: string; duration?: number }> {
+): Promise<Scene6Result> {
   console.log(`[Scene6] Generating Santa's Message for ${childData.childName}`)
   console.log(`[Scene6] Using ${USE_HEYGEN_FOR_SCENE_6 ? 'HeyGen (premium)' : 'Veo (basic)'} mode`)
 
@@ -286,50 +297,74 @@ Santa nods gently, radiating warmth and care. Premium cinematic quality.`
 }
 
 /**
- * SCENE 8: Epic Launch
- * Generate keyframe with personalized goodbye, then animate with Veo
+ * SCENE 8: Epic Launch Over Malta
+ * Generate keyframe with sleigh launching from Mdina over three islands, then animate with Veo
+ * Part of Il-Milied Magic - Santa's Maltese Adventure
  */
 export async function generateScene8EpicLaunch(childData: SceneGenerationRequest): Promise<string> {
-  console.log(`[Scene8] Generating Epic Launch for ${childData.childName}`)
+  console.log(`[Scene8] Generating Epic Launch Over Malta for ${childData.childName}`)
 
   try {
     // Step 1: Generate keyframe with NanoBanana
-    const keyframePrompt = `CINEMATIC VFX INSTRUCTION - Scene 8: Epic Launch
+    const keyframePrompt = `CINEMATIC VFX INSTRUCTION - Scene 8: Epic Launch Over Malta
 
-SPECTACULAR SLEIGH LAUNCH MOMENT
-Nighttime, starlit sky. Santa's magical sleigh launches into the Christmas night.
+THE EPIC FINALE - Launch from Mdina over Malta!
 
-VISUAL ELEMENTS:
-1. Santa's golden sleigh soars upward into the starry night sky
-2. Magical reindeer in powerful flight, silhouetted against stars
-3. Celestial panorama: stars, planets, aurora-like glow
-4. Golden magical trail of light and sparkles behind the sleigh
-5. Meteors or shooting stars streaking across the sky
-6. "${childData.childName}" appears written in GLOWING STARS in the constellation
+LAUNCH SETTING:
+- Exterior: MDINA'S ANCIENT RAMPARTS at night
+- The magnificent RED AND GOLD SLEIGH on ancient limestone battlements
+- Honey-colored Maltese stone walls glowing with torchlight
+- Mediterranean starlit sky above
+
+SLEIGH AND REINDEER:
+- Santa in his red suit takes seat in the golden sleigh
+- Eight MAJESTIC REINDEER harnessed and eager
+- RUDOLPH at the front, nose BLAZING bright red, casting red glow on ancient stone
+- Sleigh piled HIGH with beautifully wrapped presents
+- Cheerful elves waving from the ancient ramparts
+
+THE LAUNCH:
+- Reindeer LEAP into action with powerful upward thrust!
+- Sleigh ROCKETS UPWARD from the ancient Maltese walls!
+- A magnificent GOLDEN RAINBOW TRAIL streams behind
+- Golden stardust and magical sparkles swirl in the wake
+
+BELOW THE SLEIGH:
+- The THREE ISLANDS OF MALTA spread out below
+- MALTA - the main island with Valletta's twinkling lights
+- GOZO - the green sister island with Citadel visible
+- COMINO - tiny island with Blue Lagoon reflecting moonlight
+- Christmas lights sparkling from villages across all islands
+- Azure Mediterranean Sea glowing with moonlight and starlight
+
+THE PERSONALIZED MOMENT:
+- In the starlit sky, "${childData.childName.toUpperCase()}" appears written as a GLOWING CONSTELLATION!
+- The name sparkles with golden light among the stars
+- A heart-shaped AURORA forms over the Mediterranean
+- Santa waves back: "See you soon, ${childData.childName}! Merry Christmas from Malta!"
 
 ATMOSPHERE:
-- Epic, adventurous, magical farewell moment
-- Warm golden lights from sleigh against cool night sky
-- Cozy, yet adventurous feeling
-- Christmas magic in full force
-- "See you soon!" energy
+- Epic, triumphant, magical farewell over Malta
+- Warm golden sleigh lights against cool Mediterranean night
+- The promise of Christmas coming to the islands
+- Exhilarating, joyful, unforgettable
 
 EMOTION:
-- Epic conclusion to the adventure
-- "BYE SANTA!" excitement
-- Wonder and magic
+- "GO GO GO!" excitement
+- Perfect Maltese ending
+- Local pride meets Christmas magic
 - Anticipation for Christmas morning
-- Grateful, happy, magical
+- Memorable farewell from their own islands
 
 TECHNICAL REQUIREMENTS:
 - Aspect ratio: 16:9
-- Cinematic, cinematic quality
-- Night sky color palette with golden warm lights
-- Particle effects and light trails
-- Epic scope and scale
+- Cinematic quality, epic scale
+- Night sky with Mediterranean blue tones
+- Golden light trails and magical particles
+- Epic scope showing all three islands below
 - Fantasy/magical VFX style
 
-This is the epic finale of a premium $59+ personalized Santa video.`
+This is the epic finale of Il-Milied Magic - Santa's Maltese Adventure.`
 
     const keyframeRequest: KeyframeRequest = {
       prompt: keyframePrompt,
@@ -339,11 +374,13 @@ This is the epic finale of a premium $59+ personalized Santa video.`
     const keyframeResult = await generateKeyframe(keyframeRequest)
 
     // Step 2: Animate keyframe with Veo (max 8 seconds)
-    const videoPrompt = `Epic cinematic animation: Santa's golden sleigh launches into the starry Christmas night sky.
-Magical reindeer in powerful flight. Golden light trail behind the sleigh.
-${childData.childName}'s name appears glowing in the stars.
-Stars, planets, and magical aurora. Shooting stars and celestial effects.
-Warm golden light contrasts with cool night sky. Premium cinematic quality.`
+    const videoPrompt = `Epic cinematic animation: Santa's golden sleigh LAUNCHES from ancient Mdina ramparts into starlit Mediterranean sky!
+Reindeer in powerful upward flight, Rudolph's red nose blazing.
+Golden rainbow trail streams behind over the THREE ISLANDS OF MALTA below.
+${childData.childName.toUpperCase()} appears as glowing constellation letters in the stars.
+Heart-shaped aurora forms over the Mediterranean Sea.
+Christmas lights twinkle from Maltese villages below.
+Warm golden sleigh glow against cool Mediterranean night. Premium cinematic quality.`
 
     const videoRequest: VideoGenerationRequest = {
       prompt: videoPrompt,

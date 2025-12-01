@@ -335,7 +335,8 @@ export async function listVoices(): Promise<HeyGenVoice[]> {
 
 /**
  * Build Scene 6 script for a child
- * Creates a personalized Santa message in Polish
+ * Creates a personalized Santa message in English for Malta
+ * Part of Il-Milied Magic - Santa's Maltese Adventure
  *
  * @param childName - Child's name
  * @param age - Child's age
@@ -358,25 +359,26 @@ export function buildScene6Script(
     return customScript
   }
 
-  // Default Polish script template
-  return `Ho ho ho! Witaj, kochane dziecko ${childName}!
+  // Default English script template for Malta
+  return `Ho ho ho! Hello there, ${childName}!
 
-Tak, tak... właśnie patrzę na swoją wielką, magiczną listę,
-i widzę twoje imię! ${childName}, lat ${age}.
+Yes, yes... I'm looking at my special book right here in my secret study in Mdina,
+and I can see your name shining bright! ${childName}, age ${age}.
 
-Wiesz co? Widziałem jak ${goodBehavior}.
-To było naprawdę wspaniałe! Elfy opowiadały mi o tym przez cały tydzień!
+You know what made me really happy? When you ${goodBehavior}.
+That was wonderful! My elves have been talking about it all week!
 
-Pamiętaj też, że ${thingToImprove}.
-Wiem, że dasz radę, bo jesteś wyjątkowym dzieckiem!
+I also know that ${thingToImprove}.
+I believe in you completely - you're such a special child!
 
-A wiesz co jeszcze? Słyszałem, że chcesz się nauczyć ${thingToLearn}.
-To świetny pomysł! Może znajdziesz coś związanego z tym pod choinką...
+And I heard you want to learn ${thingToLearn}!
+What a brilliant idea! Maybe check under the tree...
 
-Pamiętaj, kochanie - bądź grzeczny, słuchaj rodziców,
-i nigdy nie przestawaj wierzyć w magię Świąt!
+Remember, dear ${childName} - be kind, listen to your parents,
+and never stop believing in Christmas magic!
 
-Do zobaczenia w Wigilię! Ho ho ho!`
+I'll be flying over Malta, Gozo, and Comino very soon!
+Merry Christmas from Mdina! Ho ho ho!`
 }
 
 // Utility function

@@ -54,56 +54,60 @@ export async function generateSantaScript(data: {
   thingToLearn: string
   customMessage?: string
 }): Promise<GeneratedScript> {
-  const prompt = `Jesteś scenarzystą magicznych, spersonalizowanych filmów od Świętego Mikołaja dla polskich dzieci.
-Stwórz ciepły, odpowiedni dla wieku scenariusz, w którym Mikołaj przemawia bezpośrednio do dziecka.
+  const prompt = `You are a scriptwriter for magical, personalized Santa videos for children in Malta.
+Create a warm, age-appropriate script where Santa speaks directly to the child.
 
-INFORMACJE O DZIECKU:
-- Imię: ${data.childName}
-- Wiek: ${data.childAge} lat
-- Dobre zachowanie do pochwały: ${data.goodBehavior}
-- Obszar do delikatnej poprawy: ${data.thingToImprove}
-- Cel do zachęty: ${data.thingToLearn}
-${data.customMessage ? `- Wiadomość od rodziców: ${data.customMessage}` : ''}
+STORY CONTEXT:
+This is "Il-Milied Magic" - Santa's Maltese Adventure. Santa has a secret workshop hidden in the ancient
+city of Mdina, the Silent City of Malta. His magic compass led him to this special child on the beautiful
+islands of Malta, Gozo, and Comino.
 
-WYMAGANIA SCENARIUSZA:
-1. Całkowita długość: około 90 sekund
-2. Mikołaj powinien być ciepły, wesoły i zachęcający - NIGDY nie karci
-3. Użyj imienia dziecka naturalnie (3-4 razy)
-4. Język odpowiedni dla ${data.childAge}-latka
-5. Buduj emocjonalną więź - to ma być magiczne dla dziecka
-6. Zakończ podekscytowaniem Świętami i ciepłym pożegnaniem
+CHILD INFORMATION:
+- Name: ${data.childName}
+- Age: ${data.childAge} years old
+- Good behavior to praise: ${data.goodBehavior}
+- Area for gentle encouragement: ${data.thingToImprove}
+- Goal to support: ${data.thingToLearn}
+${data.customMessage ? `- Parent's message: ${data.customMessage}` : ''}
 
-STRUKTURA SCEN (dokładnie w tej kolejności):
-- Scena 1: Mikołaj w domu, powitanie (premade, ~8 sec)
-- Scena 2: Mikołaj otwiera Listę Grzecznych, znajduje imię dziecka (spersonalizowana, ~10 sec)
-- Scena 3: Mikołaj chciał dobre zachowanie konkretnie (spersonalizowana, ~12 sec)
-- Scena 4: Mikołaj delikatnie zachęca do poprawy (spersonalizowana, ~10 sec)
-- Scena 5: Mikołaj zachęca cel/naukę (spersonalizowana, ~10 sec)
-- Scena 6: Mikołaj wspomina o przygotowaniu czegoś specjalnego (przejście, ~8 sec)
-- Scena 7: Szybka scena domu z pomocnikami (premade, ~5 sec)
-- Scena 8: Mikołaj obiecuje odwiedzić na Wigilię (spersonalizowana, ~10 sec)
-- Scena 9: Ciepłe pożegnanie Mikołaja z imieniem dziecka (spersonalizowana, ~10 sec)
-- Scena 10: Ostateczne świąteczne "Ho Ho Ho!" (premade, ~7 sec)
+SCRIPT REQUIREMENTS:
+1. Total length: approximately 90 seconds
+2. Santa should be warm, jolly, and encouraging - NEVER scolds
+3. Use the child's name naturally (3-4 times)
+4. Language appropriate for a ${data.childAge}-year-old
+5. Build emotional connection - this should feel magical
+6. Reference Malta/Mediterranean setting naturally
+7. End with excitement for Christmas and a warm farewell
 
-Zwróć TYLKO valid JSON w tym dokładnie formacie:
+SCENE STRUCTURE (in this exact order):
+- Scene 1: Aerial over Malta islands (premade, ~8 sec)
+- Scene 2: Through Mdina's ancient streets (premade, ~8 sec)
+- Scene 3: Santa finds child in Magic Book (premade, ~8 sec)
+- Scene 4: Child's photo appears in book (personalized, ~8 sec)
+- Scene 5: Child's name reveals over Valletta (personalized, ~8 sec)
+- Scene 6: Santa's personal message (personalized, ~45 sec - HeyGen)
+- Scene 7: Santa prepares on Mdina ramparts (premade, ~8 sec)
+- Scene 8: Epic sleigh launch over Malta (personalized, ~8 sec)
+
+Return ONLY valid JSON in this exact format:
 {
   "childName": "${data.childName}",
-  "totalDuration": "~90 sekund",
+  "totalDuration": "~93 seconds",
   "scenes": [
     {
       "sceneNumber": 1,
-      "title": "Powitanie w Domu",
+      "title": "Three Islands Reveal",
       "duration": "8 sec",
-      "setting": "Przytulny dom Świętego Mikołaja z zabawkami i ciepłym oświetleniem",
-      "santaDialogue": "Ho ho ho! Cze ść, ${data.childName}! Witaj w moim domu na Biegunie Północnym!",
-      "visualDescription": "Mikołaj siedzący na wielkim fotelu, kominek w tle, zabawki widoczne",
-      "emotionalTone": "Ciepły, przyjazny, wesoły",
+      "setting": "Aerial view over Malta, Gozo, and Comino at sunset",
+      "santaDialogue": "",
+      "visualDescription": "Epic aerial sweep over the three Maltese islands at golden hour",
+      "emotionalTone": "Awe-inspiring, beautiful, local pride",
       "isPremade": true
     }
   ]
 }
 
-Wygeneruj wszystkie 10 scen z spersonalizowanym dialogiem. Niech to będzie magiczne!`
+Generate all 8 scenes with personalized dialogue for scenes 4-6 and 8. Make it magical!`
 
   const accessToken = await getAccessToken()
 
@@ -167,74 +171,80 @@ export async function generateMultiChildScript(data: {
   }>
   customMessage?: string
 }): Promise<GeneratedScript> {
-  const childrenList = data.children.map(c => `${c.name} (${c.age} lat)`).join(', ')
+  const childrenList = data.children.map(c => `${c.name} (${c.age} years old)`).join(', ')
   const childrenCount = data.children.length
 
-  const prompt = `Jesteś scenarzystą magicznych filmów od Świętego Mikołaja dla polskich dzieci.
-Stwórz scenariusz dla GRUPY DZIECI w jednym wideo. Całość będzie ciepła, magiczna i spersonalizowana dla każdego dziecka.
+  const prompt = `You are a scriptwriter for magical Santa videos for children in Malta.
+Create a script for MULTIPLE CHILDREN in one video. The entire video should be warm, magical, and personalized for each child.
 
-DZIECI W WIDEO:
-${data.children.map((c, i) => `${i + 1}. ${c.name} (${c.age} lat)
-   - Dobre zachowanie: ${c.goodBehavior}
-   - Do poprawy: ${c.thingToImprove}
-   - Do nauki: ${c.thingToLearn}`).join('\n')}
+STORY CONTEXT:
+This is "Il-Milied Magic" - Santa's Maltese Adventure. Santa has a secret workshop hidden in Mdina,
+the ancient Silent City of Malta. His magic compass led him to discover these special children on the
+beautiful islands of Malta, Gozo, and Comino.
 
-STRUKTURA FILMU (8 scen):
-- Scena 1: Sky Dive - Premade (brak dialogu, tylko animacja)
-- Scena 2: Workshop - Premade (brak dialogu)
-- Scena 3: Book Magic - Premade (brak dialogu)
-- Scena 4: Photo Comes Alive - Dla każdego dziecka osobna wersja (krótki dialog Mikołaja)
-- Scena 5: Name Reveal - Dla każdego dziecka osobna wersja (Mikołaj obwieszcza imię)
-- Scena 6: Santa's Message - Dla każdego dziecka osobna wersja (personalizowana wiadomość Mikołaja, ~25 sekund)
-- Scena 7: Sleigh Ready - Premade (brak dialogu)
-- Scena 8: Epic Launch - Dla każdego dziecka osobna wersja (personalizowane pożegnanie)
+CHILDREN IN VIDEO:
+${data.children.map((c, i) => `${i + 1}. ${c.name} (${c.age} years old)
+   - Good behavior: ${c.goodBehavior}
+   - To improve: ${c.thingToImprove}
+   - To learn: ${c.thingToLearn}`).join('\n')}
 
-WYMAGANIA:
-1. Każde dziecko powinno czuć się specjalne
-2. Mikołaj powinien być ciepły, wesoły i zachęcający - NIGDY nie karci
-3. Używaj imion naturalnie
-4. Język odpowiedni dla każdego wieku
-5. Buduj emocjonalną więź
-6. Sceny personalizowane powinny być niezależne (każde dziecko może zobaczyć swoją część osobno jeśli trzeba)
+VIDEO STRUCTURE (8 scenes):
+- Scene 1: Three Islands Reveal - Premade (no dialogue, aerial over Malta)
+- Scene 2: Mdina Silent City - Premade (no dialogue, magical ancient streets)
+- Scene 3: Book of Maltese Children - Premade (no dialogue, magic book opens)
+- Scene 4: Photo Discovery - One version per child (short Santa dialogue)
+- Scene 5: Name Over Malta - One version per child (Santa announces name over Valletta)
+- Scene 6: Santa's Message - One version per child (personalized HeyGen message, ~45 seconds)
+- Scene 7: Sleigh on Mdina Ramparts - Premade (no dialogue)
+- Scene 8: Epic Launch Over Malta - One version per child (personalized farewell)
 
-Zwróć TYLKO valid JSON zawierający:
-- Ogólne informacje o wideo
-- Dialogi dla każdego dziecka w scenach 4, 5, 6, 8
-- Format dla każdego dziecka: krótkie, naturalne, magiczne dialogi
+REQUIREMENTS:
+1. Each child should feel special
+2. Santa should be warm, jolly, and encouraging - NEVER scolds
+3. Use names naturally
+4. Age-appropriate language for each child
+5. Build emotional connection
+6. Personalized scenes should be independent (each child can see their part separately if needed)
+7. Reference Malta/Mediterranean setting naturally
 
-Format JSON:
+Return ONLY valid JSON containing:
+- General video information
+- Dialogue for each child in scenes 4, 5, 6, 8
+- Format: short, natural, magical dialogues
+
+JSON Format:
 {
   "childrenNames": [${data.children.map(c => `"${c.name}"`).join(', ')}],
-  "totalDuration": "~${90 + (childrenCount - 1) * 90} sekund",
+  "totalDuration": "~${93 + (childrenCount - 1) * 69} seconds",
   "scenes": [
     {
       "sceneNumber": 1,
-      "title": "Sky Dive",
-      "duration": "12 sec",
-      "setting": "Świąteczne niebo z efektami animacji",
+      "title": "Three Islands Reveal",
+      "duration": "8 sec",
+      "setting": "Aerial view over Malta, Gozo, and Comino at sunset",
       "santaDialogue": "",
-      "visualDescription": "Magiczny skok paralotnią przez chmury zaśnieżone",
-      "emotionalTone": "Epicka, pełna przygody",
+      "visualDescription": "Epic aerial sweep over the three Maltese islands at golden hour",
+      "emotionalTone": "Awe-inspiring, beautiful, local pride",
       "isPremade": true
     },
     {
       "sceneNumber": 2,
-      "title": "Workshop",
-      "duration": "12 sec",
-      "setting": "Warsztat Mikołaja na Biegunie Północnym",
+      "title": "Mdina Silent City",
+      "duration": "8 sec",
+      "setting": "Ancient streets of Mdina at Christmas",
       "santaDialogue": "",
-      "visualDescription": "Magiczny warsztat z pomocnikami i zabawkami",
-      "emotionalTone": "Ciepły, magiczny",
+      "visualDescription": "Camera glides through magical Mdina Gate and medieval streets",
+      "emotionalTone": "Enchanting, mysterious",
       "isPremade": true
     },
     {
       "sceneNumber": 3,
-      "title": "Book Magic",
-      "duration": "10 sec",
-      "setting": "Magiczna księga z imionami grzecznych dzieci",
+      "title": "Book of Maltese Children",
+      "duration": "8 sec",
+      "setting": "Santa's Mdina study with magic book",
       "santaDialogue": "",
-      "visualDescription": "Antyczna księga otwiera się, strony latają w powietrzu",
-      "emotionalTone": "Misteryjny, magiczny",
+      "visualDescription": "Ancient book 'Children of Malta' flies to Santa, golden light explodes",
+      "emotionalTone": "Magical, anticipation",
       "isPremade": true
     }
   ],
@@ -242,31 +252,31 @@ Format JSON:
     ${data.children.map(child => `"${child.name}": [
       {
         "sceneNumber": 4,
-        "title": "Photo Comes Alive",
-        "duration": "12 sec",
-        "santaDialogue": "Ah! Tam jesteś, ${child.name}! Twoje zdjęcie się ożywa!",
-        "visualDescription": "Zdjęcie ${child.name} pojawia się w magicznej księdze, zaczyna się animować"
+        "title": "Photo Discovery",
+        "duration": "8 sec",
+        "santaDialogue": "Ah! There you are, ${child.name}! I found you in my magic book!",
+        "visualDescription": "${child.name}'s photo appears in Maltese cross frame, comes alive with sparkles"
       },
       {
         "sceneNumber": 5,
-        "title": "Name Reveal",
-        "duration": "10 sec",
-        "santaDialogue": "${child.name.toUpperCase()}!",
-        "visualDescription": "Imię ${child.name} pojawia się jako złote litery unoszące się w powietrzu"
+        "title": "Name Over Malta",
+        "duration": "8 sec",
+        "santaDialogue": "${child.name.toUpperCase()}! What a wonderful child from Malta!",
+        "visualDescription": "${child.name}'s name rises as golden letters over Valletta skyline"
       },
       {
         "sceneNumber": 6,
-        "title": "Santa's Message",
-        "duration": "25 sec",
-        "santaDialogue": "Drogi ${child.name}, byłem bardzo dumny z Twojego dobrego zachowania: ${child.goodBehavior}. Chciałbym, żebyś popracował nad: ${child.thingToImprove}. A może nauczysz się: ${child.thingToLearn}? Mam dla Ciebie coś specjalnego na Wigilię!",
-        "visualDescription": "Mikołaj mówi bezpośrednio do kamery, ciepły, osobisty moment"
+        "title": "Santa's Personal Message",
+        "duration": "45 sec",
+        "santaDialogue": "Ho ho ho! Hello there, ${child.name}! I've been watching over the children of Malta, and you are truly special. I was so proud when I saw you ${child.goodBehavior}. That was wonderful! I also know that ${child.thingToImprove}. I believe in you completely! And I heard you want to learn ${child.thingToLearn}. What a brilliant idea! Maybe check under the tree... Remember, dear ${child.name}, be kind and never stop believing in Christmas magic! See you soon! Ho ho ho!",
+        "visualDescription": "Santa speaks directly to camera in his Mdina study, warm and personal"
       },
       {
         "sceneNumber": 8,
-        "title": "Epic Launch",
-        "duration": "10 sec",
-        "santaDialogue": "Do zobaczenia soon, ${child.name}! Wesołych Świąt!",
-        "visualDescription": "Sanie Mikołaja wzlatują w nocne niebo, imię ${child.name} pojawia się w gwiazdach"
+        "title": "Epic Launch Over Malta",
+        "duration": "8 sec",
+        "santaDialogue": "See you soon, ${child.name}! Merry Christmas from Malta! Ho ho ho!",
+        "visualDescription": "Sleigh launches from Mdina ramparts, ${child.name}'s name appears in stars over the three islands"
       }
     ]`).join(',\n    ')}
   }

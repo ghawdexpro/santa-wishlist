@@ -1,11 +1,12 @@
 /**
- * Scene definitions for The Santa Experience - "The Brightest Star"
+ * Scene definitions for Il-Milied Magic - Santa's Maltese Adventure
  *
- * 8-scene structure (~64 seconds total for 1 child):
+ * 8-scene structure (~93 seconds total for 1 child):
  * - PRE-MADE (1, 2, 3, 7): Generate once, reuse forever (32s total)
- * - PERSONALIZED (4, 5, 6, 8): Generate per order with child's data (32s per child)
+ * - PERSONALIZED (4, 5, 6, 8): Generate per order with child's data (~61s per child with HeyGen)
  *
  * NOTE: Veo 3.1 supports max 8 seconds per generation (5-8s range)
+ * Scene 6 uses HeyGen for 30-60s talking Santa avatar
  */
 
 export interface SceneConfig {
@@ -18,10 +19,11 @@ export interface SceneConfig {
   audioDescription: string
 }
 
-// Cinematic quality settings for Veo
+// Cinematic quality settings for Veo - Mediterranean warmth
 const CINEMATIC_STYLE = `Cinematic quality, 4K resolution, professional Hollywood film lighting,
-shallow depth of field, warm color grading, smooth camera movement,
-photorealistic rendering, no artifacts, seamless motion, Pixar-quality magic.`
+warm Mediterranean color grading, golden hour warmth, smooth camera movement,
+photorealistic rendering, no artifacts, seamless motion, Pixar-quality magic,
+honey-colored Maltese limestone tones, azure Mediterranean blue waters.`
 
 const SANTA_CHARACTER = `Santa Claus: distinguished elderly man in his 60s,
 full natural white beard perfectly groomed, rosy cheeks glowing with warmth,
@@ -29,12 +31,15 @@ kind twinkling blue eyes with crow's feet from smiling, genuine warm smile,
 classic red velvet suit with pristine white fur trim, polished black leather belt with ornate gold buckle,
 soft gentle demeanor like a beloved grandfather, magical presence.`
 
-const WORKSHOP_SETTING = `Santa's private study in the North Pole workshop:
-Warm honey-colored wood paneling, magnificent stone fireplace with crackling orange flames,
+const MALTA_SETTING = `Santa's secret study hidden within Mdina's ancient walls:
+Warm honey-colored Maltese limestone walls with high vaulted ceiling,
+magnificent stone fireplace with crackling orange flames,
 antique leather wingback chair in deep burgundy, ornate wooden desk covered in letters,
-shelves lined with antique toys and snow globes, frosted windows showing gentle snowfall outside,
+shelves lined with antique toys and Mediterranean treasures,
+arched windows showing starlit Maltese night sky,
 warm golden ambient lighting from oil lamps and candles, magical dust particles floating in air,
-Christmas garlands with golden bells, the cozy intimate feeling of a treasured family room.`
+subtle Maltese cross decorations, traditional colorful tiles on floor,
+the cozy intimate feeling of an ancient Mediterranean palace room.`
 
 // ============================================================================
 // PRE-MADE SCENES (4 total) - Generate once, reuse for all orders
@@ -43,86 +48,87 @@ Christmas garlands with golden bells, the cozy intimate feeling of a treasured f
 export const PREMADE_SCENES: SceneConfig[] = [
   {
     sceneNumber: 1,
-    name: 'Sky Dive',
-    description: 'Epic fly-through clouds into North Pole like roller coaster',
+    name: 'Three Islands Reveal',
+    description: 'Epic aerial journey over Malta, Gozo, and Comino at golden hour',
     durationSeconds: 8, // Veo max
     type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
-EPIC OPENING - Thrilling aerial journey to the North Pole.
+EPIC OPENING - Soaring over the Maltese Islands.
 
-Camera POV flying through a magical winter night sky at high speed.
-Starting above the clouds, stars twinkling brilliantly all around.
-DIVE DOWN through layers of fluffy clouds, like a roller coaster drop.
-Pass through spectacular AURORA BOREALIS - ribbons of green and purple light dancing.
-Magical sparkles and stardust trail behind the camera as it moves.
-Speed increases - WHOOSH through more clouds with motion blur.
-Snowflakes whip past the camera.
-Finally break through the last cloud layer to reveal:
-The magnificent NORTH POLE VILLAGE below - hundreds of warm glowing windows,
-snow-covered rooftops, candy cane lampposts, giant Christmas tree in the center,
-all nestled in a snowy valley surrounded by snow-capped mountains.
-Camera continues diving toward the largest building - Santa's Workshop.
+Camera POV flying over the Mediterranean Sea at golden hour sunset.
+Starting high above azure blue waters, golden sunlight sparkling on waves.
+SWEEP DOWN toward the THREE ISLANDS OF MALTA visible below.
+The islands glow warm in the Mediterranean sunset light.
+MALTA - the main island with Valletta's iconic domes and bastions visible.
+GOZO - the sister island with green hills and the Citadel.
+COMINO - the tiny island with the famous turquoise BLUE LAGOON sparkling.
+Magical golden sparkles and stardust trail behind the camera.
+Christmas lights twinkling from villages across all three islands.
+Ancient watchtowers and fortifications dot the golden limestone coastline.
+Camera continues toward MDINA - the ancient Silent City on a hilltop.
+The walled city glows mysteriously in the fading light.
 
-Camera: First-person POV, dynamic movement, roller-coaster energy, diving motion.
-VFX: Particle trails, lens flares, speed blur, aurora effects, magical sparkles.
-Mood: EXCITING, thrilling, "WOOOAH!", sense of magic and wonder.`,
-    audioDescription: 'Whooshing wind, magical chimes building, orchestral crescendo, sleigh bells distant',
+Camera: First-person POV, sweeping cinematic movement, majestic and warm.
+VFX: Golden particle trails, lens flares, Mediterranean light reflections, magical sparkles.
+Mood: BEAUTIFUL, awe-inspiring, "That's MY home!", local pride and wonder.`,
+    audioDescription: 'Warm Mediterranean wind, magical chimes building, orchestral swell, distant church bells',
   },
   {
     sceneNumber: 2,
-    name: 'Workshop Wonder',
-    description: 'Inside magical workshop with flying toys and acrobatic elves',
+    name: 'Mdina Silent City',
+    description: 'Magical descent through the ancient streets of the Silent City',
     durationSeconds: 8, // Veo max
     type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
-MAGICAL WORKSHOP - Pure wonder and spectacle.
+MDINA MAGIC - The Silent City at Christmas.
 
-Interior of Santa's magnificent toy workshop - a massive space full of magic.
-Toys FLYING through the air - teddy bears, toy trains, dolls, robots.
-Toys ASSEMBLING THEMSELVES mid-flight - pieces spinning together with sparkles.
-Conveyor belts carrying beautifully wrapped presents with glowing ribbons.
-Cheerful ELVES in green and red outfits:
-- Some doing ACROBATIC FLIPS between workstations
-- Others riding on flying toys
-- Some painting toys with magical brushes that leave rainbow trails
-Giant candy canes as pillars, gingerbread trim on railings.
-Snow globes the size of beach balls floating and spinning.
-Christmas lights EVERYWHERE - twinkling in rainbow patterns.
-Golden sparkles and magical dust filling the air.
-Warm lighting from countless candles and magical orbs.
+Camera glides through the iconic MDINA GATE at dusk.
+Ancient honey-colored MALTESE LIMESTONE walls glow warm gold.
+Narrow medieval streets lit by warm lanterns and Christmas lights.
+Baroque architecture with ornate balconies (gallariji) decorated for Christmas.
+Golden garlands wrapping around ancient stone pillars.
+Fairy lights twinkling in arched doorways and windows.
+Red velvet ribbons on ornate wooden doors.
+The magnificent ST. PAUL'S CATHEDRAL dome visible against purple twilight sky.
+Gentle MAGICAL SNOWFLAKES begin to fall (artistic Christmas touch).
+Santa's shadow passes over the ancient cobblestones.
+A mysterious GOLDEN GLOW emanates from a palace archway ahead.
+Camera enters through the ancient archway toward the light...
 
-Camera: Sweeping crane shot through the workshop, following a flying toy.
-VFX: Floating objects, magic sparkles, glowing trails, busy magical motion.
-Mood: "SO COOL!", wonder, childhood dream come true, pure magic.`,
-    audioDescription: 'Cheerful workshop sounds, magical chimes, elf laughter, toy sounds, joyful music',
+Camera: Smooth gliding movement through narrow streets, intimate and magical.
+VFX: Appearing Christmas decorations, magical snow, warm golden glows.
+Mood: ENCHANTING, mysterious, "This is magical!", ancient wonder meets Christmas.`,
+    audioDescription: 'Soft footsteps on stone, magical chimes, distant cathedral bells, warm mysterious music',
   },
   {
     sceneNumber: 3,
-    name: 'Book Magic',
-    description: 'Santa uses telekinesis to summon the Magic Book with golden light explosion',
+    name: 'Book of Maltese Children',
+    description: 'Santa summons his magic book with the children of Malta',
     durationSeconds: 8, // Veo max
     type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
-${WORKSHOP_SETTING}
+${MALTA_SETTING}
 
 ${SANTA_CHARACTER}
 
-SANTA'S MAGICAL POWERS revealed.
+SANTA'S MAGICAL POWERS revealed in his Maltese retreat.
 
-Santa sits in his cozy study by the crackling fireplace.
+Santa sits in his cozy Mdina study by the crackling fireplace.
 He looks toward camera with a knowing twinkle in his eye.
 Santa raises his hand with a MAGICAL GESTURE - fingers spread, gentle wave.
 Across the room, an ancient leather-bound book begins to GLOW golden.
-The book - THE NICE LIST - FLIES through the air toward Santa!
+The book cover shows "THE CHILDREN OF MALTA" in gold lettering.
+A MALTESE CROSS emblem adorns the leather binding.
+The book FLIES through the air toward Santa!
 Trails of golden sparkles follow the floating book.
 The book lands gently in Santa's hands.
 He opens it and GOLDEN LIGHT EXPLODES from the pages!
 Magical particles swirl up from the illuminated pages.
 Santa's face is bathed in warm golden light from below.
-Pages begin to flip by themselves, searching...
+Pages begin to flip by themselves, searching for someone special...
 Santa's expression shows anticipation and excitement.
 
 Camera: Medium shot of Santa, dramatic lighting from book's glow.
@@ -132,38 +138,39 @@ Mood: "He has POWERS!", real movie magic, wizardly Santa, awe-inspiring.`,
   },
   {
     sceneNumber: 7,
-    name: 'Sleigh Ready',
-    description: 'Santa walks to door revealing magnificent sleigh with reindeer',
+    name: 'Sleigh on Mdina Ramparts',
+    description: 'Santa walks to door revealing sleigh on ancient Mdina battlements',
     durationSeconds: 8, // Veo max
     type: 'premade',
     videoPrompt: `${CINEMATIC_STYLE}
 
 ${SANTA_CHARACTER}
 
-THE GRAND DEPARTURE setup.
+THE GRAND DEPARTURE from Mdina's ancient ramparts.
 
 Santa rises from his chair with purpose and excitement.
-He walks toward a large wooden door with ornate Christmas carvings.
-Santa places his hand on the golden door handle.
+He walks toward massive wooden doors set in ancient limestone walls.
+Ornate iron door handles with Maltese cross details.
+Santa places his hand on the handle.
 Door SWINGS OPEN dramatically, revealing:
 
-The magnificent SNOWY COURTYARD in all its glory:
-- The legendary RED AND GOLD SLEIGH, polished to perfection
+The magnificent MDINA RAMPARTS at night:
+- The legendary RED AND GOLD SLEIGH on the ancient battlements
 - Piled HIGH with beautifully wrapped presents, ribbons glowing softly
-- EIGHT MAJESTIC REINDEER harnessed and ready, breath visible in cold air
-- RUDOLPH at the front, nose BLAZING bright red, casting red glow on snow
-- Cheerful ELVES in winter gear making final preparations
-- Snow falling gently, catching the warm light from the workshop
-- Northern lights dancing in the sky above
-- Stars twinkling brilliantly
+- EIGHT MAJESTIC REINDEER harnessed and ready, breath visible in cool night air
+- RUDOLPH at the front, nose BLAZING bright red, casting red glow on limestone
+- Below: The TWINKLING LIGHTS OF MALTA spreading to the Mediterranean Sea
+- The THREE ISLANDS visible in the moonlit distance
+- Starlit Mediterranean sky above
+- Cheerful ELVES making final preparations
 
-Santa steps through the doorway, silhouetted against the magical scene.
-Reindeer paw the snow eagerly, ready to fly.
+Santa steps through the doorway, silhouetted against the spectacular Maltese panorama.
+Reindeer paw the ancient stones eagerly, ready to fly over the islands.
 
-Camera: Following Santa, then wide reveal of the spectacular scene.
-VFX: Glowing Rudolph nose, breath vapor, magical atmosphere, northern lights.
-Mood: Anticipation, the promise of Christmas, epic setup for finale.`,
-    audioDescription: 'Door creaking open, reindeer snorting, bells jingling, wind, magical anticipation',
+Camera: Following Santa, then wide reveal of Malta below.
+VFX: Glowing Rudolph nose, breath vapor, sea reflections, starlit atmosphere.
+Mood: Anticipation, the promise of Christmas coming to Malta, epic Mediterranean setup.`,
+    audioDescription: 'Door creaking open, reindeer snorting, bells jingling, Mediterranean wind, magical anticipation',
   },
 ]
 
@@ -185,21 +192,22 @@ export interface PersonalizedSceneTemplate {
 export const PERSONALIZED_SCENE_TEMPLATES: PersonalizedSceneTemplate[] = [
   {
     sceneNumber: 4,
-    name: 'Photo Comes Alive',
-    description: "Child's photo appears on Magic Book page and comes alive with animation",
+    name: 'Photo Discovery',
+    description: "Child's photo appears in Santa's Magic Book with Maltese cross frame",
     durationSeconds: 8, // Veo max
     type: 'personalized',
     videoPromptTemplate: `${CINEMATIC_STYLE}
 
-${WORKSHOP_SETTING}
+${MALTA_SETTING}
 
 ${SANTA_CHARACTER}
 
-THE MAGICAL MOMENT - Child's photo comes alive!
+THE MAGICAL MOMENT - Child's photo discovered in Malta!
 
 Santa looks down at the glowing Magic Book in his hands.
 The page glows intensely with golden light.
-On the page, a PHOTOGRAPH appears - surrounded by an ornate golden magical frame.
+On the page, a PHOTOGRAPH appears - surrounded by an ornate GOLDEN MALTESE CROSS FRAME.
+The frame features elegant Maltese filigree patterns and Mediterranean motifs.
 The photograph shows [CHILD_DESCRIPTION].
 Santa's face lights up with recognition and pure JOY.
 "Ah! There you are!" Santa says warmly.
@@ -207,66 +215,67 @@ Santa's face lights up with recognition and pure JOY.
 THE PHOTO BEGINS TO COME ALIVE:
 - Subtle movement within the frame
 - The image gains depth and dimension
-- Magical golden sparkles swirl around the photo
-- The frame pulses with warm light
+- Magical golden sparkles swirl around the Maltese cross border
+- The frame pulses with warm Mediterranean golden light
 - Santa watches with wonder and delight
 
-Santa speaks to the photo: "I've been watching you, and I'm so proud..."
+Santa speaks to the photo: "I've been watching over Malta, and I found you..."
 
-Camera: Close-up on book with photo, then Santa's joyful reaction.
-VFX: Photo animation, magical frame glow, golden particles, depth effect.
-Mood: "THAT'S ME!!!", magical recognition, personal connection, wonder.`,
+Camera: Close-up on book with photo in Maltese frame, then Santa's joyful reaction.
+VFX: Photo animation, Maltese cross frame glow, golden particles, depth effect.
+Mood: "THAT'S ME!!!", magical recognition, personal connection, Maltese pride.`,
     audioDescription: 'Magical shimmer, warm orchestral swell, Santa speaking gently, sparkle sounds',
   },
   {
     sceneNumber: 5,
-    name: 'Name Reveal',
-    description: "Child's name rises from book as giant 3D golden letters",
+    name: 'Name Over Malta',
+    description: "Child's name rises as golden letters over Valletta skyline",
     durationSeconds: 8, // Veo max
     type: 'personalized',
     videoPromptTemplate: `${CINEMATIC_STYLE}
 
-${WORKSHOP_SETTING}
+THE NAME REVEAL - Over the Maltese Skyline!
 
-${SANTA_CHARACTER}
+Background: VALLETTA SKYLINE at dusk, Grand Harbour visible below.
+Iconic domes of St. John's Co-Cathedral and Carmelite Church.
+Mediterranean sunset colors - orange, pink, purple blending.
+Ancient bastions and fortifications silhouetted.
 
-THE NAME REVEAL - Spectacular personalization moment!
-
-Santa holds the Magic Book, the photo still glowing on the page.
-From the book, letters begin to RISE UP:
+From below, letters begin to RISE UP:
 [NAME] forms in GIANT 3D GOLDEN LETTERS!
-The letters are luminous, casting golden light across the room.
-They FLOAT and SPIN in the air around Santa.
+The letters are luminous, casting golden light across the Maltese sky.
+They FLOAT and SPIN majestically above Valletta.
 Golden sparkles trail behind each letter.
-The letters arrange themselves, hovering majestically.
-Santa looks up at the floating name with pure delight.
+The letters arrange themselves, hovering over the harbour.
+Stars begin to appear around the floating name.
 
-"[NAME]!" Santa exclaims with joy. "What a wonderful child!"
+"[NAME]!" Santa's voice exclaims with joy. "What a wonderful child from Malta!"
 
-The letters pulse with warm light, magical particles swirling.
-Santa's face glows in the golden light of the floating name.
+The letters pulse with warm Mediterranean golden light.
+The THREE ISLANDS visible in the distance below.
 
-Camera: Dynamic shot - letters rising, spinning around Santa.
-VFX: 3D text animation, golden glow, particle trails, magical floating.
-Mood: "MY NAME!", personalized magic, spectacular, memorable.`,
+Camera: Dynamic shot - letters rising over Valletta, epic wide angle.
+VFX: 3D text animation, golden glow, particle trails, magical floating, sunset reflections.
+Mood: "MY NAME over MY country!", personalized magic, spectacular, proud.`,
     audioDescription: 'Magical rising sound, triumphant orchestral notes, sparkle crescendo, Santa exclaiming',
   },
   {
     sceneNumber: 6,
-    name: "Santa's Message",
-    description: 'Santa speaks directly to camera with personalized message about behaviors',
-    durationSeconds: 8, // Veo max (was 25s with HeyGen)
+    name: "Santa's Personal Message",
+    description: 'Santa speaks directly to camera with personalized message (HeyGen 30-60s)',
+    durationSeconds: 45, // HeyGen generates 30-60s talking avatar
     type: 'personalized',
     videoPromptTemplate: `${CINEMATIC_STYLE}
 
-${WORKSHOP_SETTING}
+${MALTA_SETTING}
 
 ${SANTA_CHARACTER}
 
 SANTA'S PERSONAL MESSAGE - Emotional core of the video.
 
 Santa looks directly at camera with warm, grandfatherly love.
-Firelight flickers warmly on his face.
+Firelight flickers warmly on his face in the Mdina palace study.
+Ancient Maltese limestone walls visible in background.
 He speaks with genuine emotion and warmth:
 
 "[NAME], I want you to know something very important..."
@@ -293,45 +302,48 @@ Occasional magical dust particles float through frame.
 Camera: Medium close-up on Santa, intimate and personal.
 VFX: Sparkle bursts on key moments, warm glow, floating particles.
 Mood: Eyes glued, "He KNOWS me!", emotional, validating, loving.`,
-    audioDescription: 'Warm Santa voice, crackling fire, gentle orchestral underscore, sparkle accents',
+    audioDescription: 'Warm Santa voice in English, crackling fire, gentle orchestral underscore, sparkle accents',
   },
   {
     sceneNumber: 8,
-    name: 'Epic Launch',
-    description: 'Sleigh rockets into sky with rainbow trail and personalized goodbye',
+    name: 'Epic Launch Over Malta',
+    description: 'Sleigh rockets from Mdina ramparts over the three islands',
     durationSeconds: 8, // Veo max
     type: 'personalized',
     videoPromptTemplate: `${CINEMATIC_STYLE}
 
-THE EPIC FINALE - Rocket launch and farewell!
+THE EPIC FINALE - Launch from Mdina over Malta!
 
-Exterior: The magnificent sleigh in the snowy courtyard.
+Exterior: The magnificent sleigh on MDINA'S ANCIENT RAMPARTS.
 ${SANTA_CHARACTER} takes his seat in the sleigh.
-Reindeer paw eagerly, Rudolph's nose blazing bright.
-Elves wave and cheer from below.
+Below: The twinkling lights of Malta spread to the Mediterranean Sea.
+Reindeer paw eagerly on ancient limestone, Rudolph's nose blazing bright.
+Elves wave and cheer from the battlements.
 
 Santa calls out: "Now Dasher, now Dancer...!"
 The reindeer LEAP into action!
-The sleigh ROCKETS UPWARD with incredible speed!
-A magnificent RAINBOW TRAIL streams behind the sleigh!
+The sleigh ROCKETS UPWARD from the ancient walls!
+A magnificent GOLDEN RAINBOW TRAIL streams behind the sleigh!
 Golden stardust swirls in their wake!
 
-The sleigh arcs across the starlit sky.
+The sleigh arcs across the starlit Mediterranean sky.
+Below: The THREE ISLANDS OF MALTA glow with Christmas lights.
+In the stars, [NAME] appears written in GLOWING CONSTELLATION letters!
 Santa looks back, waves his hand:
-"See you soon, [NAME]! Ho ho ho!"
+"See you soon, [NAME]! Merry Christmas from Malta! Ho ho ho!"
 
-His warm laughter echoes across the sky.
-The sleigh becomes a streak of light among the stars.
-The rainbow trail forms a heart shape before fading.
+His warm laughter echoes across the islands.
+The sleigh becomes a streak of golden light among the stars.
+A heart-shaped aurora forms over the Mediterranean before fading.
 
 TRANSITION: Magical sparkles swirl and transform into:
-Elegant end card - "The Santa Experience" in golden script
-on deep red velvet background with gentle snowflakes.
+Elegant end card - "Il-Milied Magic" in golden script
+on deep red velvet background with Maltese cross accent.
 
-Camera: Ground level looking up, following the launch, epic wide shot.
-VFX: Rainbow trail, speed blur, stardust, magical transition, logo reveal.
-Mood: "GO GO GO!", exhilarating, perfect ending, memorable farewell.`,
-    audioDescription: 'Reindeer hooves, whooshing launch, Santa Ho Ho Ho, triumphant orchestra, sleigh bells',
+Camera: Ground level on ramparts looking up, following the launch over Malta.
+VFX: Rainbow trail, speed blur, stardust, sea reflections, magical transition, logo reveal.
+Mood: "GO GO GO!", exhilarating, perfect Maltese ending, memorable farewell.`,
+    audioDescription: 'Reindeer hooves on stone, whooshing launch, Santa Ho Ho Ho, triumphant orchestra, sleigh bells over Malta',
   },
 ]
 
