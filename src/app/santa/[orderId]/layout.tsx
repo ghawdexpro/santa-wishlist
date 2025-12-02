@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Santa Hotline - Telefon do Mikołaja 🎅',
-  description: 'Magiczny telefon do Świętego Mikołaja! Rozmawiaj, pisz i odbieraj wiadomości z Bieguna Północnego.',
+  title: 'Santa Hotline - Call Santa Claus 🎅',
+  description: 'Magical phone to Santa Claus! Chat, call and receive messages from the North Pole.',
   manifest: '/santa-manifest.json',
   appleWebApp: {
     capable: true,

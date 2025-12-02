@@ -9,20 +9,20 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   typescript: true,
 })
 
-// Pricing tiers in PLN (grosze = cents equivalent)
+// Pricing tiers in USD (cents)
 export const PRICING = {
   basic: {
-    amount: 25900, // 259.00 PLN
-    currency: 'pln',
-    name: 'Film od Mikołaja',
-    description: 'Spersonalizowany ~2 minutowy film od Świętego Mikołaja',
+    amount: 5900, // $59.00 USD
+    currency: 'usd',
+    name: 'Santa Video Message',
+    description: 'Personalized ~2 minute video from Santa Claus',
     includesLiveCall: false,
   },
   premium: {
-    amount: 39900, // 399.00 PLN
-    currency: 'pln',
-    name: 'Film + Rozmowa z Mikołajem',
-    description: 'Film + 5 minut rozmowy video z Mikołajem na żywo',
+    amount: 9900, // $99.00 USD
+    currency: 'usd',
+    name: 'Video + Live Santa Call',
+    description: 'Video + 5 minute live video call with Santa',
     includesLiveCall: true,
   },
 } as const

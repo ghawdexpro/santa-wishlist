@@ -88,7 +88,7 @@ export default function SantaHotlinePage() {
       const santaMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'santa',
-        content: data.response || 'Ho ho ho! Coś poszło nie tak...',
+        content: data.response || 'Ho ho ho! Something went wrong...',
         timestamp: new Date(),
       }
 
@@ -111,7 +111,7 @@ export default function SantaHotlinePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderId,
-          text: `Ho ho ho! Cześć ${childData?.name || 'moje dziecko'}! Tu Mikołaj! Tak się cieszę, że do mnie dzwonisz! Co słychać?`,
+          text: `Ho ho ho! Hello ${childData?.name || 'my dear child'}! This is Santa! I'm so happy you called me! How are you doing?`,
         }),
       })
 
@@ -143,7 +143,7 @@ export default function SantaHotlinePage() {
       <div className="min-h-screen bg-gradient-to-b from-red-900 via-red-800 to-green-900 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-bounce">🎅</div>
-          <p className="text-white text-xl">Łączę z Biegunem Północnym...</p>
+          <p className="text-white text-xl">Connecting to the North Pole...</p>
         </div>
       </div>
     )
@@ -162,7 +162,7 @@ export default function SantaHotlinePage() {
             <div>
               <h1 className="text-white font-bold">Santa Hotline</h1>
               <p className="text-green-300 text-xs">
-                {childData ? `Cześć, ${childData.name}!` : 'Połączono z Biegunem'}
+                {childData ? `Hi, ${childData.name}!` : 'Connected to the North Pole'}
               </p>
             </div>
           </div>
@@ -171,7 +171,7 @@ export default function SantaHotlinePage() {
               onClick={() => setMode('home')}
               className="text-white/70 hover:text-white"
             >
-              ← Wróć
+              ← Back
             </button>
           )}
         </div>
@@ -186,10 +186,10 @@ export default function SantaHotlinePage() {
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
               <div className="text-6xl mb-4">🎄</div>
               <h2 className="text-2xl font-bold text-white mb-2">
-                Cześć{childData ? `, ${childData.name}` : ''}!
+                Hello{childData ? `, ${childData.name}` : ''}!
               </h2>
               <p className="text-white/80">
-                Mikołaj czeka na wiadomość od Ciebie!
+                Santa is waiting for your message!
               </p>
             </div>
 
@@ -201,8 +201,8 @@ export default function SantaHotlinePage() {
                 className="bg-green-600 hover:bg-green-500 rounded-2xl p-6 text-center transition-all hover:scale-105 active:scale-95"
               >
                 <div className="text-4xl mb-2">💬</div>
-                <h3 className="text-white font-bold">Napisz</h3>
-                <p className="text-white/70 text-xs mt-1">Chat z Mikołajem</p>
+                <h3 className="text-white font-bold">Message</h3>
+                <p className="text-white/70 text-xs mt-1">Chat with Santa</p>
               </button>
 
               {/* Call */}
@@ -211,8 +211,8 @@ export default function SantaHotlinePage() {
                 className="bg-red-600 hover:bg-red-500 rounded-2xl p-6 text-center transition-all hover:scale-105 active:scale-95"
               >
                 <div className="text-4xl mb-2">📞</div>
-                <h3 className="text-white font-bold">Zadzwoń</h3>
-                <p className="text-white/70 text-xs mt-1">Usłysz Mikołaja</p>
+                <h3 className="text-white font-bold">Call</h3>
+                <p className="text-white/70 text-xs mt-1">Hear Santa</p>
               </button>
 
               {/* Video Messages */}
@@ -221,8 +221,8 @@ export default function SantaHotlinePage() {
                 className="bg-purple-600 hover:bg-purple-500 rounded-2xl p-6 text-center transition-all hover:scale-105 active:scale-95"
               >
                 <div className="text-4xl mb-2">🎬</div>
-                <h3 className="text-white font-bold">Obejrzyj</h3>
-                <p className="text-white/70 text-xs mt-1">Wideo od Mikołaja</p>
+                <h3 className="text-white font-bold">Watch</h3>
+                <p className="text-white/70 text-xs mt-1">Video from Santa</p>
               </button>
 
               {/* Inbox */}
@@ -231,14 +231,14 @@ export default function SantaHotlinePage() {
                 className="bg-yellow-600 hover:bg-yellow-500 rounded-2xl p-6 text-center transition-all hover:scale-105 active:scale-95"
               >
                 <div className="text-4xl mb-2">📬</div>
-                <h3 className="text-white font-bold">Skrzynka</h3>
-                <p className="text-white/70 text-xs mt-1">Wiadomości</p>
+                <h3 className="text-white font-bold">Inbox</h3>
+                <p className="text-white/70 text-xs mt-1">Messages</p>
               </button>
             </div>
 
             {/* Christmas Countdown */}
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
-              <p className="text-white/70 text-sm">Do Wigilii zostało:</p>
+              <p className="text-white/70 text-sm">Until Christmas Eve:</p>
               <ChristmasCountdown />
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function SantaHotlinePage() {
               {messages.length === 0 && (
                 <div className="text-center text-white/50 py-8">
                   <div className="text-4xl mb-2">💬</div>
-                  <p>Napisz do Mikołaja!</p>
+                  <p>Write to Santa!</p>
                 </div>
               )}
 
@@ -280,7 +280,7 @@ export default function SantaHotlinePage() {
                 <div className="flex justify-start">
                   <div className="bg-white/90 rounded-2xl px-4 py-3">
                     <span className="text-lg mr-1">🎅</span>
-                    <span className="animate-pulse">Mikołaj pisze...</span>
+                    <span className="animate-pulse">Santa is typing...</span>
                   </div>
                 </div>
               )}
@@ -295,7 +295,7 @@ export default function SantaHotlinePage() {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder="Napisz wiadomość..."
+                placeholder="Write a message..."
                 className="flex-1 rounded-full px-4 py-3 bg-white/90 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <button
@@ -303,7 +303,7 @@ export default function SantaHotlinePage() {
                 disabled={isSending || !inputText.trim()}
                 className="bg-green-600 hover:bg-green-500 disabled:bg-gray-500 text-white rounded-full px-6 py-3 transition-colors"
               >
-                Wyślij
+                Send
               </button>
             </div>
           </div>
@@ -316,10 +316,10 @@ export default function SantaHotlinePage() {
               🎅
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">
-              {isPlaying ? 'Mikołaj mówi...' : 'Połączono z Mikołajem'}
+              {isPlaying ? 'Santa is speaking...' : 'Connected to Santa'}
             </h2>
             <p className="text-white/70 mb-8">
-              {isPlaying ? 'Słuchaj uważnie!' : 'Naciśnij aby mówić'}
+              {isPlaying ? 'Listen carefully!' : 'Press to speak'}
             </p>
 
             <div className="flex gap-4">
@@ -327,7 +327,7 @@ export default function SantaHotlinePage() {
                 onClick={endCall}
                 className="bg-red-600 hover:bg-red-500 text-white rounded-full px-8 py-4 text-lg transition-colors"
               >
-                📵 Rozłącz
+                📵 Hang up
               </button>
             </div>
           </div>
@@ -337,30 +337,30 @@ export default function SantaHotlinePage() {
         {mode === 'video' && (
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white text-center mb-4">
-              🎬 Wideo od Mikołaja
+              🎬 Video from Santa
             </h2>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
               <div className="text-6xl mb-4">🎅</div>
               <p className="text-white/70">
-                Twoje spersonalizowane wideo jest tutaj!
+                Your personalized video is here!
               </p>
               <a
                 href={`/video/${orderId}`}
                 className="inline-block mt-4 bg-red-600 hover:bg-red-500 text-white rounded-full px-6 py-3 transition-colors"
               >
-                ▶️ Obejrzyj wideo
+                ▶️ Watch video
               </a>
             </div>
 
             {/* Video snippets library */}
             <div className="space-y-3">
-              <h3 className="text-white/70 text-sm">Więcej od Mikołaja:</h3>
+              <h3 className="text-white/70 text-sm">More from Santa:</h3>
               {[
-                { title: 'Powitanie od Mikołaja', emoji: '👋' },
-                { title: 'Opowieść o reniferach', emoji: '🦌' },
-                { title: 'Warsztaty elfów', emoji: '🧝' },
-                { title: 'Dobranoc od Mikołaja', emoji: '🌙' },
+                { title: 'Greeting from Santa', emoji: '👋' },
+                { title: 'Story about the reindeer', emoji: '🦌' },
+                { title: 'Elf workshop', emoji: '🧝' },
+                { title: 'Goodnight from Santa', emoji: '🌙' },
               ].map((video, i) => (
                 <button
                   key={i}
@@ -379,20 +379,20 @@ export default function SantaHotlinePage() {
         {mode === 'inbox' && (
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white text-center mb-4">
-              📬 Skrzynka odbiorcza
+              📬 Inbox
             </h2>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
               <div className="text-6xl mb-4">✉️</div>
-              <h3 className="text-white font-bold mb-2">Brak nowych wiadomości</h3>
+              <h3 className="text-white font-bold mb-2">No new messages</h3>
               <p className="text-white/70 text-sm">
-                Mikołaj wyśle Ci wiadomość przed Wigilią!
+                Santa will send you a message before Christmas Eve!
               </p>
             </div>
 
             <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-4">
               <p className="text-yellow-200 text-sm">
-                💡 <strong>Wskazówka:</strong> Włącz powiadomienia, żeby nie przegapić wiadomości od Mikołaja!
+                💡 <strong>Tip:</strong> Enable notifications so you don&apos;t miss messages from Santa!
               </p>
             </div>
           </div>
@@ -415,7 +415,7 @@ function ChristmasCountdown() {
       const now = new Date()
 
       if (now > christmas) {
-        return 'Wesołych Świąt! 🎄'
+        return 'Merry Christmas! 🎄'
       }
 
       const diff = christmas.getTime() - now.getTime()
@@ -424,9 +424,9 @@ function ChristmasCountdown() {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
 
       if (days > 0) {
-        return `${days} dni, ${hours} godz.`
+        return `${days} days, ${hours} hrs`
       }
-      return `${hours} godz. ${minutes} min.`
+      return `${hours} hrs ${minutes} min`
     }
 
     setTimeLeft(calculateTimeLeft())
@@ -463,9 +463,9 @@ function InstallBanner() {
       <div className="max-w-lg mx-auto flex items-center gap-4">
         <span className="text-3xl">📲</span>
         <div className="flex-1">
-          <p className="font-bold text-gray-800">Dodaj do ekranu głównego</p>
+          <p className="font-bold text-gray-800">Add to Home Screen</p>
           <p className="text-gray-600 text-sm">
-            Kliknij <strong>Udostępnij</strong> → <strong>Dodaj do ekranu początkowego</strong>
+            Tap <strong>Share</strong> → <strong>Add to Home Screen</strong>
           </p>
         </div>
         <button
