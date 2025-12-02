@@ -18,10 +18,13 @@ export default function LoginPage() {
     setGoogleLoading(true)
     setError(null)
 
+    // Use production URL from env var, fallback to window.location.origin
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${appUrl}/auth/callback`,
       },
     })
 

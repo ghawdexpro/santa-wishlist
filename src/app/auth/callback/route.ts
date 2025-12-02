@@ -4,7 +4,9 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const origin = requestUrl.origin
+
+  // Use production URL from env var, fallback to request origin
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin
 
   if (code) {
     const supabase = await createClient()
@@ -12,5 +14,5 @@ export async function GET(request: Request) {
   }
 
   // Redirect to dashboard after successful auth
-  return NextResponse.redirect(`${origin}/dashboard`)
+  return NextResponse.redirect(`${appUrl}/dashboard`)
 }
