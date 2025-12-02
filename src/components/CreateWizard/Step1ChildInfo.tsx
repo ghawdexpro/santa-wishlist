@@ -134,6 +134,15 @@ export default function Step1ChildInfo() {
         </div>
       </div>
 
+      {/* Validation Message */}
+      {!isStepValid(1) && data.childName.length > 0 && (
+        <div className="mt-4 p-3 bg-christmas-red/20 border border-christmas-red/40 rounded-lg text-center">
+          <p className="text-white/90 text-sm">
+            ⚠️ Name must be at least 2 characters long
+          </p>
+        </div>
+      )}
+
       {/* Navigation */}
       <div className="mt-8 flex justify-end">
         <button

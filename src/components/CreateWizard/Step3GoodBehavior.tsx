@@ -76,6 +76,15 @@ export default function Step3GoodBehavior() {
         </div>
       </div>
 
+      {/* Validation Message */}
+      {!isStepValid(3) && data.goodBehavior.length > 0 && (
+        <div className="mt-4 p-3 bg-christmas-red/20 border border-christmas-red/40 rounded-lg text-center">
+          <p className="text-white/90 text-sm">
+            ⚠️ Please write at least 10 characters ({10 - data.goodBehavior.length} more needed)
+          </p>
+        </div>
+      )}
+
       {/* Navigation */}
       <div className="mt-8 flex justify-between">
         <button
