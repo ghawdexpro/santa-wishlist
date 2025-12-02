@@ -124,18 +124,33 @@ NEXT_PUBLIC_LOCALE           # 'en' or 'pl' for data separation
 
 ## Critical Rules
 
-1. **Database:** Use ONLY ghawdexpro Supabase org (project: `epxeimwsheyttevwtjku`) - Supabase Pro plan
+1. **Database:** Supabase `santa-wishlist` project (`yxtgjuwxkrcjqrbdyxjw`)
 2. **Supabase Access:** Use curl with REST API or supabase CLI - NEVER use MCP tools
 3. **Image Generation:** Use NanoBanana Pro, NOT Imagen
 4. **Deployment:** `git push origin main && railway up --detach`
 5. **Multi-Child:** Support 1-3 children per order
-6. **Language:** EN version uses USD pricing ($59/$99), PL version uses PLN
-7. **Testing:** NEVER test locally - ALWAYS deploy directly to Railway and test on production URL
+6. **Language:** EN version uses USD pricing ($59), PL translation later
+7. **Testing:** NEVER test locally - ALWAYS deploy to Railway and test on production
+8. **Admin Security:** ADMIN_KEY env var is REQUIRED (no default fallback)
 
 ## Admin Interface
 
-- **URL:** `/admin/scenes` (password: `santa-admin-2024`)
+- **URL:** `/admin/scenes?adminKey=YOUR_ADMIN_KEY`
 - **Purpose:** Generate and manage pre-made scene keyframes and videos
+- **Security:** Requires ADMIN_KEY environment variable (set in Railway)
+
+## Current Migration Status (Dec 2, 2025)
+
+**MERGED:** Santa (EN) + Santa_PL into single codebase
+- Base: English version
+- Database: santa-wishlist (yxtgjuwxkrcjqrbdyxjw)
+- Locale filtering: ✅ Implemented (NEXT_PUBLIC_LOCALE=en)
+- Security: ✅ Admin routes secured (ADMIN_KEY required)
+
+**DONE:**
+- [x] Fix admin routes security (remove `|| 'santa-admin-2024'` fallback)
+- [x] Add ADMIN_KEY to .env.local and Railway
+- [ ] Add redirect URL to Supabase Dashboard for OAuth (manual step)
 
 ## Key Libraries
 

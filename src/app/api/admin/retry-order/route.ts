@@ -6,7 +6,11 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
-const ADMIN_KEY = process.env.ADMIN_API_KEY || 'santa-admin-2024'
+// Admin key check - ADMIN_KEY env var required
+const ADMIN_KEY = process.env.ADMIN_KEY
+if (!ADMIN_KEY) {
+  console.warn('[SECURITY] ADMIN_KEY environment variable not set!')
+}
 
 // Use service role for admin operations
 const supabaseAdmin = createClient(
@@ -26,7 +30,7 @@ export async function POST(request: NextRequest) {
     const { adminKey, orderId, resetScript } = body
 
     // Verify admin key
-    if (adminKey !== ADMIN_KEY) {
+    if (!ADMIN_KEY || !adminKey || adminKey !== ADMIN_KEY) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -149,7 +153,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const adminKey = searchParams.get('adminKey')
 
-  if (adminKey !== ADMIN_KEY) {
+  if (!ADMIN_KEY || !adminKey || adminKey !== ADMIN_KEY) {
     return NextResponse.json(
       { error: 'Unauthorized' },
       { status: 401 }

@@ -57,8 +57,11 @@ async function uploadKeyframeToStorage(
   }
 }
 
-// Simple admin key check (in production, use proper auth)
-const ADMIN_KEY = process.env.ADMIN_SECRET_KEY || 'santa-admin-2024'
+// Admin key check - ADMIN_KEY env var required
+const ADMIN_KEY = process.env.ADMIN_KEY
+if (!ADMIN_KEY) {
+  console.warn('[SECURITY] ADMIN_KEY environment variable not set!')
+}
 
 interface GenerateResult {
   sceneNumber: number
@@ -92,7 +95,7 @@ export async function POST(request: NextRequest) {
     } = body
 
     // Verify admin key
-    if (adminKey !== ADMIN_KEY) {
+    if (!ADMIN_KEY || !adminKey || adminKey !== ADMIN_KEY) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -280,7 +283,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const adminKey = request.nextUrl.searchParams.get('adminKey')
 
-  if (adminKey !== ADMIN_KEY) {
+  if (!ADMIN_KEY || !adminKey || adminKey !== ADMIN_KEY) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

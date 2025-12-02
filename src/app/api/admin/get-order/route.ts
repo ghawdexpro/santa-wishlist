@@ -5,7 +5,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const ADMIN_KEY = process.env.ADMIN_KEY || 'santa-admin-2024'
+// Admin key check - ADMIN_KEY env var required
+const ADMIN_KEY = process.env.ADMIN_KEY
+if (!ADMIN_KEY) {
+  console.warn('[SECURITY] ADMIN_KEY environment variable not set!')
+}
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,7 +21,7 @@ export async function GET(request: NextRequest) {
   const orderId = searchParams.get('orderId')
   const adminKey = searchParams.get('adminKey')
 
-  if (!adminKey || adminKey !== ADMIN_KEY) {
+  if (!ADMIN_KEY || !adminKey || adminKey !== ADMIN_KEY) {
     return NextResponse.json({ error: 'Invalid admin key' }, { status: 401 })
   }
 
