@@ -27,7 +27,7 @@ railway up --detach             # Deploy to Railway (manual)
 ### Tech Stack
 - **Frontend:** Next.js 15 + React 19 + Tailwind CSS 4
 - **Backend:** Next.js API Routes
-- **Database:** Supabase PostgreSQL (ghawdexpro org, project: `epxeimwsheyttevwtjku`)
+- **Database:** Supabase PostgreSQL (santa-wishlist project: `yxtgjuwxkrcjqrbdyxjw`)
 - **Auth:** Supabase Auth
 - **Storage:** Supabase Storage
 - **Payments:** Stripe
@@ -130,6 +130,7 @@ NEXT_PUBLIC_LOCALE           # 'en' or 'pl' for data separation
 4. **Deployment:** `git push origin main && railway up --detach`
 5. **Multi-Child:** Support 1-3 children per order
 6. **Language:** EN version uses USD pricing ($59/$99), PL version uses PLN
+7. **Testing:** NEVER test locally - ALWAYS deploy directly to Railway and test on production URL
 
 ## Admin Interface
 
