@@ -37,7 +37,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
             <span className="text-3xl">🎅</span>
-            <span className="text-xl font-bold glow-gold">Magia Świąt</span>
+            <span className="text-xl font-bold glow-gold">Santa Experience</span>
           </Link>
 
           <nav className="flex items-center gap-4">
@@ -47,13 +47,13 @@ export default function Header() {
                   href="/dashboard"
                   className="text-white/80 hover:text-white transition-colors"
                 >
-                  Moje filmy
+                  My Videos
                 </Link>
                 <button
                   onClick={handleSignOut}
                   className="btn-christmas text-sm py-2 px-4"
                 >
-                  Wyloguj
+                  Sign Out
                 </button>
               </>
             ) : (
@@ -62,10 +62,10 @@ export default function Header() {
                   href="/login"
                   className="text-white/80 hover:text-white transition-colors"
                 >
-                  Zaloguj
+                  Login
                 </Link>
                 <Link href="/signup" className="btn-christmas text-sm py-2 px-4">
-                  Rozpocznij
+                  Get Started
                 </Link>
               </>
             )}
