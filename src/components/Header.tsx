@@ -1,13 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
+import UserMenu from './UserMenu'
 
 export default function Header() {
-  const router = useRouter()
   const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
 
@@ -25,12 +24,6 @@ export default function Header() {
     return () => subscription.unsubscribe()
   }, [supabase.auth])
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-    router.refresh()
-  }
-
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-black/20 backdrop-blur-md border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,20 +35,7 @@ export default function Header() {
 
           <nav className="flex items-center gap-4">
             {user ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="text-white/80 hover:text-white transition-colors"
-                >
-                  My Videos
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="btn-christmas text-sm py-2 px-4"
-                >
-                  Sign Out
-                </button>
-              </>
+              <UserMenu user={user} />
             ) : (
               <>
                 <Link

@@ -227,6 +227,15 @@ export function OrderCard({ order, onRetry }: { order: Order; onRetry?: (orderId
           </Link>
         )}
 
+        {/* Edit Order Button */}
+        <Link
+          href={`/order/${order.id}/edit`}
+          className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white transition-colors flex items-center gap-2"
+        >
+          <span>✏️</span>
+          Edytuj
+        </Link>
+
         {/* Continue Draft */}
         {order.status === 'draft' && (
           <Link
