@@ -58,7 +58,7 @@ railway up --detach             # Deploy to Railway (manual)
 - `children` - Child data per order (name, age, photo_url, personalization fields)
 - `premade_scenes` - Pre-generated scenes 1, 2, 3, 7
 
-**Note:** Database schema is complete. No migrations needed.
+**Locale Separation:** `locale` column on `orders` and `children` tables isolates EN/PL data via `NEXT_PUBLIC_LOCALE` env var.
 
 ### Key Flows
 
@@ -119,15 +119,17 @@ SMTP_FROM
 # App
 NEXT_PUBLIC_APP_URL
 AUTO_APPROVE_VIDEOS          # default: true (skip admin review)
+NEXT_PUBLIC_LOCALE           # 'en' or 'pl' for data separation
 ```
 
 ## Critical Rules
 
-1. **Database:** Use ONLY ghawdexpro Supabase org (project: `epxeimwsheyttevwtjku`)
-2. **No migrations needed** - Schema is complete, don't create migration files
+1. **Database:** Use ONLY ghawdexpro Supabase org (project: `epxeimwsheyttevwtjku`) - Supabase Pro plan
+2. **Supabase Access:** Use curl with REST API or supabase CLI - NEVER use MCP tools
 3. **Image Generation:** Use NanoBanana Pro, NOT Imagen
 4. **Deployment:** `git push origin main && railway up --detach`
 5. **Multi-Child:** Support 1-3 children per order
+6. **Language:** EN version uses USD pricing ($59/$99), PL version uses PLN
 
 ## Admin Interface
 
@@ -144,6 +146,7 @@ AUTO_APPROVE_VIDEOS          # default: true (skip admin review)
 - `src/lib/email.ts` - SMTP email notifications (nodemailer)
 - `src/lib/retry.ts` - Retry logic with exponential backoff
 - `src/lib/cost-tracker.ts` - AI service cost tracking
+- `src/lib/locale.ts` - Locale helper for EN/PL data separation
 
 ## Documentation
 
