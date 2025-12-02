@@ -45,11 +45,8 @@ export default function ScriptPreviewPage() {
         setScriptApproved(true)
       }
 
-      // Check if we already have keyframes
-      const storedKeyframes = sessionStorage.getItem('generatedKeyframes')
-      if (storedKeyframes) {
-        setKeyframes(JSON.parse(storedKeyframes))
-      }
+      // Keyframes are not stored in sessionStorage (too large)
+      // User will regenerate if they refresh the page
     } else {
       router.push('/create')
     }
@@ -131,8 +128,8 @@ export default function ScriptPreviewPage() {
       const { keyframes: generatedKeyframes } = await response.json()
       setKeyframes(generatedKeyframes)
 
-      // Store for later use
-      sessionStorage.setItem('generatedKeyframes', JSON.stringify(generatedKeyframes))
+      // Note: We don't store keyframes in sessionStorage as they're too large (base64 images)
+      // If user refreshes, they'll need to regenerate
     } catch (err) {
       console.error('Keyframe generation error:', err)
       setError(err instanceof Error ? err.message : 'Failed to generate keyframes')
